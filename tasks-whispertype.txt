@@ -9,12 +9,12 @@ Check off tasks as they are completed.
 ## Phase 0: Project Setup
 
 ### 0.1 Create Xcode Project
-- [ ] Create new macOS App project named "WhisperType"
-- [ ] Set deployment target to macOS 13.0
-- [ ] Configure as menu bar app (LSUIElement = YES in Info.plist)
-- [ ] Set up project directory structure as per PRD
-- [ ] Add .gitignore for Xcode/Swift projects
-- [ ] Initialize git repository
+- [x] Create new macOS App project named "WhisperType"
+- [x] Set deployment target to macOS 13.0
+- [x] Configure as menu bar app (LSUIElement = YES in Info.plist)
+- [x] Set up project directory structure as per PRD
+- [x] Add .gitignore for Xcode/Swift projects
+- [x] Initialize git repository
 
 ### 0.2 Add whisper.cpp Dependency
 - [ ] Add whisper.cpp as git submodule: `git submodule add https://github.com/ggerganov/whisper.cpp Libraries/whisper.cpp`
