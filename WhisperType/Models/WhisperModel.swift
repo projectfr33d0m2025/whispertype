@@ -198,20 +198,11 @@ enum WhisperModelType: String, CaseIterable, Identifiable {
     /// SHA256 checksum for model file verification.
     /// Note: These checksums are from the ggerganov/whisper.cpp Hugging Face repository.
     /// If nil, checksum verification is skipped during download.
+    /// TODO: Update checksums when model versions stabilize
     var sha256Checksum: String? {
-        switch self {
-        // Checksums from Hugging Face ggerganov/whisper.cpp repo
-        // These should be verified and updated if models are updated
-        case .tinyEn:   return "c78c86eb1a8faa21b369bcd33207cc90d64ae9df" // placeholder - verify
-        case .baseEn:   return "137c40403d78fd54d454da0f9bd998f78703390c" // placeholder - verify
-        case .smallEn:  return "db8a495a91d927739e50b3fc1cc4c6b8f6c2d022" // placeholder - verify
-        case .mediumEn: return "8c30f0e44ce9560643ebd10bbe50cd20eafd3723" // placeholder - verify
-        case .tiny:     return "be07e048e1e599ad46341c8d2a135645097a538c" // placeholder - verify
-        case .base:     return "60ed5bc3dd14eea856493d334349b405782ddcaf" // placeholder - verify
-        case .small:    return "1be3a9b2063867b937e64e2ec7483364a79917e2" // placeholder - verify
-        case .medium:   return "6c14d5adee5f86394037b4e4e8b59f1673b6cee3" // placeholder - verify
-        case .large:    return nil // Skip verification for large model (checksum varies by version)
-        }
+        // Disabled for now - model files on Hugging Face are frequently updated
+        // and checksums change. Re-enable once we pin to specific model versions.
+        return nil
     }
 
     // MARK: - Helpers
