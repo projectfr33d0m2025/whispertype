@@ -244,6 +244,11 @@ enum ModelDownloadState: Equatable {
     }
 
     var canDownload: Bool {
-        return self == .notDownloaded || (if case .failed = self { true } else { false })
+        switch self {
+        case .notDownloaded, .failed:
+            return true
+        default:
+            return false
+        }
     }
 }

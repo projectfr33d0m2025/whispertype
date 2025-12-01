@@ -8,9 +8,9 @@
 import Foundation
 import SwiftUI
 import AppKit
+import Combine
 
-@Observable
-class AppSettings {
+class AppSettings: ObservableObject {
 
     // MARK: - Singleton
 
@@ -18,28 +18,28 @@ class AppSettings {
 
     // MARK: - Settings Properties
 
-    var activeModelId: String {
+    @Published var activeModelId: String {
         didSet {
             UserDefaults.standard.set(activeModelId, forKey: Constants.UserDefaultsKeys.activeModelId)
             print("AppSettings: Active model changed to \(activeModelId)")
         }
     }
 
-    var hotkeyKeyCode: UInt32 {
+    @Published var hotkeyKeyCode: UInt32 {
         didSet {
             UserDefaults.standard.set(hotkeyKeyCode, forKey: Constants.UserDefaultsKeys.hotkeyKeyCode)
             print("AppSettings: Hotkey key code changed to \(hotkeyKeyCode)")
         }
     }
 
-    var hotkeyModifierFlags: NSEvent.ModifierFlags {
+    @Published var hotkeyModifierFlags: NSEvent.ModifierFlags {
         didSet {
             UserDefaults.standard.set(hotkeyModifierFlags.rawValue, forKey: Constants.UserDefaultsKeys.hotkeyModifierFlags)
             print("AppSettings: Hotkey modifier flags changed")
         }
     }
 
-    var launchAtLogin: Bool {
+    @Published var launchAtLogin: Bool {
         didSet {
             UserDefaults.standard.set(launchAtLogin, forKey: Constants.UserDefaultsKeys.launchAtLogin)
             print("AppSettings: Launch at login changed to \(launchAtLogin)")
@@ -47,35 +47,35 @@ class AppSettings {
         }
     }
 
-    var selectedMicrophoneId: String? {
+    @Published var selectedMicrophoneId: String? {
         didSet {
             UserDefaults.standard.set(selectedMicrophoneId, forKey: Constants.UserDefaultsKeys.selectedMicrophoneId)
             print("AppSettings: Selected microphone changed to \(selectedMicrophoneId ?? "default")")
         }
     }
 
-    var keepAudioRecordings: Bool {
+    @Published var keepAudioRecordings: Bool {
         didSet {
             UserDefaults.standard.set(keepAudioRecordings, forKey: Constants.UserDefaultsKeys.keepAudioRecordings)
             print("AppSettings: Keep audio recordings changed to \(keepAudioRecordings)")
         }
     }
 
-    var audioRetentionDays: Int {
+    @Published var audioRetentionDays: Int {
         didSet {
             UserDefaults.standard.set(audioRetentionDays, forKey: Constants.UserDefaultsKeys.audioRetentionDays)
             print("AppSettings: Audio retention days changed to \(audioRetentionDays)")
         }
     }
 
-    var playAudioFeedback: Bool {
+    @Published var playAudioFeedback: Bool {
         didSet {
             UserDefaults.standard.set(playAudioFeedback, forKey: Constants.UserDefaultsKeys.playAudioFeedback)
             print("AppSettings: Play audio feedback changed to \(playAudioFeedback)")
         }
     }
 
-    var hotkeyMode: HotkeyMode {
+    @Published var hotkeyMode: HotkeyMode {
         didSet {
             UserDefaults.standard.set(hotkeyMode.rawValue, forKey: Constants.UserDefaultsKeys.hotkeyMode)
             print("AppSettings: Hotkey mode changed to \(hotkeyMode.rawValue)")
