@@ -33,13 +33,25 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
         
         // Test TextInjector permission flow (Phase 5.1 testing)
+        // Note: When running from Xcode, permission may show as denied due to
+        // debug build signature changing. The production build won't have this issue.
         Task { @MainActor in
             let injector = TextInjector.shared
             injector.printDiagnostics()
             
-            // Test permission request (will show alert if not granted)
-            let hasPermission = injector.checkAndRequestPermission()
-            print("TextInjector: Permission granted: \(hasPermission)")
+            let hasPermission = injector.hasAccessibilityPermission
+            print("TextInjector: Permission status: \(hasPermission ? "✅ Granted" : "❌ Not Granted")")
+            
+            // Phase 5.2 Test: Inject text after a delay (gives user time to click a text field)
+            if hasPermission {
+                print("⏳ TextInjector: Will inject test text in 3 seconds...")
+                print("👆 Click on a text field NOW! (Notes, TextEdit, browser search bar, etc.)")
+                
+                try? await Task.sleep(nanoseconds: 3_000_000_000) // 3 second delay
+                
+                print("🚀 TextInjector: Injecting now!")
+                await injector.injectTestString()
+            }
         }
     }
 

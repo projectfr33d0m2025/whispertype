@@ -172,14 +172,14 @@ Note: See DEPENDENCIES.md for instructions. Packages should be added when projec
 - [x] Open System Settings to correct pane if needed
 
 ### 5.2 CGEvent Text Insertion
-- [ ] Implement injectText(_:) method
-- [ ] Create CGEventSource
-- [ ] For each character:
+- [x] Implement injectText(_:) method
+- [x] Create CGEventSource
+- [x] For each character:
   - Create keyDown CGEvent with Unicode
   - Create keyUp CGEvent
   - Post events to HID system
-- [ ] Handle special characters properly
-- [ ] Add small delay between characters if needed for reliability
+- [x] Handle special characters properly
+- [x] Add small delay between characters if needed for reliability
 
 ### 5.3 Alternative: Clipboard Method
 - [ ] Implement clipboardInjectText(_:) as fallback

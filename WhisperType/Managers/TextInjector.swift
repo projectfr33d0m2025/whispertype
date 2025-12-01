@@ -215,10 +215,105 @@ class TextInjector: ObservableObject {
     /// Inject text using CGEvent keyboard simulation
     /// - Parameter text: Text to inject character by character
     private func injectViaKeyboard(_ text: String) async throws {
-        // TODO: Phase 5.2 - Implement CGEvent keyboard simulation
-        // For now, fall back to clipboard method
-        print("TextInjector: Keyboard injection not yet implemented, falling back to clipboard")
-        try await injectViaClipboard(text)
+        // Create event source
+        guard let eventSource = CGEventSource(stateID: .hidSystemState) else {
+            lastError = .eventSourceCreationFailed
+            throw TextInjectionError.eventSourceCreationFailed
+        }
+        
+        // Process text, normalizing line endings
+        let normalizedText = text
+            .replacingOccurrences(of: "\r\n", with: "\n")  // Windows → Unix
+            .replacingOccurrences(of: "\r", with: "\n")    // Old Mac → Unix
+        
+        // Inject each character
+        for character in normalizedText {
+            try await injectCharacter(character, eventSource: eventSource)
+            
+            // Optional delay between characters
+            if characterDelay > 0 {
+                try await Task.sleep(nanoseconds: UInt64(characterDelay * 1_000_000_000))
+            }
+        }
+    }
+    
+    /// Inject a single character using CGEvent
+    /// - Parameters:
+    ///   - character: The character to inject
+    ///   - eventSource: The CGEventSource to use
+    private func injectCharacter(_ character: Character, eventSource: CGEventSource) async throws {
+        if character == "\n" {
+            // Handle newline as Enter key press
+            try await injectKeyPress(keyCode: CGKeyCode(kVK_Return), eventSource: eventSource)
+        } else if character == "\t" {
+            // Handle tab
+            try await injectKeyPress(keyCode: CGKeyCode(kVK_Tab), eventSource: eventSource)
+        } else {
+            // Handle regular character using Unicode
+            try await injectUnicodeCharacter(character, eventSource: eventSource)
+        }
+    }
+    
+    /// Inject a key press (keyDown + keyUp) for a specific key code
+    /// - Parameters:
+    ///   - keyCode: The virtual key code
+    ///   - eventSource: The CGEventSource to use
+    ///   - modifiers: Optional modifier flags (e.g., for Shift, Cmd)
+    private func injectKeyPress(
+        keyCode: CGKeyCode,
+        eventSource: CGEventSource,
+        modifiers: CGEventFlags = []
+    ) async throws {
+        // Create key down event
+        guard let keyDown = CGEvent(keyboardEventSource: eventSource, virtualKey: keyCode, keyDown: true) else {
+            lastError = .eventCreationFailed
+            throw TextInjectionError.eventCreationFailed
+        }
+        
+        // Create key up event
+        guard let keyUp = CGEvent(keyboardEventSource: eventSource, virtualKey: keyCode, keyDown: false) else {
+            lastError = .eventCreationFailed
+            throw TextInjectionError.eventCreationFailed
+        }
+        
+        // Apply modifiers if any
+        if !modifiers.isEmpty {
+            keyDown.flags = modifiers
+            keyUp.flags = modifiers
+        }
+        
+        // Post events
+        keyDown.post(tap: .cghidEventTap)
+        keyUp.post(tap: .cghidEventTap)
+    }
+    
+    /// Inject a Unicode character using CGEvent's Unicode input method
+    /// - Parameters:
+    ///   - character: The character to inject
+    ///   - eventSource: The CGEventSource to use
+    private func injectUnicodeCharacter(_ character: Character, eventSource: CGEventSource) async throws {
+        // Convert character to UTF-16 code units (handles emoji and international chars)
+        let utf16Units = Array(String(character).utf16)
+        
+        // Create key down event (we use a dummy key code, the Unicode data is what matters)
+        guard let keyDown = CGEvent(keyboardEventSource: eventSource, virtualKey: 0, keyDown: true) else {
+            lastError = .eventCreationFailed
+            throw TextInjectionError.eventCreationFailed
+        }
+        
+        // Create key up event
+        guard let keyUp = CGEvent(keyboardEventSource: eventSource, virtualKey: 0, keyDown: false) else {
+            lastError = .eventCreationFailed
+            throw TextInjectionError.eventCreationFailed
+        }
+        
+        // Set the Unicode string on the key down event
+        keyDown.keyboardSetUnicodeString(stringLength: utf16Units.count, unicodeString: utf16Units)
+        keyUp.keyboardSetUnicodeString(stringLength: utf16Units.count, unicodeString: utf16Units)
+        
+        // Post events
+        keyDown.post(tap: .cghidEventTap)
+        keyUp.post(tap: .cghidEventTap)
     }
     
     // MARK: - Clipboard Injection (Phase 5.3)
