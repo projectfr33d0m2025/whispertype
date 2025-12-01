@@ -32,8 +32,9 @@ Check off tasks as they are completed.
 - [x] Create Permissions.swift utility for checking/requesting permissions
 
 ### 0.4 Add Third-Party Dependencies (Swift Package Manager)
-- [ ] Add HotKey package: https://github.com/soffes/HotKey
-- [ ] Add KeyboardShortcuts (optional): https://github.com/sindresorhus/KeyboardShortcuts
+- [x] Add HotKey package: https://github.com/soffes/HotKey
+- [x] Add KeyboardShortcuts (optional): https://github.com/sindresorhus/KeyboardShortcuts
+Note: See DEPENDENCIES.md for instructions. Packages should be added when project is opened in Xcode.
 
 ---
 
