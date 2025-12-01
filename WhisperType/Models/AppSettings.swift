@@ -16,17 +16,17 @@ class AppSettings: ObservableObject {
 
     static let shared = AppSettings()
 
-    // MARK: - Private Backing Storage (explicitly ignored from Observation framework)
+    // MARK: - Private Backing Storage
 
-    @ObservationIgnored private var _activeModelId: String = ""
-    @ObservationIgnored private var _hotkeyKeyCode: UInt32 = 0
-    @ObservationIgnored private var _hotkeyModifierFlags: NSEvent.ModifierFlags = []
-    @ObservationIgnored private var _launchAtLogin: Bool = false
-    @ObservationIgnored private var _selectedMicrophoneId: String? = nil
-    @ObservationIgnored private var _keepAudioRecordings: Bool = false
-    @ObservationIgnored private var _audioRetentionDays: Int = 0
-    @ObservationIgnored private var _playAudioFeedback: Bool = false
-    @ObservationIgnored private var _hotkeyMode: HotkeyMode = .hold
+    private var _activeModelId: String = ""
+    private var _hotkeyKeyCode: UInt32 = 0
+    private var _hotkeyModifierFlags: NSEvent.ModifierFlags = []
+    private var _launchAtLogin: Bool = false
+    private var _selectedMicrophoneId: String? = nil
+    private var _keepAudioRecordings: Bool = false
+    private var _audioRetentionDays: Int = 0
+    private var _playAudioFeedback: Bool = false
+    private var _hotkeyMode: HotkeyMode = .hold
 
     // MARK: - Public Computed Properties
 

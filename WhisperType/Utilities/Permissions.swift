@@ -8,6 +8,7 @@
 import Foundation
 import AVFoundation
 import ApplicationServices
+import AppKit
 
 @MainActor
 class Permissions: ObservableObject {
