@@ -9,6 +9,7 @@
 #define WhisperType_Bridging_Header_h
 
 // Import whisper.cpp C API
-#import "whisper.h"
+// TODO: Uncomment when whisper.cpp is compiled (Phase 4)
+// #import "whisper.h"
 
 #endif /* WhisperType_Bridging_Header_h */

@@ -10,6 +10,13 @@
 		A1000001000000000000001 /* WhisperTypeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000002000000000000001 /* WhisperTypeApp.swift */; };
 		A1000003000000000000001 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1000004000000000000001 /* Assets.xcassets */; };
 		A1000005000000000000001 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1000006000000000000001 /* Accelerate.framework */; };
+		A1000050000000000000001 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000051000000000000001 /* AppDelegate.swift */; };
+		A1000052000000000000001 /* AppCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000053000000000000001 /* AppCoordinator.swift */; };
+		A1000054000000000000001 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000055000000000000001 /* AppSettings.swift */; };
+		A1000056000000000000001 /* WhisperModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000057000000000000001 /* WhisperModel.swift */; };
+		A1000058000000000000001 /* TranscriptionResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000059000000000000001 /* TranscriptionResult.swift */; };
+		A1000060000000000000001 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000061000000000000001 /* Constants.swift */; };
+		A1000062000000000000001 /* Permissions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000063000000000000001 /* Permissions.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -19,10 +26,18 @@
 		A1000007000000000000001 /* WhisperType.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WhisperType.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1000008000000000000001 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A1000009000000000000001 /* WhisperType-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "WhisperType-Bridging-Header.h"; sourceTree = "<group>"; };
+		A1000010000000000000001 /* WhisperType.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WhisperType.entitlements; sourceTree = "<group>"; };
+		A1000051000000000000001 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		A1000053000000000000001 /* AppCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCoordinator.swift; sourceTree = "<group>"; };
+		A1000055000000000000001 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
+		A1000057000000000000001 /* WhisperModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhisperModel.swift; sourceTree = "<group>"; };
+		A1000059000000000000001 /* TranscriptionResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptionResult.swift; sourceTree = "<group>"; };
+		A1000061000000000000001 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		A1000063000000000000001 /* Permissions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Permissions.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		A1000010000000000000001 /* Frameworks */ = {
+		A1000011000000000000001 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -33,39 +48,40 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		A1000011000000000000001 = {
+		A1000012000000000000001 = {
 			isa = PBXGroup;
 			children = (
-				A1000012000000000000001 /* WhisperType */,
-				A1000013000000000000001 /* Libraries */,
-				A1000014000000000000001 /* Frameworks */,
-				A1000015000000000000001 /* Products */,
+				A1000013000000000000001 /* WhisperType */,
+				A1000014000000000000001 /* Libraries */,
+				A1000015000000000000001 /* Frameworks */,
+				A1000016000000000000001 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		A1000012000000000000001 /* WhisperType */ = {
+		A1000013000000000000001 /* WhisperType */ = {
 			isa = PBXGroup;
 			children = (
-				A1000016000000000000001 /* App */,
-				A1000017000000000000001 /* Models */,
-				A1000018000000000000001 /* Managers */,
-				A1000019000000000000001 /* Views */,
-				A1000020000000000000001 /* Utilities */,
-				A1000021000000000000001 /* Bridging */,
-				A1000022000000000000001 /* Resources */,
+				A1000017000000000000001 /* App */,
+				A1000018000000000000001 /* Models */,
+				A1000019000000000000001 /* Managers */,
+				A1000020000000000000001 /* Views */,
+				A1000021000000000000001 /* Utilities */,
+				A1000022000000000000001 /* Bridging */,
+				A1000023000000000000001 /* Resources */,
 				A1000008000000000000001 /* Info.plist */,
+				A1000010000000000000001 /* WhisperType.entitlements */,
 			);
 			path = WhisperType;
 			sourceTree = "<group>";
 		};
-		A1000013000000000000001 /* Libraries */ = {
+		A1000014000000000000001 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			path = Libraries;
 			sourceTree = "<group>";
 		};
-		A1000014000000000000001 /* Frameworks */ = {
+		A1000015000000000000001 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
 				A1000006000000000000001 /* Accelerate.framework */,
@@ -73,7 +89,7 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		A1000015000000000000001 /* Products */ = {
+		A1000016000000000000001 /* Products */ = {
 			isa = PBXGroup;
 			children = (
 				A1000007000000000000001 /* WhisperType.app */,
@@ -81,46 +97,53 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		A1000016000000000000001 /* App */ = {
+		A1000017000000000000001 /* App */ = {
 			isa = PBXGroup;
 			children = (
 				A1000002000000000000001 /* WhisperTypeApp.swift */,
+				A1000051000000000000001 /* AppDelegate.swift */,
+				A1000053000000000000001 /* AppCoordinator.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
 		};
-		A1000017000000000000001 /* Models */ = {
+		A1000018000000000000001 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				A1000055000000000000001 /* AppSettings.swift */,
+				A1000057000000000000001 /* WhisperModel.swift */,
+				A1000059000000000000001 /* TranscriptionResult.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
 		};
-		A1000018000000000000001 /* Managers */ = {
+		A1000019000000000000001 /* Managers */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			path = Managers;
 			sourceTree = "<group>";
 		};
-		A1000019000000000000001 /* Views */ = {
+		A1000020000000000000001 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				A1000023000000000000001 /* MenuBar */,
-				A1000024000000000000001 /* Settings */,
-				A1000025000000000000001 /* Components */,
+				A1000024000000000000001 /* MenuBar */,
+				A1000025000000000000001 /* Settings */,
+				A1000026000000000000001 /* Components */,
 			);
 			path = Views;
 			sourceTree = "<group>";
 		};
-		A1000020000000000000001 /* Utilities */ = {
+		A1000021000000000000001 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				A1000061000000000000001 /* Constants.swift */,
+				A1000063000000000000001 /* Permissions.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
 		};
-		A1000021000000000000001 /* Bridging */ = {
+		A1000022000000000000001 /* Bridging */ = {
 			isa = PBXGroup;
 			children = (
 				A1000009000000000000001 /* WhisperType-Bridging-Header.h */,
@@ -128,7 +151,7 @@
 			path = Bridging;
 			sourceTree = "<group>";
 		};
-		A1000022000000000000001 /* Resources */ = {
+		A1000023000000000000001 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
 				A1000004000000000000001 /* Assets.xcassets */,
@@ -136,21 +159,21 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
-		A1000023000000000000001 /* MenuBar */ = {
+		A1000024000000000000001 /* MenuBar */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			path = MenuBar;
 			sourceTree = "<group>";
 		};
-		A1000024000000000000001 /* Settings */ = {
+		A1000025000000000000001 /* Settings */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			path = Settings;
 			sourceTree = "<group>";
 		};
-		A1000025000000000000001 /* Components */ = {
+		A1000026000000000000001 /* Components */ = {
 			isa = PBXGroup;
 			children = (
 			);
@@ -160,13 +183,13 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		A1000026000000000000001 /* WhisperType */ = {
+		A1000027000000000000001 /* WhisperType */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = A1000027000000000000001 /* Build configuration list for PBXNativeTarget "WhisperType" */;
+			buildConfigurationList = A1000028000000000000001 /* Build configuration list for PBXNativeTarget "WhisperType" */;
 			buildPhases = (
-				A1000028000000000000001 /* Sources */,
-				A1000010000000000000001 /* Frameworks */,
-				A1000029000000000000001 /* Resources */,
+				A1000029000000000000001 /* Sources */,
+				A1000011000000000000001 /* Frameworks */,
+				A1000030000000000000001 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -182,19 +205,19 @@
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		A1000030000000000000001 /* Project object */ = {
+		A1000031000000000000001 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1500;
 				LastUpgradeCheck = 1500;
 				TargetAttributes = {
-					A1000026000000000000001 = {
+					A1000027000000000000001 = {
 						CreatedOnToolsVersion = 15.0;
 					};
 				};
 			};
-			buildConfigurationList = A1000031000000000000001 /* Build configuration list for PBXProject "WhisperType" */;
+			buildConfigurationList = A1000032000000000000001 /* Build configuration list for PBXProject "WhisperType" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -202,18 +225,18 @@
 				en,
 				Base,
 			);
-			mainGroup = A1000011000000000000001;
-			productRefGroup = A1000015000000000000001 /* Products */;
+			mainGroup = A1000012000000000000001;
+			productRefGroup = A1000016000000000000001 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				A1000026000000000000001 /* WhisperType */,
+				A1000027000000000000001 /* WhisperType */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		A1000029000000000000001 /* Resources */ = {
+		A1000030000000000000001 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -224,18 +247,25 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		A1000028000000000000001 /* Sources */ = {
+		A1000029000000000000001 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				A1000001000000000000001 /* WhisperTypeApp.swift in Sources */,
+				A1000050000000000000001 /* AppDelegate.swift in Sources */,
+				A1000052000000000000001 /* AppCoordinator.swift in Sources */,
+				A1000054000000000000001 /* AppSettings.swift in Sources */,
+				A1000056000000000000001 /* WhisperModel.swift in Sources */,
+				A1000058000000000000001 /* TranscriptionResult.swift in Sources */,
+				A1000060000000000000001 /* Constants.swift in Sources */,
+				A1000062000000000000001 /* Permissions.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		A1000032000000000000001 /* Debug */ = {
+		A1000033000000000000001 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -298,7 +328,7 @@
 			};
 			name = Debug;
 		};
-		A1000033000000000000001 /* Release */ = {
+		A1000034000000000000001 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -353,7 +383,7 @@
 			};
 			name = Release;
 		};
-		A1000034000000000000001 /* Debug */ = {
+		A1000035000000000000001 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -382,12 +412,12 @@
 				SWIFT_VERSION = 5.0;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/Libraries/whisper.cpp",
+					"$(PROJECT_DIR)/Libraries/whisper.cpp/include",
 				);
 			};
 			name = Debug;
 		};
-		A1000035000000000000001 /* Release */ = {
+		A1000036000000000000001 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -416,7 +446,7 @@
 				SWIFT_VERSION = 5.0;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/Libraries/whisper.cpp",
+					"$(PROJECT_DIR)/Libraries/whisper.cpp/include",
 				);
 			};
 			name = Release;
@@ -424,25 +454,25 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		A1000027000000000000001 /* Build configuration list for PBXNativeTarget "WhisperType" */ = {
+		A1000028000000000000001 /* Build configuration list for PBXNativeTarget "WhisperType" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				A1000034000000000000001 /* Debug */,
-				A1000035000000000000001 /* Release */,
+				A1000035000000000000001 /* Debug */,
+				A1000036000000000000001 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		A1000031000000000000001 /* Build configuration list for PBXProject "WhisperType" */ = {
+		A1000032000000000000001 /* Build configuration list for PBXProject "WhisperType" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				A1000032000000000000001 /* Debug */,
-				A1000033000000000000001 /* Release */,
+				A1000033000000000000001 /* Debug */,
+				A1000034000000000000001 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = A1000030000000000000001 /* Project object */;
+	rootObject = A1000031000000000000001 /* Project object */;
 }
