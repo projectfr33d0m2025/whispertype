@@ -70,36 +70,36 @@ Note: See DEPENDENCIES.md for instructions. Packages should be added when projec
 ## Phase 2: Model Management
 
 ### 2.1 ModelManager Core
-- [ ] Create ModelManager.swift as @Observable singleton
-- [ ] Implement modelsDirectory computed property (~/Library/Application Support/WhisperType/Models/)
-- [ ] Implement modelPath(for:) → URL
-- [ ] Implement isModelDownloaded(_:) → Bool
-- [ ] Implement loadDownloadedModels() - scan directory on init
-- [ ] Implement loadActiveModel() from UserDefaults
+- [x] Create ModelManager.swift as @Observable singleton
+- [x] Implement modelsDirectory computed property (~/Library/Application Support/WhisperType/Models/)
+- [x] Implement modelPath(for:) → URL
+- [x] Implement isModelDownloaded(_:) → Bool
+- [x] Implement loadDownloadedModels() - scan directory on init
+- [x] Implement loadActiveModel() from UserDefaults
 
 ### 2.2 Model Download
-- [ ] Implement downloadModel(_:) async throws
-- [ ] Use URLSession downloadTask for large file downloads
-- [ ] Track and publish download progress (0.0 - 1.0)
-- [ ] Handle download errors gracefully
-- [ ] Move completed download to models directory
-- [ ] Verify downloaded file integrity (optional: check file size)
+- [x] Implement downloadModel(_:) async throws
+- [x] Use URLSession downloadTask for large file downloads
+- [x] Track and publish download progress (0.0 - 1.0)
+- [x] Handle download errors gracefully
+- [x] Move completed download to models directory
+- [x] Verify downloaded file integrity (optional: check file size)
 
 ### 2.3 Model Switching & Deletion
-- [ ] Implement setActiveModel(_:)
-- [ ] Post notification when model changes
-- [ ] Implement deleteModel(_:)
-- [ ] Handle deleting currently active model (switch to another)
-- [ ] Implement cancelDownload(_:)
+- [x] Implement setActiveModel(_:)
+- [x] Post notification when model changes
+- [x] Implement deleteModel(_:)
+- [x] Handle deleting currently active model (switch to another)
+- [x] Implement cancelDownload(_:)
 
 ### 2.4 Model Management UI
-- [ ] Create ModelSettingsView.swift
-- [ ] Display list of all available models
-- [ ] Show download status / progress for each
-- [ ] Download button for not-downloaded models
-- [ ] "Set Active" button for downloaded models
-- [ ] Delete button with confirmation
-- [ ] Visual indicator for currently active model
+- [x] Create ModelSettingsView.swift
+- [x] Display list of all available models
+- [x] Show download status / progress for each
+- [x] Download button for not-downloaded models
+- [x] "Set Active" button for downloaded models
+- [x] Delete button with confirmation
+- [x] Visual indicator for currently active model
 
 ---
 
