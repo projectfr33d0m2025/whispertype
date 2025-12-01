@@ -16,33 +16,85 @@ class AppSettings: ObservableObject {
 
     static let shared = AppSettings()
 
-    // MARK: - Settings Properties (without property observers - macOS 13.0 compatible)
+    // MARK: - Settings Properties (manual objectWillChange - macOS 13.0 compatible)
 
-    @Published var activeModelId: String = ""
-    @Published var hotkeyKeyCode: UInt32 = 0
-    @Published var hotkeyModifierFlags: NSEvent.ModifierFlags = []
-    @Published var launchAtLogin: Bool = false
-    @Published var selectedMicrophoneId: String? = nil
-    @Published var keepAudioRecordings: Bool = false
-    @Published var audioRetentionDays: Int = 0
-    @Published var playAudioFeedback: Bool = false
-    @Published var hotkeyMode: HotkeyMode = .hold
+    var activeModelId: String = "" {
+        willSet {
+            objectWillChange.send()
+            UserDefaults.standard.set(newValue, forKey: Constants.UserDefaultsKeys.activeModelId)
+            print("AppSettings: Active model changed to \(newValue)")
+        }
+    }
 
-    // MARK: - Private
+    var hotkeyKeyCode: UInt32 = 0 {
+        willSet {
+            objectWillChange.send()
+            UserDefaults.standard.set(newValue, forKey: Constants.UserDefaultsKeys.hotkeyKeyCode)
+            print("AppSettings: Hotkey key code changed to \(newValue)")
+        }
+    }
 
-    private var cancellables = Set<AnyCancellable>()
+    var hotkeyModifierFlags: NSEvent.ModifierFlags = [] {
+        willSet {
+            objectWillChange.send()
+            UserDefaults.standard.set(newValue.rawValue, forKey: Constants.UserDefaultsKeys.hotkeyModifierFlags)
+            print("AppSettings: Hotkey modifier flags changed")
+        }
+    }
+
+    var launchAtLogin: Bool = false {
+        willSet {
+            objectWillChange.send()
+            UserDefaults.standard.set(newValue, forKey: Constants.UserDefaultsKeys.launchAtLogin)
+            print("AppSettings: Launch at login changed to \(newValue)")
+            // TODO: Update launch at login preference using SMAppService
+        }
+    }
+
+    var selectedMicrophoneId: String? = nil {
+        willSet {
+            objectWillChange.send()
+            UserDefaults.standard.set(newValue, forKey: Constants.UserDefaultsKeys.selectedMicrophoneId)
+            print("AppSettings: Selected microphone changed to \(newValue ?? "default")")
+        }
+    }
+
+    var keepAudioRecordings: Bool = false {
+        willSet {
+            objectWillChange.send()
+            UserDefaults.standard.set(newValue, forKey: Constants.UserDefaultsKeys.keepAudioRecordings)
+            print("AppSettings: Keep audio recordings changed to \(newValue)")
+        }
+    }
+
+    var audioRetentionDays: Int = 0 {
+        willSet {
+            objectWillChange.send()
+            UserDefaults.standard.set(newValue, forKey: Constants.UserDefaultsKeys.audioRetentionDays)
+            print("AppSettings: Audio retention days changed to \(newValue)")
+        }
+    }
+
+    var playAudioFeedback: Bool = false {
+        willSet {
+            objectWillChange.send()
+            UserDefaults.standard.set(newValue, forKey: Constants.UserDefaultsKeys.playAudioFeedback)
+            print("AppSettings: Play audio feedback changed to \(newValue)")
+        }
+    }
+
+    var hotkeyMode: HotkeyMode = .hold {
+        willSet {
+            objectWillChange.send()
+            UserDefaults.standard.set(newValue.rawValue, forKey: Constants.UserDefaultsKeys.hotkeyMode)
+            print("AppSettings: Hotkey mode changed to \(newValue.rawValue)")
+        }
+    }
 
     // MARK: - Initialization
 
     private init() {
         // Load from UserDefaults or use defaults
-        loadSettings()
-
-        // Observe changes and save to UserDefaults
-        setupObservers()
-    }
-
-    private func loadSettings() {
         let defaults = UserDefaults.standard
 
         self.activeModelId = defaults.string(forKey: Constants.UserDefaultsKeys.activeModelId)
@@ -83,82 +135,6 @@ class AppSettings: ObservableObject {
         }
 
         print("AppSettings: Initialized with active model: \(activeModelId)")
-    }
-
-    private func setupObservers() {
-        // Observe each property and save to UserDefaults when changed
-        $activeModelId
-            .dropFirst() // Skip initial value
-            .sink { [weak self] newValue in
-                UserDefaults.standard.set(newValue, forKey: Constants.UserDefaultsKeys.activeModelId)
-                print("AppSettings: Active model changed to \(newValue)")
-            }
-            .store(in: &cancellables)
-
-        $hotkeyKeyCode
-            .dropFirst()
-            .sink { newValue in
-                UserDefaults.standard.set(newValue, forKey: Constants.UserDefaultsKeys.hotkeyKeyCode)
-                print("AppSettings: Hotkey key code changed to \(newValue)")
-            }
-            .store(in: &cancellables)
-
-        $hotkeyModifierFlags
-            .dropFirst()
-            .sink { newValue in
-                UserDefaults.standard.set(newValue.rawValue, forKey: Constants.UserDefaultsKeys.hotkeyModifierFlags)
-                print("AppSettings: Hotkey modifier flags changed")
-            }
-            .store(in: &cancellables)
-
-        $launchAtLogin
-            .dropFirst()
-            .sink { newValue in
-                UserDefaults.standard.set(newValue, forKey: Constants.UserDefaultsKeys.launchAtLogin)
-                print("AppSettings: Launch at login changed to \(newValue)")
-                // TODO: Update launch at login preference using SMAppService
-            }
-            .store(in: &cancellables)
-
-        $selectedMicrophoneId
-            .dropFirst()
-            .sink { newValue in
-                UserDefaults.standard.set(newValue, forKey: Constants.UserDefaultsKeys.selectedMicrophoneId)
-                print("AppSettings: Selected microphone changed to \(newValue ?? "default")")
-            }
-            .store(in: &cancellables)
-
-        $keepAudioRecordings
-            .dropFirst()
-            .sink { newValue in
-                UserDefaults.standard.set(newValue, forKey: Constants.UserDefaultsKeys.keepAudioRecordings)
-                print("AppSettings: Keep audio recordings changed to \(newValue)")
-            }
-            .store(in: &cancellables)
-
-        $audioRetentionDays
-            .dropFirst()
-            .sink { newValue in
-                UserDefaults.standard.set(newValue, forKey: Constants.UserDefaultsKeys.audioRetentionDays)
-                print("AppSettings: Audio retention days changed to \(newValue)")
-            }
-            .store(in: &cancellables)
-
-        $playAudioFeedback
-            .dropFirst()
-            .sink { newValue in
-                UserDefaults.standard.set(newValue, forKey: Constants.UserDefaultsKeys.playAudioFeedback)
-                print("AppSettings: Play audio feedback changed to \(newValue)")
-            }
-            .store(in: &cancellables)
-
-        $hotkeyMode
-            .dropFirst()
-            .sink { newValue in
-                UserDefaults.standard.set(newValue.rawValue, forKey: Constants.UserDefaultsKeys.hotkeyMode)
-                print("AppSettings: Hotkey mode changed to \(newValue.rawValue)")
-            }
-            .store(in: &cancellables)
     }
 
     // MARK: - Reset
