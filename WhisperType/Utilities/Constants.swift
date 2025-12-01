@@ -103,7 +103,7 @@ enum Constants {
         static let playAudioFeedback = true
 
         // Hotkey mode
-        static let hotkeyMode = "hold" // "hold" or "toggle"
+        static let hotkeyMode = "toggle" // "hold" or "toggle"
     }
 
     // MARK: - Audio Settings

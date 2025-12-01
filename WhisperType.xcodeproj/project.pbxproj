@@ -11,8 +11,7 @@
 		7B73EFC42EDD946C0062E68C /* ModelRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B73EFC32EDD946C0062E68C /* ModelRowView.swift */; };
 		7B73EFC62EDD947C0062E68C /* ModelSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B73EFC52EDD947C0062E68C /* ModelSettingsView.swift */; };
 		7B73EFCA2EDD989E0062E68C /* AudioRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B73EFC92EDD989E0062E68C /* AudioRecorder.swift */; };
-		A1000093000000000000001 /* TextInjector.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000092000000000000001 /* TextInjector.swift */; };
-		A1000095000000000000001 /* HotkeyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000094000000000000001 /* HotkeyManager.swift */; };
+		7B73EFCF2EDDD9D10062E68C /* HotKey in Frameworks */ = {isa = PBXBuildFile; productRef = 7B73EFCE2EDDD9D10062E68C /* HotKey */; };
 		A1000001000000000000001 /* WhisperTypeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000002000000000000001 /* WhisperTypeApp.swift */; };
 		A1000003000000000000001 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1000004000000000000001 /* Assets.xcassets */; };
 		A1000005000000000000001 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1000006000000000000001 /* Accelerate.framework */; };
@@ -31,6 +30,8 @@
 		A1000086000000000000001 /* libggml-cpu.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A1000087000000000000001 /* libggml-cpu.a */; };
 		A1000088000000000000001 /* libggml-metal.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A1000089000000000000001 /* libggml-metal.a */; };
 		A1000090000000000000001 /* libggml-blas.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A1000091000000000000001 /* libggml-blas.a */; };
+		A1000093000000000000001 /* TextInjector.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000092000000000000001 /* TextInjector.swift */; };
+		A1000095000000000000001 /* HotkeyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000094000000000000001 /* HotkeyManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -38,8 +39,6 @@
 		7B73EFC32EDD946C0062E68C /* ModelRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelRowView.swift; sourceTree = "<group>"; };
 		7B73EFC52EDD947C0062E68C /* ModelSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelSettingsView.swift; sourceTree = "<group>"; };
 		7B73EFC92EDD989E0062E68C /* AudioRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecorder.swift; sourceTree = "<group>"; };
-		A1000092000000000000001 /* TextInjector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextInjector.swift; sourceTree = "<group>"; };
-		A1000094000000000000001 /* HotkeyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotkeyManager.swift; sourceTree = "<group>"; };
 		A1000002000000000000001 /* WhisperTypeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhisperTypeApp.swift; sourceTree = "<group>"; };
 		A1000004000000000000001 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A1000006000000000000001 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
@@ -62,6 +61,8 @@
 		A1000087000000000000001 /* libggml-cpu.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libggml-cpu.a"; path = "Libraries/whisper-built/lib/libggml-cpu.a"; sourceTree = "<group>"; };
 		A1000089000000000000001 /* libggml-metal.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libggml-metal.a"; path = "Libraries/whisper-built/lib/libggml-metal.a"; sourceTree = "<group>"; };
 		A1000091000000000000001 /* libggml-blas.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libggml-blas.a"; path = "Libraries/whisper-built/lib/libggml-blas.a"; sourceTree = "<group>"; };
+		A1000092000000000000001 /* TextInjector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextInjector.swift; sourceTree = "<group>"; };
+		A1000094000000000000001 /* HotkeyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotkeyManager.swift; sourceTree = "<group>"; };
 		A1000100000000000000001 /* WhisperType.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = WhisperType.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -76,6 +77,7 @@
 				A1000086000000000000001 /* libggml-cpu.a in Frameworks */,
 				A1000088000000000000001 /* libggml-metal.a in Frameworks */,
 				A1000090000000000000001 /* libggml-blas.a in Frameworks */,
+				7B73EFCF2EDDD9D10062E68C /* HotKey in Frameworks */,
 				A1000005000000000000001 /* Accelerate.framework in Frameworks */,
 				A1000072000000000000001 /* Metal.framework in Frameworks */,
 			);
@@ -283,6 +285,9 @@
 				Base,
 			);
 			mainGroup = A1000012000000000000001;
+			packageReferences = (
+				7B73EFCD2EDDD9D10062E68C /* XCRemoteSwiftPackageReference "HotKey" */,
+			);
 			productRefGroup = A1000016000000000000001 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -534,15 +539,6 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		A1000032000000000000001 /* Build configuration list for PBXProject "WhisperType" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				A1000033000000000000001 /* Debug */,
-				A1000034000000000000001 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		A1000028000000000000001 /* Build configuration list for PBXNativeTarget "WhisperType" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -552,7 +548,35 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		A1000032000000000000001 /* Build configuration list for PBXProject "WhisperType" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A1000033000000000000001 /* Debug */,
+				A1000034000000000000001 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		7B73EFCD2EDDD9D10062E68C /* XCRemoteSwiftPackageReference "HotKey" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/soffes/HotKey";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		7B73EFCE2EDDD9D10062E68C /* HotKey */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7B73EFCD2EDDD9D10062E68C /* XCRemoteSwiftPackageReference "HotKey" */;
+			productName = HotKey;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = A1000031000000000000001 /* Project object */;
 }
