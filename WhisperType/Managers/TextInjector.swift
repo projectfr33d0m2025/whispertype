@@ -321,13 +321,101 @@ class TextInjector: ObservableObject {
     /// Inject text using clipboard and Cmd+V
     /// - Parameter text: Text to paste
     private func injectViaClipboard(_ text: String) async throws {
-        // TODO: Phase 5.3 - Implement clipboard injection
-        // Placeholder implementation for testing permission flow
-        print("TextInjector: Clipboard injection not yet fully implemented")
-        print("TextInjector: Would inject: \"\(text.prefix(50))...\"")
+        let pasteboard = NSPasteboard.general
         
-        // Small delay to simulate injection
-        try await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
+        // Save original clipboard contents if we need to restore them
+        let originalContents: [NSPasteboard.PasteboardType: Data]?
+        if restoreClipboard {
+            originalContents = saveClipboardContents(pasteboard)
+        } else {
+            originalContents = nil
+        }
+        
+        // Copy text to clipboard
+        pasteboard.clearContents()
+        let success = pasteboard.setString(text, forType: .string)
+        
+        guard success else {
+            lastError = .clipboardOperationFailed
+            throw TextInjectionError.clipboardOperationFailed
+        }
+        
+        // Small delay to ensure clipboard is ready
+        try await Task.sleep(nanoseconds: 50_000_000) // 50ms
+        
+        // Simulate Cmd+V to paste
+        try await simulatePaste()
+        
+        // Restore original clipboard contents after a delay
+        if restoreClipboard, let original = originalContents {
+            try await Task.sleep(nanoseconds: UInt64(clipboardRestoreDelay * 1_000_000_000))
+            restoreClipboardContents(original, to: pasteboard)
+        }
+    }
+    
+    /// Save current clipboard contents for later restoration
+    /// - Parameter pasteboard: The pasteboard to save from
+    /// - Returns: Dictionary of pasteboard types to their data
+    private func saveClipboardContents(_ pasteboard: NSPasteboard) -> [NSPasteboard.PasteboardType: Data]? {
+        guard let types = pasteboard.types else { return nil }
+        
+        var contents: [NSPasteboard.PasteboardType: Data] = [:]
+        
+        for type in types {
+            if let data = pasteboard.data(forType: type) {
+                contents[type] = data
+            }
+        }
+        
+        return contents.isEmpty ? nil : contents
+    }
+    
+    /// Restore clipboard contents from saved data
+    /// - Parameters:
+    ///   - contents: The saved clipboard contents
+    ///   - pasteboard: The pasteboard to restore to
+    private func restoreClipboardContents(_ contents: [NSPasteboard.PasteboardType: Data], to pasteboard: NSPasteboard) {
+        pasteboard.clearContents()
+        
+        for (type, data) in contents {
+            pasteboard.setData(data, forType: type)
+        }
+        
+        print("TextInjector: Clipboard contents restored")
+    }
+    
+    /// Simulate Cmd+V keystroke to paste
+    private func simulatePaste() async throws {
+        guard let eventSource = CGEventSource(stateID: .hidSystemState) else {
+            lastError = .eventSourceCreationFailed
+            throw TextInjectionError.eventSourceCreationFailed
+        }
+        
+        // V key code
+        let vKeyCode: CGKeyCode = 9
+        
+        // Create key down event with Command modifier
+        guard let keyDown = CGEvent(keyboardEventSource: eventSource, virtualKey: vKeyCode, keyDown: true) else {
+            lastError = .eventCreationFailed
+            throw TextInjectionError.eventCreationFailed
+        }
+        
+        // Create key up event
+        guard let keyUp = CGEvent(keyboardEventSource: eventSource, virtualKey: vKeyCode, keyDown: false) else {
+            lastError = .eventCreationFailed
+            throw TextInjectionError.eventCreationFailed
+        }
+        
+        // Set Command modifier flag
+        keyDown.flags = .maskCommand
+        keyUp.flags = .maskCommand
+        
+        // Post events
+        keyDown.post(tap: .cghidEventTap)
+        keyUp.post(tap: .cghidEventTap)
+        
+        // Small delay to allow paste to complete
+        try await Task.sleep(nanoseconds: 50_000_000) // 50ms
     }
     
     // MARK: - Testing
@@ -346,6 +434,25 @@ class TextInjector: ObservableObject {
             print("TextInjector: Test injection successful!")
         } catch {
             print("TextInjector: Test injection failed: \(error.localizedDescription)")
+        }
+    }
+    
+    /// Test clipboard injection method with a longer string
+    func injectTestStringViaClipboard() async {
+        let testText = """
+        This is a longer test from WhisperType! 🎤
+        It uses the clipboard method (Cmd+V) because it's faster for longer text.
+        Testing: Unicode émojis 🚀, special chars @#$%, and newlines work correctly.
+        """
+        
+        print("TextInjector: Starting CLIPBOARD test injection...")
+        print("TextInjector: Test string length: \(testText.count) characters")
+        
+        do {
+            try await injectText(testText, method: .clipboard)
+            print("TextInjector: Clipboard test injection successful!")
+        } catch {
+            print("TextInjector: Clipboard test injection failed: \(error.localizedDescription)")
         }
     }
     

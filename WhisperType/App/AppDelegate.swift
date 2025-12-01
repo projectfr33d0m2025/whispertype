@@ -32,9 +32,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             await checkInitialPermissions()
         }
         
-        // Test TextInjector permission flow (Phase 5.1 testing)
-        // Note: When running from Xcode, permission may show as denied due to
-        // debug build signature changing. The production build won't have this issue.
+        // Test TextInjector (Phase 5.2 & 5.3 testing)
         Task { @MainActor in
             let injector = TextInjector.shared
             injector.printDiagnostics()
@@ -42,15 +40,26 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             let hasPermission = injector.hasAccessibilityPermission
             print("TextInjector: Permission status: \(hasPermission ? "✅ Granted" : "❌ Not Granted")")
             
-            // Phase 5.2 Test: Inject text after a delay (gives user time to click a text field)
             if hasPermission {
-                print("⏳ TextInjector: Will inject test text in 3 seconds...")
+                // Test 1: Keyboard method (short text)
+                print("\n⏳ TEST 1: Keyboard injection in 3 seconds...")
                 print("👆 Click on a text field NOW! (Notes, TextEdit, browser search bar, etc.)")
                 
                 try? await Task.sleep(nanoseconds: 3_000_000_000) // 3 second delay
                 
-                print("🚀 TextInjector: Injecting now!")
+                print("🚀 Injecting via KEYBOARD method...")
                 await injector.injectTestString()
+                
+                // Test 2: Clipboard method (longer text)
+                print("\n⏳ TEST 2: Clipboard injection in 3 seconds...")
+                print("👆 Stay in the same text field or click another one!")
+                
+                try? await Task.sleep(nanoseconds: 3_000_000_000) // 3 second delay
+                
+                print("🚀 Injecting via CLIPBOARD method...")
+                await injector.injectTestStringViaClipboard()
+                
+                print("\n✅ All tests complete!")
             }
         }
     }

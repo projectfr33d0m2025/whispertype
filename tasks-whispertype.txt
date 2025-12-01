@@ -182,10 +182,10 @@ Note: See DEPENDENCIES.md for instructions. Packages should be added when projec
 - [x] Add small delay between characters if needed for reliability
 
 ### 5.3 Alternative: Clipboard Method
-- [ ] Implement clipboardInjectText(_:) as fallback
-- [ ] Copy text to clipboard
-- [ ] Simulate Cmd+V keystroke
-- [ ] Restore original clipboard contents (optional)
+- [x] Implement clipboardInjectText(_:) as fallback
+- [x] Copy text to clipboard
+- [x] Simulate Cmd+V keystroke
+- [x] Restore original clipboard contents (optional)
 
 ---
 
