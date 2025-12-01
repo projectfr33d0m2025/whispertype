@@ -17,14 +17,14 @@ Check off tasks as they are completed.
 - [x] Initialize git repository
 
 ### 0.2 Add whisper.cpp Dependency
-- [ ] Add whisper.cpp as git submodule: `git submodule add https://github.com/ggerganov/whisper.cpp Libraries/whisper.cpp`
-- [ ] Create Bridging-Header.h and add whisper.h import
-- [ ] Configure Build Settings:
+- [x] Add whisper.cpp as git submodule: `git submodule add https://github.com/ggerganov/whisper.cpp Libraries/whisper.cpp`
+- [x] Create Bridging-Header.h and add whisper.h import
+- [x] Configure Build Settings:
   - Add bridging header path
   - Add whisper.cpp to Header Search Paths
   - Add Accelerate.framework
-- [ ] Create whisper.cpp compilation target or add source files directly
-- [ ] Verify whisper.cpp compiles without errors
+- [x] Create whisper.cpp compilation target or add source files directly
+- [x] Verify whisper.cpp compiles without errors
 
 ### 0.3 Configure Permissions
 - [ ] Add NSMicrophoneUsageDescription to Info.plist
