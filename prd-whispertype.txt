@@ -1,0 +1,359 @@
+# Product Requirements Document: WhisperType
+
+## Overview
+
+**Product Name:** WhisperType  
+**Version:** 1.0.0  
+**Platform:** macOS 13.0+ (Ventura and later)  
+**Tech Stack:** Swift, SwiftUI, whisper.cpp  
+**License:** MIT (Open Source)
+
+## Problem Statement
+
+Users need a free, privacy-focused, system-wide voice input solution for macOS that:
+- Works in any text field across the OS
+- Runs entirely locally (no cloud/API dependency)
+- Provides high-quality transcription using OpenAI's Whisper models
+- Allows users to choose between different model sizes based on their needs
+
+## Product Goals
+
+1. **Privacy-first**: All processing happens locally on-device
+2. **System-wide**: Works in any application where text can be typed
+3. **User choice**: Let users download and switch between Whisper models
+4. **Low friction**: Simple hotkey activation, minimal UI
+5. **Free & Open Source**: No cost to use, distribute, or modify
+
+## Target Users
+
+- Developers who want voice coding/input
+- Writers who prefer dictation
+- Users with accessibility needs
+- Anyone wanting hands-free text input
+- Privacy-conscious users avoiding cloud services
+
+---
+
+## Features
+
+### P0 - Must Have (MVP)
+
+#### F1: Global Hotkey Activation
+- User can configure a global hotkey (default: `Cmd + Shift + Space`)
+- Hotkey works regardless of which app is in focus
+- Press to start recording, release to stop and transcribe
+- Alternative: Press once to start, press again to stop
+
+#### F2: Audio Recording
+- Capture microphone audio when activated
+- Record in format compatible with Whisper (16kHz, mono, Float32)
+- Show visual indicator when recording is active
+- Handle microphone permission requests gracefully
+
+#### F3: Whisper Transcription
+- Integrate whisper.cpp for local transcription
+- Load selected model into memory on app start
+- Transcribe recorded audio to text
+- Support English and multilingual models
+
+#### F4: Text Injection
+- Insert transcribed text at current cursor position
+- Work in any application (browser, text editor, terminal, etc.)
+- Use CGEvent to simulate keyboard input
+- Handle Accessibility permission requests
+
+#### F5: Model Management
+- Display list of available Whisper models with metadata:
+  - Model name and size
+  - Speed rating
+  - Accuracy rating
+  - English-only vs multilingual
+- Download models from Hugging Face
+- Show download progress
+- Cancel ongoing downloads
+- Delete downloaded models
+- Switch active model (reload whisper.cpp context)
+
+#### F6: Menu Bar App
+- Run as menu bar application (no dock icon)
+- Menu bar icon indicates status:
+  - Idle (default icon)
+  - Recording (red/pulsing icon)
+  - Processing (animated icon)
+- Dropdown menu with:
+  - Current model indicator
+  - Start/Stop recording
+  - Open Settings
+  - Quit
+
+#### F7: Settings Window
+- Hotkey configuration
+- Model management (download/delete/switch)
+- Launch at login toggle
+- Microphone selection (if multiple)
+
+### P1 - Should Have (v1.1)
+
+#### F8: Vocabulary & Text Replacements
+Improve transcription accuracy with user-defined terms and automatic corrections.
+
+**Vocabulary Words:**
+- User can add custom words/terms to improve Whisper recognition
+- Useful for: company names, technical jargon, product names, people's names
+- Words are sent as hints to Whisper via `initial_prompt` parameter
+- Limit to ~20-30 words to avoid confusing the model
+
+**Text Replacements:**
+- Post-transcription find/replace rules
+- Runs after Whisper outputs text, before displaying to user
+- Use cases:
+  - Fix persistent mis-transcriptions (e.g., "jason" → "JSON")
+  - Expand abbreviations (e.g., "btw" → "by the way")
+  - Fix capitalization (e.g., "github" → "GitHub")
+  - Code formatting (e.g., "use state" → "useState")
+- Whole-word matching only (e.g., "Cat" → "Dog" won't affect "Caterpillar")
+- Case-sensitive and case-insensitive options
+
+**Storage:**
+- Vocabulary and replacements stored in JSON file in app support directory
+- Synced across settings
+
+#### F9: Transcription History
+- Store all transcriptions locally with metadata:
+  - Timestamp
+  - Audio file path (optional: keep audio)
+  - Raw transcription (before replacements)
+  - Final text (after replacements)
+  - Duration
+  - Model used
+- View history in Settings window
+- Copy any past transcription to clipboard
+- Delete individual entries or clear all
+- Search/filter history by date or content
+- Optional: Keep original audio recordings for reprocessing
+
+#### F10: Audio Feedback
+- Optional sound on recording start/stop
+- Optional sound on transcription complete
+
+#### F10: Text Formatting Options
+- Auto-capitalize sentences
+- Auto-punctuation (if model supports)
+- Configurable language hint for multilingual models
+
+### P2 - Nice to Have (Future)
+
+#### F11: Voice Commands
+- "Delete that" - remove last transcription
+- "New line" / "New paragraph"
+- Custom voice commands
+
+#### F12: Per-App Settings
+- Different models for different apps
+- App-specific formatting rules
+
+#### F13: CoreML Acceleration
+- Download and use CoreML-optimized models
+- Faster transcription on Apple Silicon
+
+---
+
+## Technical Architecture
+
+### System Components
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                      WhisperType App                        │
+├─────────────────────────────────────────────────────────────┤
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐  │
+│  │  Menu Bar   │  │  Settings   │  │   Model Manager     │  │
+│  │  Controller │  │   Window    │  │   (Download/Switch) │  │
+│  └──────┬──────┘  └──────┬──────┘  └──────────┬──────────┘  │
+│         │                │                     │             │
+│         └────────────────┼─────────────────────┘             │
+│                          │                                   │
+│  ┌───────────────────────▼───────────────────────────────┐  │
+│  │                  App Coordinator                       │  │
+│  │  - Manages app lifecycle                               │  │
+│  │  - Coordinates between components                      │  │
+│  └───────────────────────┬───────────────────────────────┘  │
+│                          │                                   │
+│  ┌──────────┬────────────┼────────────┬──────────────────┐  │
+│  │          │            │            │                  │  │
+│  ▼          ▼            ▼            ▼                  │  │
+│ ┌────┐  ┌────────┐  ┌─────────┐  ┌──────────┐           │  │
+│ │Hot │  │ Audio  │  │ Whisper │  │   Text   │           │  │
+│ │Key │  │Recorder│  │ Wrapper │  │ Injector │           │  │
+│ └────┘  └────────┘  └─────────┘  └──────────┘           │  │
+│                          │                               │  │
+│                          ▼                               │  │
+│                    ┌───────────┐                         │  │
+│                    │whisper.cpp│                         │  │
+│                    │  (C/C++)  │                         │  │
+│                    └───────────┘                         │  │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Directory Structure
+
+```
+WhisperType/
+├── WhisperType.xcodeproj
+├── WhisperType/
+│   ├── App/
+│   │   ├── WhisperTypeApp.swift        # Main app entry
+│   │   ├── AppDelegate.swift           # NSApplicationDelegate
+│   │   └── AppCoordinator.swift        # Coordinates components
+│   │
+│   ├── Models/
+│   │   ├── WhisperModel.swift          # Model definitions
+│   │   ├── TranscriptionResult.swift   # Transcription data
+│   │   ├── TranscriptionRecord.swift   # History record
+│   │   ├── VocabularyWord.swift        # Vocabulary entry
+│   │   ├── TextReplacement.swift       # Replacement rule
+│   │   └── AppSettings.swift           # User settings
+│   │
+│   ├── Managers/
+│   │   ├── ModelManager.swift          # Download/manage models
+│   │   ├── HotkeyManager.swift         # Global hotkey handling
+│   │   ├── AudioRecorder.swift         # Microphone recording
+│   │   ├── WhisperWrapper.swift        # whisper.cpp integration
+│   │   ├── TextInjector.swift          # CGEvent text insertion
+│   │   ├── VocabularyManager.swift     # Vocabulary & replacements
+│   │   ├── TextReplacementEngine.swift # Apply text replacements
+│   │   └── HistoryManager.swift        # Transcription history
+│   │
+│   ├── Views/
+│   │   ├── MenuBar/
+│   │   │   ├── MenuBarController.swift
+│   │   │   └── MenuBarView.swift
+│   │   ├── Settings/
+│   │   │   ├── SettingsWindow.swift
+│   │   │   ├── GeneralSettingsView.swift
+│   │   │   ├── ModelSettingsView.swift
+│   │   │   ├── VocabularySettingsView.swift
+│   │   │   ├── HistorySettingsView.swift
+│   │   │   └── HotkeySettingsView.swift
+│   │   └── Components/
+│   │       ├── ModelRowView.swift
+│   │       ├── HistoryRowView.swift
+│   │       └── ProgressIndicator.swift
+│   │
+│   ├── Utilities/
+│   │   ├── Constants.swift
+│   │   ├── Permissions.swift           # Check/request permissions
+│   │   └── Extensions.swift
+│   │
+│   ├── Resources/
+│   │   ├── Assets.xcassets
+│   │   └── Localizable.strings
+│   │
+│   └── Bridging/
+│       ├── WhisperType-Bridging-Header.h
+│       └── whisper_wrapper.cpp         # C++ wrapper for whisper.cpp
+│
+├── Libraries/
+│   └── whisper.cpp/                    # Git submodule
+│
+├── README.md
+├── LICENSE
+└── Docs/
+    ├── PRD.md
+    └── Tasks.md
+```
+
+### Key Technical Decisions
+
+1. **whisper.cpp Integration**
+   - Add as git submodule
+   - Use C bridging header to call from Swift
+   - Compile whisper.cpp with Accelerate framework for Apple Silicon optimization
+
+2. **Audio Format**
+   - Record at device sample rate using AVAudioEngine
+   - Convert to 16kHz mono Float32 before passing to Whisper
+   - Use AVAudioConverter for resampling
+
+3. **Global Hotkey**
+   - Use Carbon's RegisterEventHotKey (legacy but reliable)
+   - Or use third-party library: HotKey (github.com/soffes/HotKey)
+
+4. **Text Injection**
+   - Use CGEvent to post keyboard events
+   - Requires Accessibility permission
+   - Handle Unicode properly for non-ASCII characters
+
+5. **Model Storage**
+   - Store in ~/Library/Application Support/WhisperType/Models/
+   - Track downloaded models in UserDefaults
+   - Validate model files on startup
+
+---
+
+## User Flows
+
+### First Launch
+1. App starts, appears in menu bar
+2. Prompt for Microphone permission
+3. Prompt for Accessibility permission
+4. Open Settings → Models tab
+5. User downloads preferred model
+6. App ready to use
+
+### Normal Usage
+1. User focuses on any text field
+2. User presses global hotkey
+3. Menu bar icon changes to "recording"
+4. User speaks
+5. User releases hotkey (or presses again)
+6. Menu bar icon changes to "processing"
+7. Text appears at cursor position
+8. Menu bar icon returns to idle
+
+### Switching Models
+1. Open Settings → Models
+2. Download new model (if not downloaded)
+3. Click "Set Active" on desired model
+4. App reloads Whisper context
+5. Confirmation shown
+
+---
+
+## Non-Functional Requirements
+
+### Performance
+- Model loading: < 5 seconds
+- Transcription latency: < 2 seconds for 10-second audio (small model)
+- Memory usage: < 500MB idle, < 2GB during transcription (varies by model)
+
+### Security
+- No network calls except model downloads from Hugging Face
+- No telemetry or analytics
+- All processing local
+
+### Accessibility
+- VoiceOver support for settings UI
+- Keyboard navigation in settings
+- High contrast support
+
+---
+
+## Success Metrics
+
+1. App launches without crash
+2. Global hotkey works in all tested apps
+3. Transcription accuracy comparable to Superwhisper
+4. Model download and switching works reliably
+5. Memory doesn't leak over extended use
+
+---
+
+## Out of Scope (v1.0)
+
+- Windows/Linux support
+- Real-time streaming transcription
+- Custom model training/fine-tuning
+- Cloud-based transcription option
+- Translation (speech in one language → text in another)
+- Speaker diarization

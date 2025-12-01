@@ -1,0 +1,524 @@
+# WhisperType - Implementation Tasks
+
+## Overview
+This document breaks down the WhisperType implementation into phases and actionable tasks.
+Check off tasks as they are completed.
+
+---
+
+## Phase 0: Project Setup
+
+### 0.1 Create Xcode Project
+- [ ] Create new macOS App project named "WhisperType"
+- [ ] Set deployment target to macOS 13.0
+- [ ] Configure as menu bar app (LSUIElement = YES in Info.plist)
+- [ ] Set up project directory structure as per PRD
+- [ ] Add .gitignore for Xcode/Swift projects
+- [ ] Initialize git repository
+
+### 0.2 Add whisper.cpp Dependency
+- [ ] Add whisper.cpp as git submodule: `git submodule add https://github.com/ggerganov/whisper.cpp Libraries/whisper.cpp`
+- [ ] Create Bridging-Header.h and add whisper.h import
+- [ ] Configure Build Settings:
+  - Add bridging header path
+  - Add whisper.cpp to Header Search Paths
+  - Add Accelerate.framework
+- [ ] Create whisper.cpp compilation target or add source files directly
+- [ ] Verify whisper.cpp compiles without errors
+
+### 0.3 Configure Permissions
+- [ ] Add NSMicrophoneUsageDescription to Info.plist
+- [ ] Add NSAccessibilityUsageDescription to Info.plist (for text injection)
+- [ ] Create Permissions.swift utility for checking/requesting permissions
+
+### 0.4 Add Third-Party Dependencies (Swift Package Manager)
+- [ ] Add HotKey package: https://github.com/soffes/HotKey
+- [ ] Add KeyboardShortcuts (optional): https://github.com/sindresorhus/KeyboardShortcuts
+
+---
+
+## Phase 1: Core Infrastructure
+
+### 1.1 App Entry Point & Lifecycle
+- [ ] Create WhisperTypeApp.swift with @main
+- [ ] Create AppDelegate.swift for NSApplicationDelegate
+- [ ] Set up app as agent (no dock icon)
+- [ ] Implement applicationDidFinishLaunching
+- [ ] Implement applicationWillTerminate (cleanup)
+
+### 1.2 Constants & Configuration
+- [ ] Create Constants.swift with:
+  - Model download URLs
+  - Default hotkey combination
+  - App Support directory paths
+  - UserDefaults keys
+- [ ] Create AppSettings.swift @Observable class:
+  - activeModelId: String
+  - hotkeyKeyCode: Int
+  - hotkeyModifiers: NSEvent.ModifierFlags
+  - launchAtLogin: Bool
+  - selectedMicrophoneId: String?
+
+### 1.3 Model Definitions
+- [ ] Create WhisperModelType enum with all model variants
+- [ ] Add computed properties: displayName, fileName, downloadURL, fileSize, speedRating, accuracyRating, description
+- [ ] Create helper methods: isEnglishOnly, isMultilingual
+
+---
+
+## Phase 2: Model Management
+
+### 2.1 ModelManager Core
+- [ ] Create ModelManager.swift as @Observable singleton
+- [ ] Implement modelsDirectory computed property (~/Library/Application Support/WhisperType/Models/)
+- [ ] Implement modelPath(for:) → URL
+- [ ] Implement isModelDownloaded(_:) → Bool
+- [ ] Implement loadDownloadedModels() - scan directory on init
+- [ ] Implement loadActiveModel() from UserDefaults
+
+### 2.2 Model Download
+- [ ] Implement downloadModel(_:) async throws
+- [ ] Use URLSession downloadTask for large file downloads
+- [ ] Track and publish download progress (0.0 - 1.0)
+- [ ] Handle download errors gracefully
+- [ ] Move completed download to models directory
+- [ ] Verify downloaded file integrity (optional: check file size)
+
+### 2.3 Model Switching & Deletion
+- [ ] Implement setActiveModel(_:)
+- [ ] Post notification when model changes
+- [ ] Implement deleteModel(_:)
+- [ ] Handle deleting currently active model (switch to another)
+- [ ] Implement cancelDownload(_:)
+
+### 2.4 Model Management UI
+- [ ] Create ModelSettingsView.swift
+- [ ] Display list of all available models
+- [ ] Show download status / progress for each
+- [ ] Download button for not-downloaded models
+- [ ] "Set Active" button for downloaded models
+- [ ] Delete button with confirmation
+- [ ] Visual indicator for currently active model
+
+---
+
+## Phase 3: Audio Recording
+
+### 3.1 AudioRecorder Class
+- [ ] Create AudioRecorder.swift as @Observable class
+- [ ] Request microphone permission on init if needed
+- [ ] Set up AVAudioEngine with input node
+- [ ] Configure audio format (device native sample rate)
+- [ ] Implement startRecording() - install tap on input node
+- [ ] Implement stopRecording() → Data (audio buffer)
+- [ ] Store audio samples in buffer during recording
+
+### 3.2 Audio Format Conversion
+- [ ] Create method to convert recorded audio to Whisper format
+- [ ] Resample to 16kHz if needed (AVAudioConverter)
+- [ ] Convert to mono if stereo
+- [ ] Convert to Float32 PCM
+- [ ] Return [Float] array for whisper.cpp
+
+### 3.3 Recording State Management
+- [ ] Publish isRecording: Bool
+- [ ] Publish audioLevel: Float (for visual feedback)
+- [ ] Implement metering for audio level visualization
+- [ ] Handle audio session interruptions
+
+---
+
+## Phase 4: Whisper Integration
+
+### 4.1 WhisperWrapper Setup
+- [ ] Create WhisperWrapper.swift
+- [ ] Create C++ wrapper (whisper_wrapper.cpp) if needed for cleaner bridging
+- [ ] Implement initializeContext(modelPath:) → Bool
+- [ ] Load model file into whisper context
+- [ ] Handle model loading errors
+
+### 4.2 Transcription
+- [ ] Implement transcribe(audioData: [Float]) → String
+- [ ] Configure whisper_full_params:
+  - Set language (en or auto)
+  - Set n_threads (use performanceCores count)
+  - Disable translate
+  - Set print_progress = false
+- [ ] Run whisper_full() with audio data
+- [ ] Extract text from segments
+- [ ] Combine segments into final string
+
+### 4.3 Model Hot-Swapping
+- [ ] Implement reloadModel(path:)
+- [ ] Free existing context before loading new one
+- [ ] Listen for modelChanged notification
+- [ ] Handle reload errors (revert to previous or show error)
+
+### 4.4 Performance Optimization
+- [ ] Implement model preloading on app start
+- [ ] Keep model in memory between transcriptions
+- [ ] Use appropriate thread count for device
+- [ ] Consider CoreML backend (future enhancement)
+
+---
+
+## Phase 5: Text Injection
+
+### 5.1 TextInjector Class
+- [ ] Create TextInjector.swift
+- [ ] Check for Accessibility permission
+- [ ] Prompt user to enable if not granted
+- [ ] Open System Settings to correct pane if needed
+
+### 5.2 CGEvent Text Insertion
+- [ ] Implement injectText(_:) method
+- [ ] Create CGEventSource
+- [ ] For each character:
+  - Create keyDown CGEvent with Unicode
+  - Create keyUp CGEvent
+  - Post events to HID system
+- [ ] Handle special characters properly
+- [ ] Add small delay between characters if needed for reliability
+
+### 5.3 Alternative: Clipboard Method
+- [ ] Implement clipboardInjectText(_:) as fallback
+- [ ] Copy text to clipboard
+- [ ] Simulate Cmd+V keystroke
+- [ ] Restore original clipboard contents (optional)
+
+---
+
+## Phase 6: Global Hotkey
+
+### 6.1 HotkeyManager Setup
+- [ ] Create HotkeyManager.swift using HotKey library
+- [ ] Register default hotkey (Cmd+Shift+Space)
+- [ ] Implement callback for hotkey press
+- [ ] Implement callback for hotkey release (if using press-and-hold)
+
+### 6.2 Hotkey Configuration
+- [ ] Store hotkey configuration in AppSettings
+- [ ] Implement updateHotkey(keyCode:modifiers:)
+- [ ] Unregister old hotkey before registering new one
+- [ ] Persist hotkey settings to UserDefaults
+
+### 6.3 Recording Trigger Logic
+- [ ] On hotkey press: start recording
+- [ ] On hotkey release: stop recording, start transcription
+- [ ] Alternative mode: toggle on/off with single press
+- [ ] Prevent re-trigger while transcribing
+
+---
+
+## Phase 7: Menu Bar UI
+
+### 7.1 Menu Bar Controller
+- [ ] Create MenuBarController.swift
+- [ ] Create NSStatusItem
+- [ ] Set up status bar button with icon
+- [ ] Create NSMenu with items
+
+### 7.2 Menu Bar Icon States
+- [ ] Create/add icon assets:
+  - Default (waveform or microphone)
+  - Recording (red variant or filled)
+  - Processing (could be same as recording)
+- [ ] Implement updateIcon(state:) method
+- [ ] Add animation for recording state (optional)
+
+### 7.3 Menu Bar Menu Items
+- [ ] "Recording..." / "Ready" status item (disabled, informational)
+- [ ] Current model indicator
+- [ ] Separator
+- [ ] "Settings..." menu item → open settings window
+- [ ] "Check for Updates..." (future)
+- [ ] Separator
+- [ ] "Quit WhisperType" menu item
+
+### 7.4 Menu Bar View (SwiftUI)
+- [ ] Alternative: Use SwiftUI MenuBarExtra (macOS 13+)
+- [ ] Implement popover-style menu with SwiftUI
+- [ ] Show recording status and controls
+- [ ] Quick model switcher dropdown
+
+---
+
+## Phase 8: Settings Window
+
+### 8.1 Settings Window Container
+- [ ] Create SettingsWindow.swift using Settings scene (SwiftUI)
+- [ ] Implement tab-based settings (General, Models, Vocabulary, History, Hotkey)
+- [ ] Use native macOS settings appearance
+
+### 8.2 General Settings Tab
+- [ ] Launch at login toggle (use SMAppService or LaunchAtLogin library)
+- [ ] Microphone selection dropdown
+- [ ] Audio feedback toggles (sound on record start/stop)
+- [ ] About section with version info
+
+### 8.3 Models Settings Tab
+- [ ] Embed ModelSettingsView
+- [ ] Show storage usage
+- [ ] "Open Models Folder" button
+
+### 8.4 Hotkey Settings Tab
+- [ ] Hotkey recorder control (KeyboardShortcuts or custom)
+- [ ] Display current hotkey
+- [ ] "Record New Hotkey" button
+- [ ] Reset to default button
+- [ ] Mode toggle: Hold-to-record vs Toggle
+
+---
+
+## Phase 8B: Vocabulary & Text Replacements
+
+### 8B.1 Data Models
+- [ ] Create VocabularyWord struct:
+  - word: String
+  - dateAdded: Date
+- [ ] Create TextReplacement struct:
+  - fromText: String
+  - toText: String
+  - caseSensitive: Bool
+  - enabled: Bool
+  - dateAdded: Date
+- [ ] Create VocabularyManager.swift as @Observable singleton
+
+### 8B.2 Vocabulary Storage
+- [ ] Store vocabulary in JSON file: ~/Library/Application Support/WhisperType/vocabulary.json
+- [ ] Implement loadVocabulary() on app start
+- [ ] Implement saveVocabulary() after changes
+- [ ] Add word limit (recommend max 20-30 words)
+
+### 8B.3 Vocabulary Integration with Whisper
+- [ ] Modify WhisperWrapper to accept vocabulary words
+- [ ] Build initial_prompt string from vocabulary words
+- [ ] Pass initial_prompt to whisper_full_params
+- [ ] Test that vocabulary words improve recognition
+
+### 8B.4 Text Replacements Engine
+- [ ] Implement TextReplacementEngine.swift
+- [ ] Method: applyReplacements(text: String) → String
+- [ ] Use word boundary matching (whole words only)
+- [ ] Support case-sensitive and case-insensitive modes
+- [ ] Apply replacements in order (first match wins)
+- [ ] Handle edge cases: punctuation, multiple spaces
+
+### 8B.5 Vocabulary Settings UI
+- [ ] Create VocabularySettingsView.swift
+- [ ] Two sections: Vocabulary Words, Text Replacements
+- [ ] Vocabulary section:
+  - List of current vocabulary words
+  - Add new word text field + button
+  - Delete button for each word
+  - Word count indicator (e.g., "5/30 words")
+- [ ] Replacements section:
+  - List showing "from" → "to" pairs
+  - Add replacement: two text fields + case-sensitive toggle
+  - Enable/disable toggle per replacement
+  - Delete button for each replacement
+  - Reorder capability (drag and drop)
+
+### 8B.6 Import/Export
+- [ ] Export vocabulary & replacements to JSON file
+- [ ] Import from JSON file
+- [ ] Validate imported data
+
+---
+
+## Phase 8C: Transcription History
+
+### 8C.1 History Data Model
+- [ ] Create TranscriptionRecord struct:
+  - id: UUID
+  - timestamp: Date
+  - rawTranscription: String (before replacements)
+  - finalText: String (after replacements)
+  - duration: TimeInterval
+  - modelUsed: WhisperModelType
+  - audioFilePath: String? (optional, if keeping audio)
+- [ ] Create HistoryManager.swift as @Observable singleton
+
+### 8C.2 History Storage
+- [ ] Store history in JSON file: ~/Library/Application Support/WhisperType/history.json
+- [ ] Implement append(record:) - add new transcription
+- [ ] Implement loadHistory() on app start
+- [ ] Implement saveHistory() after changes
+- [ ] Implement configurable max history size (e.g., 500 entries)
+- [ ] Auto-prune old entries when limit exceeded
+
+### 8C.3 Audio File Storage (Optional)
+- [ ] Create audio storage directory: ~/Library/Application Support/WhisperType/AudioHistory/
+- [ ] Save audio file with UUID filename
+- [ ] Link audio path in TranscriptionRecord
+- [ ] Implement cleanup of orphaned audio files
+- [ ] Add setting: "Keep audio recordings" toggle
+- [ ] Add setting: "Audio retention period" (e.g., 7 days, 30 days, forever)
+
+### 8C.4 History Integration
+- [ ] After transcription completes, create TranscriptionRecord
+- [ ] Store raw text before applying replacements
+- [ ] Store final text after applying replacements
+- [ ] Save to history via HistoryManager
+
+### 8C.5 History Settings UI
+- [ ] Create HistorySettingsView.swift
+- [ ] Display list of transcriptions (newest first)
+- [ ] Each row shows:
+  - Timestamp (formatted: "Today 2:34 PM" or "Dec 1, 2025")
+  - Preview of text (truncated to ~50 chars)
+  - Duration
+  - Model used
+- [ ] Click row to expand and show full text
+- [ ] Copy button for each entry
+- [ ] Delete button for each entry (with confirmation)
+- [ ] "Clear All History" button (with confirmation)
+
+### 8C.6 History Search & Filter
+- [ ] Search bar to filter by text content
+- [ ] Date filter (Today, Last 7 days, Last 30 days, All)
+- [ ] Show result count
+
+### 8C.7 History Actions
+- [ ] Copy to clipboard action
+- [ ] Delete single entry action
+- [ ] Delete all entries action
+- [ ] Play audio (if audio file exists)
+- [ ] (Future) Reprocess with different model
+
+---
+
+## Phase 9: App Coordinator & Integration
+
+### 9.1 AppCoordinator
+- [ ] Create AppCoordinator.swift as central controller
+- [ ] Initialize all managers on app start:
+  - ModelManager
+  - HotkeyManager
+  - AudioRecorder
+  - WhisperWrapper
+  - TextInjector
+- [ ] Wire up communication between components
+
+### 9.2 Main Workflow Integration
+- [ ] Implement full recording → transcription → injection flow:
+  1. Hotkey pressed → AudioRecorder.startRecording()
+  2. Hotkey released → AudioRecorder.stopRecording()
+  3. Convert audio format
+  4. WhisperWrapper.transcribe(audio)
+  5. TextInjector.injectText(result)
+- [ ] Update UI states throughout flow
+- [ ] Handle errors at each step
+
+### 9.3 Error Handling
+- [ ] Create user-facing error alerts
+- [ ] Handle: no model downloaded
+- [ ] Handle: microphone permission denied
+- [ ] Handle: accessibility permission denied
+- [ ] Handle: transcription failed
+- [ ] Handle: text injection failed
+
+---
+
+## Phase 10: Polish & Testing
+
+### 10.1 Error States & Edge Cases
+- [ ] Test with no internet (model download fails gracefully)
+- [ ] Test with no microphone
+- [ ] Test with Accessibility denied
+- [ ] Test rapid hotkey presses
+- [ ] Test very long recordings (memory)
+- [ ] Test switching models while recording
+
+### 10.2 Performance Testing
+- [ ] Measure model load time for each size
+- [ ] Measure transcription time vs audio length
+- [ ] Monitor memory usage during transcription
+- [ ] Test on Intel vs Apple Silicon Macs
+
+### 10.3 UI Polish
+- [ ] Add loading indicators where appropriate
+- [ ] Add success/error feedback (subtle animations or sounds)
+- [ ] Ensure Dark Mode support
+- [ ] Test VoiceOver accessibility
+
+### 10.4 Documentation
+- [ ] Write README.md with:
+  - App description
+  - Installation instructions
+  - Usage guide
+  - Building from source
+  - License info
+- [ ] Add inline code documentation
+- [ ] Create CONTRIBUTING.md (if open source)
+
+---
+
+## Phase 11: Distribution
+
+### 11.1 Build Configuration
+- [ ] Set up Release build configuration
+- [ ] Configure code signing (or disable for unsigned distribution)
+- [ ] Set version and build numbers
+- [ ] Archive app
+
+### 11.2 Create DMG
+- [ ] Create DMG for distribution
+- [ ] Add app icon to DMG
+- [ ] Add Applications folder shortcut
+- [ ] Set DMG background (optional)
+- [ ] Test installation from DMG
+
+### 11.3 GitHub Release (if open source)
+- [ ] Create GitHub repository
+- [ ] Push code
+- [ ] Create release with DMG attached
+- [ ] Write release notes
+
+---
+
+## Future Enhancements (Post v1.0)
+
+### CoreML Acceleration
+- [ ] Download CoreML model variants
+- [ ] Configure whisper.cpp to use CoreML backend
+- [ ] Benchmark performance improvement
+
+### Voice Commands
+- [ ] Detect command phrases: "delete that", "new line", etc.
+- [ ] Execute commands instead of typing
+
+### Improved Text Formatting
+- [ ] Auto-capitalization
+- [ ] Smart punctuation
+- [ ] Number formatting
+
+### History Reprocessing
+- [ ] Reprocess audio from history with different model
+- [ ] Reprocess with different vocabulary/replacements
+
+---
+
+## Notes for Claude Code
+
+When implementing:
+1. Start with Phase 0-1 to get basic app structure running
+2. Phase 2-3 can be developed in parallel
+3. Phase 4 is the core - spend time getting whisper.cpp integration right
+4. Test each phase before moving to next
+5. Phase 8B (Vocabulary) should be done after Phase 4 since it integrates with WhisperWrapper
+6. Phase 8C (History) should be done after Phase 9 since it needs the full transcription flow working
+7. Use `@Observable` (Swift 5.9+) instead of `ObservableObject` where possible
+8. Prefer async/await over completion handlers
+9. Use Swift concurrency (actors) for thread safety where appropriate
+
+Key files to reference:
+- whisper.cpp examples: Libraries/whisper.cpp/examples/
+- whisper.h for C API: Libraries/whisper.cpp/whisper.h
+- Apple docs for AVAudioEngine, CGEvent, NSStatusItem
+
+Data storage locations:
+- Models: ~/Library/Application Support/WhisperType/Models/
+- Vocabulary: ~/Library/Application Support/WhisperType/vocabulary.json
+- History: ~/Library/Application Support/WhisperType/history.json
+- Audio recordings: ~/Library/Application Support/WhisperType/AudioHistory/
