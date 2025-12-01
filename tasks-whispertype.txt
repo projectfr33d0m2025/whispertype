@@ -48,12 +48,12 @@ Note: See DEPENDENCIES.md for instructions. Packages should be added when projec
 - [x] Implement applicationWillTerminate (cleanup)
 
 ### 1.2 Constants & Configuration
-- [ ] Create Constants.swift with:
+- [x] Create Constants.swift with:
   - Model download URLs
   - Default hotkey combination
   - App Support directory paths
   - UserDefaults keys
-- [ ] Create AppSettings.swift @Observable class:
+- [x] Create AppSettings.swift @Observable class:
   - activeModelId: String
   - hotkeyKeyCode: Int
   - hotkeyModifiers: NSEvent.ModifierFlags
