@@ -10,6 +10,8 @@
 		7B73EFC22EDD944D0062E68C /* ModelManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B73EFC12EDD944D0062E68C /* ModelManager.swift */; };
 		7B73EFC42EDD946C0062E68C /* ModelRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B73EFC32EDD946C0062E68C /* ModelRowView.swift */; };
 		7B73EFC62EDD947C0062E68C /* ModelSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B73EFC52EDD947C0062E68C /* ModelSettingsView.swift */; };
+		7B73EFC82EDD983F0062E68C /* AudioRecorderTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B73EFC72EDD983F0062E68C /* AudioRecorderTestView.swift */; };
+		7B73EFCA2EDD989E0062E68C /* AudioRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B73EFC92EDD989E0062E68C /* AudioRecorder.swift */; };
 		A1000001000000000000001 /* WhisperTypeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000002000000000000001 /* WhisperTypeApp.swift */; };
 		A1000003000000000000001 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1000004000000000000001 /* Assets.xcassets */; };
 		A1000005000000000000001 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1000006000000000000001 /* Accelerate.framework */; };
@@ -26,6 +28,8 @@
 		7B73EFC12EDD944D0062E68C /* ModelManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelManager.swift; sourceTree = "<group>"; };
 		7B73EFC32EDD946C0062E68C /* ModelRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelRowView.swift; sourceTree = "<group>"; };
 		7B73EFC52EDD947C0062E68C /* ModelSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelSettingsView.swift; sourceTree = "<group>"; };
+		7B73EFC72EDD983F0062E68C /* AudioRecorderTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecorderTestView.swift; sourceTree = "<group>"; };
+		7B73EFC92EDD989E0062E68C /* AudioRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecorder.swift; sourceTree = "<group>"; };
 		A1000002000000000000001 /* WhisperTypeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhisperTypeApp.swift; sourceTree = "<group>"; };
 		A1000004000000000000001 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A1000006000000000000001 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
@@ -126,6 +130,7 @@
 		A1000019000000000000001 /* Managers */ = {
 			isa = PBXGroup;
 			children = (
+				7B73EFC92EDD989E0062E68C /* AudioRecorder.swift */,
 				7B73EFC12EDD944D0062E68C /* ModelManager.swift */,
 			);
 			path = Managers;
@@ -134,6 +139,7 @@
 		A1000020000000000000001 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				7B73EFC72EDD983F0062E68C /* AudioRecorderTestView.swift */,
 				A1000024000000000000001 /* MenuBar */,
 				A1000025000000000000001 /* Settings */,
 				A1000026000000000000001 /* Components */,
@@ -265,8 +271,10 @@
 				A1000050000000000000001 /* AppDelegate.swift in Sources */,
 				A1000052000000000000001 /* AppCoordinator.swift in Sources */,
 				A1000054000000000000001 /* AppSettings.swift in Sources */,
+				7B73EFC82EDD983F0062E68C /* AudioRecorderTestView.swift in Sources */,
 				7B73EFC62EDD947C0062E68C /* ModelSettingsView.swift in Sources */,
 				A1000056000000000000001 /* WhisperModel.swift in Sources */,
+				7B73EFCA2EDD989E0062E68C /* AudioRecorder.swift in Sources */,
 				7B73EFC22EDD944D0062E68C /* ModelManager.swift in Sources */,
 				A1000058000000000000001 /* TranscriptionResult.swift in Sources */,
 				A1000060000000000000001 /* Constants.swift in Sources */,

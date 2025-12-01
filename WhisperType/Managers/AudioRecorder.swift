@@ -436,14 +436,10 @@ class AudioRecorder: ObservableObject {
     func getAvailableMicrophones() -> [(id: String, name: String)] {
         var microphones: [(id: String, name: String)] = []
         
-        // Get all audio devices
-        let discoverySession = AVCaptureDevice.DiscoverySession(
-            deviceTypes: [.microphone, .builtInMicrophone, .externalUnknown],
-            mediaType: .audio,
-            position: .unspecified
-        )
+        // Get all audio input devices (compatible with macOS 13.0+)
+        let devices = AVCaptureDevice.devices(for: .audio)
         
-        for device in discoverySession.devices {
+        for device in devices {
             microphones.append((id: device.uniqueID, name: device.localizedName))
         }
         
