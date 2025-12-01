@@ -18,67 +18,67 @@ class AppSettings: ObservableObject {
 
     // MARK: - Settings Properties
 
-    @Published var activeModelId: String {
-        didSet {
-            UserDefaults.standard.set(activeModelId, forKey: Constants.UserDefaultsKeys.activeModelId)
-            print("AppSettings: Active model changed to \(activeModelId)")
+    @Published var activeModelId: String = "" {
+        willSet {
+            UserDefaults.standard.set(newValue, forKey: Constants.UserDefaultsKeys.activeModelId)
+            print("AppSettings: Active model changed to \(newValue)")
         }
     }
 
-    @Published var hotkeyKeyCode: UInt32 {
-        didSet {
-            UserDefaults.standard.set(hotkeyKeyCode, forKey: Constants.UserDefaultsKeys.hotkeyKeyCode)
-            print("AppSettings: Hotkey key code changed to \(hotkeyKeyCode)")
+    @Published var hotkeyKeyCode: UInt32 = 0 {
+        willSet {
+            UserDefaults.standard.set(newValue, forKey: Constants.UserDefaultsKeys.hotkeyKeyCode)
+            print("AppSettings: Hotkey key code changed to \(newValue)")
         }
     }
 
-    @Published var hotkeyModifierFlags: NSEvent.ModifierFlags {
-        didSet {
-            UserDefaults.standard.set(hotkeyModifierFlags.rawValue, forKey: Constants.UserDefaultsKeys.hotkeyModifierFlags)
+    @Published var hotkeyModifierFlags: NSEvent.ModifierFlags = [] {
+        willSet {
+            UserDefaults.standard.set(newValue.rawValue, forKey: Constants.UserDefaultsKeys.hotkeyModifierFlags)
             print("AppSettings: Hotkey modifier flags changed")
         }
     }
 
-    @Published var launchAtLogin: Bool {
-        didSet {
-            UserDefaults.standard.set(launchAtLogin, forKey: Constants.UserDefaultsKeys.launchAtLogin)
-            print("AppSettings: Launch at login changed to \(launchAtLogin)")
+    @Published var launchAtLogin: Bool = false {
+        willSet {
+            UserDefaults.standard.set(newValue, forKey: Constants.UserDefaultsKeys.launchAtLogin)
+            print("AppSettings: Launch at login changed to \(newValue)")
             // TODO: Update launch at login preference using SMAppService
         }
     }
 
-    @Published var selectedMicrophoneId: String? {
-        didSet {
-            UserDefaults.standard.set(selectedMicrophoneId, forKey: Constants.UserDefaultsKeys.selectedMicrophoneId)
-            print("AppSettings: Selected microphone changed to \(selectedMicrophoneId ?? "default")")
+    @Published var selectedMicrophoneId: String? = nil {
+        willSet {
+            UserDefaults.standard.set(newValue, forKey: Constants.UserDefaultsKeys.selectedMicrophoneId)
+            print("AppSettings: Selected microphone changed to \(newValue ?? "default")")
         }
     }
 
-    @Published var keepAudioRecordings: Bool {
-        didSet {
-            UserDefaults.standard.set(keepAudioRecordings, forKey: Constants.UserDefaultsKeys.keepAudioRecordings)
-            print("AppSettings: Keep audio recordings changed to \(keepAudioRecordings)")
+    @Published var keepAudioRecordings: Bool = false {
+        willSet {
+            UserDefaults.standard.set(newValue, forKey: Constants.UserDefaultsKeys.keepAudioRecordings)
+            print("AppSettings: Keep audio recordings changed to \(newValue)")
         }
     }
 
-    @Published var audioRetentionDays: Int {
-        didSet {
-            UserDefaults.standard.set(audioRetentionDays, forKey: Constants.UserDefaultsKeys.audioRetentionDays)
-            print("AppSettings: Audio retention days changed to \(audioRetentionDays)")
+    @Published var audioRetentionDays: Int = 0 {
+        willSet {
+            UserDefaults.standard.set(newValue, forKey: Constants.UserDefaultsKeys.audioRetentionDays)
+            print("AppSettings: Audio retention days changed to \(newValue)")
         }
     }
 
-    @Published var playAudioFeedback: Bool {
-        didSet {
-            UserDefaults.standard.set(playAudioFeedback, forKey: Constants.UserDefaultsKeys.playAudioFeedback)
-            print("AppSettings: Play audio feedback changed to \(playAudioFeedback)")
+    @Published var playAudioFeedback: Bool = false {
+        willSet {
+            UserDefaults.standard.set(newValue, forKey: Constants.UserDefaultsKeys.playAudioFeedback)
+            print("AppSettings: Play audio feedback changed to \(newValue)")
         }
     }
 
-    @Published var hotkeyMode: HotkeyMode {
-        didSet {
-            UserDefaults.standard.set(hotkeyMode.rawValue, forKey: Constants.UserDefaultsKeys.hotkeyMode)
-            print("AppSettings: Hotkey mode changed to \(hotkeyMode.rawValue)")
+    @Published var hotkeyMode: HotkeyMode = .hold {
+        willSet {
+            UserDefaults.standard.set(newValue.rawValue, forKey: Constants.UserDefaultsKeys.hotkeyMode)
+            print("AppSettings: Hotkey mode changed to \(newValue.rawValue)")
         }
     }
 
