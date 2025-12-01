@@ -12,7 +12,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     // MARK: - Properties
 
-    var appCoordinator: AppCoordinator?
+    var appCoordinator: AppCoordinator {
+        AppCoordinator.shared
+    }
 
     // MARK: - Application Lifecycle
 
@@ -23,53 +25,22 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // This is also set via LSUIElement in Info.plist, but we can ensure it here
         NSApp.setActivationPolicy(.accessory)
 
-        // Initialize the app coordinator
-        appCoordinator = AppCoordinator()
-        appCoordinator?.start()
+        // Initialize and start the app coordinator
+        appCoordinator.start()
 
         // Check permissions on launch
         Task { @MainActor in
             await checkInitialPermissions()
         }
         
-        // Test TextInjector (Phase 5.2 & 5.3 testing)
-        Task { @MainActor in
-            let injector = TextInjector.shared
-            injector.printDiagnostics()
-            
-            let hasPermission = injector.hasAccessibilityPermission
-            print("TextInjector: Permission status: \(hasPermission ? "✅ Granted" : "❌ Not Granted")")
-            
-            if hasPermission {
-                // Test 1: Keyboard method (short text)
-                print("\n⏳ TEST 1: Keyboard injection in 3 seconds...")
-                print("👆 Click on a text field NOW! (Notes, TextEdit, browser search bar, etc.)")
-                
-                try? await Task.sleep(nanoseconds: 3_000_000_000) // 3 second delay
-                
-                print("🚀 Injecting via KEYBOARD method...")
-                await injector.injectTestString()
-                
-                // Test 2: Clipboard method (longer text)
-                print("\n⏳ TEST 2: Clipboard injection in 3 seconds...")
-                print("👆 Stay in the same text field or click another one!")
-                
-                try? await Task.sleep(nanoseconds: 3_000_000_000) // 3 second delay
-                
-                print("🚀 Injecting via CLIPBOARD method...")
-                await injector.injectTestStringViaClipboard()
-                
-                print("\n✅ All tests complete!")
-            }
-        }
+        print("WhisperType: Ready! Press Option+Space to toggle recording.")
     }
 
     func applicationWillTerminate(_ notification: Notification) {
         print("WhisperType: Application terminating")
 
         // Cleanup
-        appCoordinator?.cleanup()
-        appCoordinator = nil
+        appCoordinator.cleanup()
     }
 
     func applicationSupportsSecureRestorableState(_ app: NSApplication) -> Bool {

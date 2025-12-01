@@ -192,10 +192,10 @@ Note: See DEPENDENCIES.md for instructions. Packages should be added when projec
 ## Phase 6: Global Hotkey
 
 ### 6.1 HotkeyManager Setup
-- [ ] Create HotkeyManager.swift using HotKey library
-- [ ] Register default hotkey (Cmd+Shift+Space)
-- [ ] Implement callback for hotkey press
-- [ ] Implement callback for hotkey release (if using press-and-hold)
+- [x] Create HotkeyManager.swift using HotKey library
+- [x] Register default hotkey (Option+Space)
+- [x] Implement callback for hotkey press
+- [x] Implement callback for hotkey release (if using press-and-hold)
 
 ### 6.2 Hotkey Configuration
 - [ ] Store hotkey configuration in AppSettings

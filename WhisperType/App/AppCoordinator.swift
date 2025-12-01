@@ -11,11 +11,15 @@ import SwiftUI
 @MainActor
 class AppCoordinator: ObservableObject {
 
+    // MARK: - Singleton
+    
+    static let shared = AppCoordinator()
+
     // MARK: - Properties
 
-    // Managers (will be initialized in later phases)
+    // Managers
     // var modelManager: ModelManager?
-    // var hotkeyManager: HotkeyManager?
+    var hotkeyManager: HotkeyManager?
     // var audioRecorder: AudioRecorder?
     // var whisperWrapper: WhisperWrapper?
     // var textInjector: TextInjector?
@@ -27,7 +31,7 @@ class AppCoordinator: ObservableObject {
 
     // MARK: - Initialization
 
-    init() {
+    private init() {
         print("AppCoordinator: Initializing...")
     }
 
@@ -36,25 +40,54 @@ class AppCoordinator: ObservableObject {
     func start() {
         print("AppCoordinator: Starting app components...")
 
-        // TODO: Initialize managers in later phases
+        // Phase 6: Initialize HotkeyManager
+        setupHotkeyManager()
+        
+        // TODO: Initialize other managers in later phases
         // Phase 2: ModelManager
         // Phase 3: AudioRecorder
         // Phase 4: WhisperWrapper
         // Phase 5: TextInjector
-        // Phase 6: HotkeyManager
         // Phase 7: MenuBarController
 
         setupNotifications()
+        
+        print("AppCoordinator: All components started")
     }
 
     func cleanup() {
         print("AppCoordinator: Cleaning up...")
 
-        // TODO: Cleanup managers
-        // Stop recording if active
         // Unregister hotkeys
+        hotkeyManager?.unregisterHotkey()
+        
+        // TODO: Cleanup other managers
+        // Stop recording if active
         // Free whisper context
         // Save settings
+    }
+    
+    // MARK: - Hotkey Setup
+    
+    private func setupHotkeyManager() {
+        print("AppCoordinator: Setting up HotkeyManager...")
+        
+        hotkeyManager = HotkeyManager.shared
+        
+        // Set callback for when recording is toggled via hotkey
+        hotkeyManager?.onRecordingToggle = { [weak self] shouldRecord in
+            Task { @MainActor in
+                if shouldRecord {
+                    self?.startRecording()
+                } else {
+                    self?.stopRecording()
+                }
+            }
+        }
+        
+        // Register the hotkey
+        hotkeyManager?.registerHotkey()
+        hotkeyManager?.printStatus()
     }
 
     // MARK: - Notifications
@@ -64,7 +97,7 @@ class AppCoordinator: ObservableObject {
         // Will be expanded in later phases
     }
 
-    // MARK: - Main Workflow (Placeholder)
+    // MARK: - Main Workflow
 
     func startRecording() {
         guard !isRecording && !isProcessing else {
@@ -72,10 +105,11 @@ class AppCoordinator: ObservableObject {
             return
         }
 
-        print("AppCoordinator: Starting recording...")
+        print("AppCoordinator: 🎤 Starting recording...")
         isRecording = true
 
         // TODO: Phase 3 - Start audio recording
+        // audioRecorder?.startRecording()
     }
 
     func stopRecording() {
@@ -84,17 +118,31 @@ class AppCoordinator: ObservableObject {
             return
         }
 
-        print("AppCoordinator: Stopping recording...")
+        print("AppCoordinator: ⏹️ Stopping recording...")
         isRecording = false
         isProcessing = true
 
         // TODO: Phase 3 - Stop audio recording
+        // let audioData = audioRecorder?.stopRecording()
+        
         // TODO: Phase 4 - Transcribe audio
+        // let text = whisperWrapper?.transcribe(audioData)
+        
         // TODO: Phase 5 - Inject text
+        // textInjector?.injectText(text)
 
-        // Placeholder - mark processing complete
+        // Placeholder - mark processing complete after delay
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             self?.isProcessing = false
+            print("AppCoordinator: ✅ Processing complete (placeholder)")
+        }
+    }
+    
+    func toggleRecording() {
+        if isRecording {
+            stopRecording()
+        } else {
+            startRecording()
         }
     }
 

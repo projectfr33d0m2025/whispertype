@@ -90,9 +90,9 @@ enum Constants {
     // MARK: - Default Values
 
     enum Defaults {
-        // Default hotkey: Cmd + Shift + Space
+        // Default hotkey: Option + Space
         static let hotkeyKeyCode: UInt32 = 49 // Space key
-        static let hotkeyModifierFlags: NSEvent.ModifierFlags = [.command, .shift]
+        static let hotkeyModifierFlags: NSEvent.ModifierFlags = [.option]
 
         // Default model (tiny.en - smallest, fastest)
         static let defaultModelId = "tiny.en"
