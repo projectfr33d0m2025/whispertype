@@ -106,26 +106,26 @@ Note: See DEPENDENCIES.md for instructions. Packages should be added when projec
 ## Phase 3: Audio Recording
 
 ### 3.1 AudioRecorder Class
-- [ ] Create AudioRecorder.swift as @Observable class
-- [ ] Request microphone permission on init if needed
-- [ ] Set up AVAudioEngine with input node
-- [ ] Configure audio format (device native sample rate)
-- [ ] Implement startRecording() - install tap on input node
-- [ ] Implement stopRecording() → Data (audio buffer)
-- [ ] Store audio samples in buffer during recording
+- [x] Create AudioRecorder.swift as @Observable class
+- [x] Request microphone permission on init if needed
+- [x] Set up AVAudioEngine with input node
+- [x] Configure audio format (device native sample rate)
+- [x] Implement startRecording() - install tap on input node
+- [x] Implement stopRecording() → Data (audio buffer)
+- [x] Store audio samples in buffer during recording
 
 ### 3.2 Audio Format Conversion
-- [ ] Create method to convert recorded audio to Whisper format
-- [ ] Resample to 16kHz if needed (AVAudioConverter)
-- [ ] Convert to mono if stereo
-- [ ] Convert to Float32 PCM
-- [ ] Return [Float] array for whisper.cpp
+- [x] Create method to convert recorded audio to Whisper format
+- [x] Resample to 16kHz if needed (AVAudioConverter)
+- [x] Convert to mono if stereo
+- [x] Convert to Float32 PCM
+- [x] Return [Float] array for whisper.cpp
 
 ### 3.3 Recording State Management
-- [ ] Publish isRecording: Bool
-- [ ] Publish audioLevel: Float (for visual feedback)
-- [ ] Implement metering for audio level visualization
-- [ ] Handle audio session interruptions
+- [x] Publish isRecording: Bool
+- [x] Publish audioLevel: Float (for visual feedback)
+- [x] Implement metering for audio level visualization
+- [x] Handle audio session interruptions
 
 ---
 
