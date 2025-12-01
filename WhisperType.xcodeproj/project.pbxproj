@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7B73EFC22EDD944D0062E68C /* ModelManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B73EFC12EDD944D0062E68C /* ModelManager.swift */; };
+		7B73EFC42EDD946C0062E68C /* ModelRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B73EFC32EDD946C0062E68C /* ModelRowView.swift */; };
+		7B73EFC62EDD947C0062E68C /* ModelSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B73EFC52EDD947C0062E68C /* ModelSettingsView.swift */; };
 		A1000001000000000000001 /* WhisperTypeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000002000000000000001 /* WhisperTypeApp.swift */; };
 		A1000003000000000000001 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1000004000000000000001 /* Assets.xcassets */; };
 		A1000005000000000000001 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1000006000000000000001 /* Accelerate.framework */; };
@@ -20,6 +23,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		7B73EFC12EDD944D0062E68C /* ModelManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelManager.swift; sourceTree = "<group>"; };
+		7B73EFC32EDD946C0062E68C /* ModelRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelRowView.swift; sourceTree = "<group>"; };
+		7B73EFC52EDD947C0062E68C /* ModelSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelSettingsView.swift; sourceTree = "<group>"; };
 		A1000002000000000000001 /* WhisperTypeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhisperTypeApp.swift; sourceTree = "<group>"; };
 		A1000004000000000000001 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A1000006000000000000001 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
@@ -120,6 +126,7 @@
 		A1000019000000000000001 /* Managers */ = {
 			isa = PBXGroup;
 			children = (
+				7B73EFC12EDD944D0062E68C /* ModelManager.swift */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
@@ -169,6 +176,7 @@
 		A1000025000000000000001 /* Settings */ = {
 			isa = PBXGroup;
 			children = (
+				7B73EFC52EDD947C0062E68C /* ModelSettingsView.swift */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
@@ -176,6 +184,7 @@
 		A1000026000000000000001 /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				7B73EFC32EDD946C0062E68C /* ModelRowView.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -252,10 +261,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				A1000001000000000000001 /* WhisperTypeApp.swift in Sources */,
+				7B73EFC42EDD946C0062E68C /* ModelRowView.swift in Sources */,
 				A1000050000000000000001 /* AppDelegate.swift in Sources */,
 				A1000052000000000000001 /* AppCoordinator.swift in Sources */,
 				A1000054000000000000001 /* AppSettings.swift in Sources */,
+				7B73EFC62EDD947C0062E68C /* ModelSettingsView.swift in Sources */,
 				A1000056000000000000001 /* WhisperModel.swift in Sources */,
+				7B73EFC22EDD944D0062E68C /* ModelManager.swift in Sources */,
 				A1000058000000000000001 /* TranscriptionResult.swift in Sources */,
 				A1000060000000000000001 /* Constants.swift in Sources */,
 				A1000062000000000000001 /* Permissions.swift in Sources */,
@@ -397,6 +409,10 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Libraries/whisper.cpp/include",
+				);
 				INFOPLIST_FILE = WhisperType/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
@@ -410,10 +426,6 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "WhisperType/Bridging/WhisperType-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/Libraries/whisper.cpp/include",
-				);
 			};
 			name = Debug;
 		};
@@ -431,6 +443,10 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Libraries/whisper.cpp/include",
+				);
 				INFOPLIST_FILE = WhisperType/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
@@ -444,10 +460,6 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "WhisperType/Bridging/WhisperType-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/Libraries/whisper.cpp/include",
-				);
 			};
 			name = Release;
 		};
