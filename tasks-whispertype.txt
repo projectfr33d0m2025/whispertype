@@ -198,16 +198,16 @@ Note: See DEPENDENCIES.md for instructions. Packages should be added when projec
 - [x] Implement callback for hotkey release (if using press-and-hold)
 
 ### 6.2 Hotkey Configuration
-- [ ] Store hotkey configuration in AppSettings
-- [ ] Implement updateHotkey(keyCode:modifiers:)
-- [ ] Unregister old hotkey before registering new one
-- [ ] Persist hotkey settings to UserDefaults
+- [x] Store hotkey configuration in AppSettings
+- [x] Implement updateHotkey(keyCode:modifiers:)
+- [x] Unregister old hotkey before registering new one
+- [x] Persist hotkey settings to UserDefaults
 
 ### 6.3 Recording Trigger Logic
-- [ ] On hotkey press: start recording
-- [ ] On hotkey release: stop recording, start transcription
-- [ ] Alternative mode: toggle on/off with single press
-- [ ] Prevent re-trigger while transcribing
+- [x] On hotkey press: start recording
+- [x] On hotkey release: stop recording, start transcription
+- [x] Alternative mode: toggle on/off with single press
+- [x] Prevent re-trigger while transcribing
 
 ---
 

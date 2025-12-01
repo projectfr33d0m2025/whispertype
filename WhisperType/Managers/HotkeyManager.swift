@@ -23,6 +23,7 @@ class HotkeyManager: ObservableObject {
     private var isRegistered = false
     
     @Published var isRecording = false
+    @Published var isProcessing = false  // Prevents re-trigger while transcribing
     @Published var lastError: String?
     
     // Callback for when recording should start/stop
@@ -135,6 +136,12 @@ class HotkeyManager: ObservableObject {
     // MARK: - Recording Control
     
     private func toggleRecording() {
+        // Prevent re-trigger while processing
+        if isProcessing {
+            print("HotkeyManager: ⚠️ Ignoring hotkey - still processing previous transcription")
+            return
+        }
+        
         if isRecording {
             stopRecording()
         } else {
@@ -143,6 +150,12 @@ class HotkeyManager: ObservableObject {
     }
     
     private func startRecording() {
+        // Prevent starting while processing
+        if isProcessing {
+            print("HotkeyManager: ⚠️ Cannot start recording - still processing")
+            return
+        }
+        
         print("HotkeyManager: 🎤 Starting recording...")
         isRecording = true
         
@@ -156,12 +169,19 @@ class HotkeyManager: ObservableObject {
     private func stopRecording() {
         print("HotkeyManager: ⏹️ Stopping recording...")
         isRecording = false
+        isProcessing = true  // Mark as processing until transcription completes
         
         // Show notification for testing
         showNotification(title: "WhisperType", body: "⏹️ Recording stopped, transcribing...")
         
         // Notify callback
         onRecordingToggle?(false)
+    }
+    
+    /// Called when transcription is complete (from AppCoordinator)
+    func transcriptionDidComplete() {
+        print("HotkeyManager: ✅ Transcription complete, ready for next recording")
+        isProcessing = false
     }
     
     // MARK: - Hotkey Update

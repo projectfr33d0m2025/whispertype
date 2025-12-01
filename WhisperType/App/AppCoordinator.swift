@@ -134,6 +134,7 @@ class AppCoordinator: ObservableObject {
         // Placeholder - mark processing complete after delay
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             self?.isProcessing = false
+            self?.hotkeyManager?.transcriptionDidComplete()
             print("AppCoordinator: ✅ Processing complete (placeholder)")
         }
     }
