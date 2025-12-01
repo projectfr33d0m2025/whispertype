@@ -27,9 +27,9 @@ Check off tasks as they are completed.
 - [x] Verify whisper.cpp compiles without errors
 
 ### 0.3 Configure Permissions
-- [ ] Add NSMicrophoneUsageDescription to Info.plist
-- [ ] Add NSAccessibilityUsageDescription to Info.plist (for text injection)
-- [ ] Create Permissions.swift utility for checking/requesting permissions
+- [x] Add NSMicrophoneUsageDescription to Info.plist
+- [x] Add NSAccessibilityUsageDescription to Info.plist (for text injection)
+- [x] Create Permissions.swift utility for checking/requesting permissions
 
 ### 0.4 Add Third-Party Dependencies (Swift Package Manager)
 - [ ] Add HotKey package: https://github.com/soffes/HotKey
