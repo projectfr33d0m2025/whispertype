@@ -1,0 +1,13 @@
+{
+	"InstallScripts" : 
+	[
+		"/Users/engleong.lee/research/whispertype/Libraries/whisper-build/cmake_install.cmake",
+		"/Users/engleong.lee/research/whispertype/Libraries/whisper-build/ggml/cmake_install.cmake",
+		"/Users/engleong.lee/research/whispertype/Libraries/whisper-build/ggml/src/cmake_install.cmake",
+		"/Users/engleong.lee/research/whispertype/Libraries/whisper-build/ggml/src/ggml-cpu/cmake_install.cmake",
+		"/Users/engleong.lee/research/whispertype/Libraries/whisper-build/ggml/src/ggml-blas/cmake_install.cmake",
+		"/Users/engleong.lee/research/whispertype/Libraries/whisper-build/ggml/src/ggml-metal/cmake_install.cmake",
+		"/Users/engleong.lee/research/whispertype/Libraries/whisper-build/src/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

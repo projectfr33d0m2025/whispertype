@@ -10,7 +10,6 @@
 		7B73EFC22EDD944D0062E68C /* ModelManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B73EFC12EDD944D0062E68C /* ModelManager.swift */; };
 		7B73EFC42EDD946C0062E68C /* ModelRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B73EFC32EDD946C0062E68C /* ModelRowView.swift */; };
 		7B73EFC62EDD947C0062E68C /* ModelSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B73EFC52EDD947C0062E68C /* ModelSettingsView.swift */; };
-		7B73EFC82EDD983F0062E68C /* AudioRecorderTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B73EFC72EDD983F0062E68C /* AudioRecorderTestView.swift */; };
 		7B73EFCA2EDD989E0062E68C /* AudioRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B73EFC92EDD989E0062E68C /* AudioRecorder.swift */; };
 		A1000001000000000000001 /* WhisperTypeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000002000000000000001 /* WhisperTypeApp.swift */; };
 		A1000003000000000000001 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1000004000000000000001 /* Assets.xcassets */; };
@@ -22,13 +21,20 @@
 		A1000058000000000000001 /* TranscriptionResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000059000000000000001 /* TranscriptionResult.swift */; };
 		A1000060000000000000001 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000061000000000000001 /* Constants.swift */; };
 		A1000062000000000000001 /* Permissions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000063000000000000001 /* Permissions.swift */; };
+		A1000070000000000000001 /* WhisperWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000071000000000000001 /* WhisperWrapper.swift */; };
+		A1000072000000000000001 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1000073000000000000001 /* Metal.framework */; };
+		A1000080000000000000001 /* libwhisper.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A1000081000000000000001 /* libwhisper.a */; };
+		A1000082000000000000001 /* libggml.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A1000083000000000000001 /* libggml.a */; };
+		A1000084000000000000001 /* libggml-base.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A1000085000000000000001 /* libggml-base.a */; };
+		A1000086000000000000001 /* libggml-cpu.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A1000087000000000000001 /* libggml-cpu.a */; };
+		A1000088000000000000001 /* libggml-metal.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A1000089000000000000001 /* libggml-metal.a */; };
+		A1000090000000000000001 /* libggml-blas.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A1000091000000000000001 /* libggml-blas.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		7B73EFC12EDD944D0062E68C /* ModelManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelManager.swift; sourceTree = "<group>"; };
 		7B73EFC32EDD946C0062E68C /* ModelRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelRowView.swift; sourceTree = "<group>"; };
 		7B73EFC52EDD947C0062E68C /* ModelSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelSettingsView.swift; sourceTree = "<group>"; };
-		7B73EFC72EDD983F0062E68C /* AudioRecorderTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecorderTestView.swift; sourceTree = "<group>"; };
 		7B73EFC92EDD989E0062E68C /* AudioRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecorder.swift; sourceTree = "<group>"; };
 		A1000002000000000000001 /* WhisperTypeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhisperTypeApp.swift; sourceTree = "<group>"; };
 		A1000004000000000000001 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -44,6 +50,15 @@
 		A1000059000000000000001 /* TranscriptionResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptionResult.swift; sourceTree = "<group>"; };
 		A1000061000000000000001 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		A1000063000000000000001 /* Permissions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Permissions.swift; sourceTree = "<group>"; };
+		A1000071000000000000001 /* WhisperWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhisperWrapper.swift; sourceTree = "<group>"; };
+		A1000073000000000000001 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
+		A1000081000000000000001 /* libwhisper.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libwhisper.a; path = "Libraries/whisper-built/lib/libwhisper.a"; sourceTree = "<group>"; };
+		A1000083000000000000001 /* libggml.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libggml.a; path = "Libraries/whisper-built/lib/libggml.a"; sourceTree = "<group>"; };
+		A1000085000000000000001 /* libggml-base.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libggml-base.a"; path = "Libraries/whisper-built/lib/libggml-base.a"; sourceTree = "<group>"; };
+		A1000087000000000000001 /* libggml-cpu.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libggml-cpu.a"; path = "Libraries/whisper-built/lib/libggml-cpu.a"; sourceTree = "<group>"; };
+		A1000089000000000000001 /* libggml-metal.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libggml-metal.a"; path = "Libraries/whisper-built/lib/libggml-metal.a"; sourceTree = "<group>"; };
+		A1000091000000000000001 /* libggml-blas.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libggml-blas.a"; path = "Libraries/whisper-built/lib/libggml-blas.a"; sourceTree = "<group>"; };
+		A1000100000000000000001 /* WhisperType.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = WhisperType.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -51,7 +66,14 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A1000080000000000000001 /* libwhisper.a in Frameworks */,
+				A1000082000000000000001 /* libggml.a in Frameworks */,
+				A1000084000000000000001 /* libggml-base.a in Frameworks */,
+				A1000086000000000000001 /* libggml-cpu.a in Frameworks */,
+				A1000088000000000000001 /* libggml-metal.a in Frameworks */,
+				A1000090000000000000001 /* libggml-blas.a in Frameworks */,
 				A1000005000000000000001 /* Accelerate.framework in Frameworks */,
+				A1000072000000000000001 /* Metal.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +100,7 @@
 				A1000021000000000000001 /* Utilities */,
 				A1000022000000000000001 /* Bridging */,
 				A1000023000000000000001 /* Resources */,
+				A1000101000000000000001 /* Config */,
 				A1000008000000000000001 /* Info.plist */,
 				A1000010000000000000001 /* WhisperType.entitlements */,
 			);
@@ -95,6 +118,13 @@
 			isa = PBXGroup;
 			children = (
 				A1000006000000000000001 /* Accelerate.framework */,
+				A1000073000000000000001 /* Metal.framework */,
+				A1000081000000000000001 /* libwhisper.a */,
+				A1000083000000000000001 /* libggml.a */,
+				A1000085000000000000001 /* libggml-base.a */,
+				A1000087000000000000001 /* libggml-cpu.a */,
+				A1000089000000000000001 /* libggml-metal.a */,
+				A1000091000000000000001 /* libggml-blas.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -132,6 +162,7 @@
 			children = (
 				7B73EFC92EDD989E0062E68C /* AudioRecorder.swift */,
 				7B73EFC12EDD944D0062E68C /* ModelManager.swift */,
+				A1000071000000000000001 /* WhisperWrapper.swift */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
@@ -139,7 +170,6 @@
 		A1000020000000000000001 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				7B73EFC72EDD983F0062E68C /* AudioRecorderTestView.swift */,
 				A1000024000000000000001 /* MenuBar */,
 				A1000025000000000000001 /* Settings */,
 				A1000026000000000000001 /* Components */,
@@ -195,6 +225,14 @@
 			path = Components;
 			sourceTree = "<group>";
 		};
+		A1000101000000000000001 /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				A1000100000000000000001 /* WhisperType.xcconfig */,
+			);
+			path = Config;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -211,8 +249,6 @@
 			dependencies = (
 			);
 			name = WhisperType;
-			packageProductDependencies = (
-			);
 			productName = WhisperType;
 			productReference = A1000007000000000000001 /* WhisperType.app */;
 			productType = "com.apple.product-type.application";
@@ -267,18 +303,18 @@
 			buildActionMask = 2147483647;
 			files = (
 				A1000001000000000000001 /* WhisperTypeApp.swift in Sources */,
-				7B73EFC42EDD946C0062E68C /* ModelRowView.swift in Sources */,
 				A1000050000000000000001 /* AppDelegate.swift in Sources */,
 				A1000052000000000000001 /* AppCoordinator.swift in Sources */,
 				A1000054000000000000001 /* AppSettings.swift in Sources */,
-				7B73EFC82EDD983F0062E68C /* AudioRecorderTestView.swift in Sources */,
-				7B73EFC62EDD947C0062E68C /* ModelSettingsView.swift in Sources */,
 				A1000056000000000000001 /* WhisperModel.swift in Sources */,
-				7B73EFCA2EDD989E0062E68C /* AudioRecorder.swift in Sources */,
-				7B73EFC22EDD944D0062E68C /* ModelManager.swift in Sources */,
 				A1000058000000000000001 /* TranscriptionResult.swift in Sources */,
 				A1000060000000000000001 /* Constants.swift in Sources */,
 				A1000062000000000000001 /* Permissions.swift in Sources */,
+				A1000070000000000000001 /* WhisperWrapper.swift in Sources */,
+				7B73EFC22EDD944D0062E68C /* ModelManager.swift in Sources */,
+				7B73EFC42EDD946C0062E68C /* ModelRowView.swift in Sources */,
+				7B73EFC62EDD947C0062E68C /* ModelSettingsView.swift in Sources */,
+				7B73EFCA2EDD989E0062E68C /* AudioRecorder.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -292,7 +328,8 @@
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
@@ -337,7 +374,6 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -355,7 +391,8 @@
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
@@ -394,7 +431,6 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -412,23 +448,31 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
-				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = NO;
+				GENERATE_INFOPLIST_FILE = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/Libraries/whisper.cpp/include",
+					"$(SRCROOT)/Libraries/whisper-built/include",
 				);
 				INFOPLIST_FILE = WhisperType/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = WhisperType;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_LSUIElement = YES;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "WhisperType needs microphone access to record your voice for transcription.";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.0;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/Libraries/whisper-built/lib",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-lc++",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.whispertype.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -446,23 +490,31 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
-				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = NO;
+				GENERATE_INFOPLIST_FILE = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/Libraries/whisper.cpp/include",
+					"$(SRCROOT)/Libraries/whisper-built/include",
 				);
 				INFOPLIST_FILE = WhisperType/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = WhisperType;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_LSUIElement = YES;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "WhisperType needs microphone access to record your voice for transcription.";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.0;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/Libraries/whisper-built/lib",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-lc++",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.whispertype.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -474,20 +526,20 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		A1000028000000000000001 /* Build configuration list for PBXNativeTarget "WhisperType" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				A1000035000000000000001 /* Debug */,
-				A1000036000000000000001 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		A1000032000000000000001 /* Build configuration list for PBXProject "WhisperType" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A1000033000000000000001 /* Debug */,
 				A1000034000000000000001 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A1000028000000000000001 /* Build configuration list for PBXNativeTarget "WhisperType" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A1000035000000000000001 /* Debug */,
+				A1000036000000000000001 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

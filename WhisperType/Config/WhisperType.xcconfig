@@ -1,0 +1,21 @@
+// WhisperType Build Configuration
+// This file configures whisper.cpp library integration
+
+// Header Search Paths for whisper.cpp
+HEADER_SEARCH_PATHS = $(inherited) "$(SRCROOT)/Libraries/whisper.cpp/include" "$(SRCROOT)/Libraries/whisper.cpp/ggml/include"
+
+// Library Search Paths for pre-built whisper.cpp libraries
+LIBRARY_SEARCH_PATHS = $(inherited) "$(SRCROOT)/Libraries/whisper.cpp/build/src" "$(SRCROOT)/Libraries/whisper.cpp/build/ggml/src" "$(SRCROOT)/Libraries/whisper.cpp/build/ggml/src/ggml-metal" "$(SRCROOT)/Libraries/whisper.cpp/build/ggml/src/ggml-blas"
+
+// Link against whisper.cpp static libraries
+OTHER_LDFLAGS = $(inherited) -lwhisper -lggml -lggml-base -lggml-cpu -lggml-metal -lggml-blas -lc++
+
+// Swift/Objective-C Bridging Header
+SWIFT_OBJC_BRIDGING_HEADER = $(SRCROOT)/WhisperType/Bridging/WhisperType-Bridging-Header.h
+
+// Enable C++ standard library
+CLANG_CXX_LANGUAGE_STANDARD = c++17
+CLANG_CXX_LIBRARY = libc++
+
+// Required frameworks are already added in project
+// Metal.framework, Accelerate.framework

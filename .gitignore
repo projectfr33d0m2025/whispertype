@@ -95,3 +95,8 @@ iOSInjectionProject/
 # WhisperType specific
 WhisperType/Resources/*.bin
 *.ggml
+
+# whisper.cpp build artifacts (build locally using Scripts/build-whisper.sh)
+Libraries/whisper-built/
+Libraries/whisper.cpp/build*/
+build.log

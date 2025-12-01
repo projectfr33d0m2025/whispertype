@@ -132,33 +132,33 @@ Note: See DEPENDENCIES.md for instructions. Packages should be added when projec
 ## Phase 4: Whisper Integration
 
 ### 4.1 WhisperWrapper Setup
-- [ ] Create WhisperWrapper.swift
-- [ ] Create C++ wrapper (whisper_wrapper.cpp) if needed for cleaner bridging
-- [ ] Implement initializeContext(modelPath:) → Bool
-- [ ] Load model file into whisper context
-- [ ] Handle model loading errors
+- [x] Create WhisperWrapper.swift
+- [x] Create C++ wrapper (whisper_wrapper.cpp) if needed for cleaner bridging
+- [x] Implement initializeContext(modelPath:) → Bool
+- [x] Load model file into whisper context
+- [x] Handle model loading errors
 
 ### 4.2 Transcription
-- [ ] Implement transcribe(audioData: [Float]) → String
-- [ ] Configure whisper_full_params:
+- [x] Implement transcribe(audioData: [Float]) → String
+- [x] Configure whisper_full_params:
   - Set language (en or auto)
   - Set n_threads (use performanceCores count)
   - Disable translate
   - Set print_progress = false
-- [ ] Run whisper_full() with audio data
-- [ ] Extract text from segments
-- [ ] Combine segments into final string
+- [x] Run whisper_full() with audio data
+- [x] Extract text from segments
+- [x] Combine segments into final string
 
 ### 4.3 Model Hot-Swapping
-- [ ] Implement reloadModel(path:)
-- [ ] Free existing context before loading new one
-- [ ] Listen for modelChanged notification
-- [ ] Handle reload errors (revert to previous or show error)
+- [x] Implement reloadModel(path:)
+- [x] Free existing context before loading new one
+- [x] Listen for modelChanged notification
+- [x] Handle reload errors (revert to previous or show error)
 
 ### 4.4 Performance Optimization
-- [ ] Implement model preloading on app start
-- [ ] Keep model in memory between transcriptions
-- [ ] Use appropriate thread count for device
+- [x] Implement model preloading on app start
+- [x] Keep model in memory between transcriptions
+- [x] Use appropriate thread count for device
 - [ ] Consider CoreML backend (future enhancement)
 
 ---
