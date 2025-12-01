@@ -61,9 +61,9 @@ Note: See DEPENDENCIES.md for instructions. Packages should be added when projec
   - selectedMicrophoneId: String?
 
 ### 1.3 Model Definitions
-- [ ] Create WhisperModelType enum with all model variants
-- [ ] Add computed properties: displayName, fileName, downloadURL, fileSize, speedRating, accuracyRating, description
-- [ ] Create helper methods: isEnglishOnly, isMultilingual
+- [x] Create WhisperModelType enum with all model variants
+- [x] Add computed properties: displayName, fileName, downloadURL, fileSize, speedRating, accuracyRating, description
+- [x] Create helper methods: isEnglishOnly, isMultilingual
 
 ---
 
