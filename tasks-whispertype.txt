@@ -166,10 +166,10 @@ Note: See DEPENDENCIES.md for instructions. Packages should be added when projec
 ## Phase 5: Text Injection
 
 ### 5.1 TextInjector Class
-- [ ] Create TextInjector.swift
-- [ ] Check for Accessibility permission
-- [ ] Prompt user to enable if not granted
-- [ ] Open System Settings to correct pane if needed
+- [x] Create TextInjector.swift
+- [x] Check for Accessibility permission
+- [x] Prompt user to enable if not granted
+- [x] Open System Settings to correct pane if needed
 
 ### 5.2 CGEvent Text Insertion
 - [ ] Implement injectText(_:) method
