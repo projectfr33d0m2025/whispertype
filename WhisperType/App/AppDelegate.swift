@@ -31,6 +31,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         Task { @MainActor in
             await checkInitialPermissions()
         }
+        
+        // Test TextInjector permission flow (Phase 5.1 testing)
+        Task { @MainActor in
+            let injector = TextInjector.shared
+            injector.printDiagnostics()
+            
+            // Test permission request (will show alert if not granted)
+            let hasPermission = injector.checkAndRequestPermission()
+            print("TextInjector: Permission granted: \(hasPermission)")
+        }
     }
 
     func applicationWillTerminate(_ notification: Notification) {
