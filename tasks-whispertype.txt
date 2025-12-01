@@ -41,11 +41,11 @@ Note: See DEPENDENCIES.md for instructions. Packages should be added when projec
 ## Phase 1: Core Infrastructure
 
 ### 1.1 App Entry Point & Lifecycle
-- [ ] Create WhisperTypeApp.swift with @main
-- [ ] Create AppDelegate.swift for NSApplicationDelegate
-- [ ] Set up app as agent (no dock icon)
-- [ ] Implement applicationDidFinishLaunching
-- [ ] Implement applicationWillTerminate (cleanup)
+- [x] Create WhisperTypeApp.swift with @main
+- [x] Create AppDelegate.swift for NSApplicationDelegate
+- [x] Set up app as agent (no dock icon)
+- [x] Implement applicationDidFinishLaunching
+- [x] Implement applicationWillTerminate (cleanup)
 
 ### 1.2 Constants & Configuration
 - [ ] Create Constants.swift with:
