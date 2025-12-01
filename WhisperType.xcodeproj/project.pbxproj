@@ -12,6 +12,7 @@
 		7B73EFC62EDD947C0062E68C /* ModelSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B73EFC52EDD947C0062E68C /* ModelSettingsView.swift */; };
 		7B73EFCA2EDD989E0062E68C /* AudioRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B73EFC92EDD989E0062E68C /* AudioRecorder.swift */; };
 		A1000093000000000000001 /* TextInjector.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000092000000000000001 /* TextInjector.swift */; };
+		A1000095000000000000001 /* HotkeyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000094000000000000001 /* HotkeyManager.swift */; };
 		A1000001000000000000001 /* WhisperTypeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000002000000000000001 /* WhisperTypeApp.swift */; };
 		A1000003000000000000001 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1000004000000000000001 /* Assets.xcassets */; };
 		A1000005000000000000001 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1000006000000000000001 /* Accelerate.framework */; };
@@ -38,6 +39,7 @@
 		7B73EFC52EDD947C0062E68C /* ModelSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelSettingsView.swift; sourceTree = "<group>"; };
 		7B73EFC92EDD989E0062E68C /* AudioRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecorder.swift; sourceTree = "<group>"; };
 		A1000092000000000000001 /* TextInjector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextInjector.swift; sourceTree = "<group>"; };
+		A1000094000000000000001 /* HotkeyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotkeyManager.swift; sourceTree = "<group>"; };
 		A1000002000000000000001 /* WhisperTypeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhisperTypeApp.swift; sourceTree = "<group>"; };
 		A1000004000000000000001 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A1000006000000000000001 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
@@ -163,6 +165,7 @@
 			isa = PBXGroup;
 			children = (
 				7B73EFC92EDD989E0062E68C /* AudioRecorder.swift */,
+				A1000094000000000000001 /* HotkeyManager.swift */,
 				7B73EFC12EDD944D0062E68C /* ModelManager.swift */,
 				A1000092000000000000001 /* TextInjector.swift */,
 				A1000071000000000000001 /* WhisperWrapper.swift */,
@@ -315,6 +318,7 @@
 				A1000062000000000000001 /* Permissions.swift in Sources */,
 				A1000070000000000000001 /* WhisperWrapper.swift in Sources */,
 				A1000093000000000000001 /* TextInjector.swift in Sources */,
+				A1000095000000000000001 /* HotkeyManager.swift in Sources */,
 				7B73EFC22EDD944D0062E68C /* ModelManager.swift in Sources */,
 				7B73EFC42EDD946C0062E68C /* ModelRowView.swift in Sources */,
 				7B73EFC62EDD947C0062E68C /* ModelSettingsView.swift in Sources */,
