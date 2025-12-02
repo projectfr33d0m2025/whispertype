@@ -274,32 +274,33 @@ Note: See DEPENDENCIES.md for instructions. Packages should be added when projec
 ## Phase 9: App Coordinator & Integration
 
 ### 9.1 AppCoordinator
-- [ ] Create AppCoordinator.swift as central controller
-- [ ] Initialize all managers on app start:
+- [x] Create AppCoordinator.swift as central controller
+- [x] Initialize all managers on app start:
   - ModelManager
   - HotkeyManager
   - AudioRecorder
   - WhisperWrapper
   - TextInjector
-- [ ] Wire up communication between components
+- [x] Wire up communication between components
 
 ### 9.2 Main Workflow Integration
-- [ ] Implement full recording → transcription → injection flow:
+- [x] Implement full recording → transcription → injection flow:
   1. Hotkey pressed → AudioRecorder.startRecording()
   2. Hotkey released → AudioRecorder.stopRecording()
   3. Convert audio format
   4. WhisperWrapper.transcribe(audio)
   5. TextInjector.injectText(result)
-- [ ] Update UI states throughout flow
-- [ ] Handle errors at each step
+- [x] Update UI states throughout flow
+- [x] Handle errors at each step
 
 ### 9.3 Error Handling
-- [ ] Create user-facing error alerts
-- [ ] Handle: no model downloaded
-- [ ] Handle: microphone permission denied
-- [ ] Handle: accessibility permission denied
-- [ ] Handle: transcription failed
-- [ ] Handle: text injection failed
+- [x] Create user-facing error notifications (non-blocking menu bar style)
+- [x] Handle: no model downloaded
+- [x] Handle: microphone permission denied
+- [x] Handle: accessibility permission denied
+- [x] Handle: transcription failed
+- [x] Handle: text injection failed
+- [x] Optional audio feedback sounds (configurable in settings)
 
 ---
 

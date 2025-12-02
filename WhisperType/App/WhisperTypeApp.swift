@@ -16,9 +16,6 @@ struct WhisperTypeApp: App {
     // Use ObservedObject for singletons (they're already created elsewhere)
     @ObservedObject private var coordinator = AppCoordinator.shared
     @ObservedObject private var modelManager = ModelManager.shared
-    
-    // State to control settings window visibility
-    @State private var settingsWindowOpen = false
 
     var body: some Scene {
         // Menu Bar Extra - Primary UI for the app
@@ -46,15 +43,40 @@ struct MenuBarIcon: View {
     var body: some View {
         Image(systemName: iconName)
             .symbolRenderingMode(.hierarchical)
+            .foregroundColor(iconColor)
     }
     
     private var iconName: String {
-        if coordinator.isProcessing {
-            return "ellipsis.circle"
-        } else if coordinator.isRecording {
-            return "mic.fill"
-        } else {
+        switch coordinator.state {
+        case .idle:
             return "waveform"
+        case .loading:
+            return "ellipsis.circle"
+        case .ready:
+            return "waveform"
+        case .recording:
+            return "mic.fill"
+        case .processing:
+            return "ellipsis.circle"
+        case .error:
+            return "exclamationmark.triangle"
+        }
+    }
+    
+    private var iconColor: Color {
+        switch coordinator.state {
+        case .idle:
+            return .secondary
+        case .loading:
+            return .orange
+        case .ready:
+            return .primary
+        case .recording:
+            return .red
+        case .processing:
+            return .orange
+        case .error:
+            return .red
         }
     }
 }
