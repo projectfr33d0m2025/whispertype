@@ -355,8 +355,8 @@ Note: See DEPENDENCIES.md for instructions. Packages should be added when projec
 
 ### 11.3 GitHub Release (if open source)
 - [x] Create GitHub repository
-- [ ] Push code
-- [ ] Create release with DMG attached
+- [x] Push code
+- [x] Create release with DMG attached
 - [x] Write release notes
 
 ---
