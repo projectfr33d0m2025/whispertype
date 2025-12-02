@@ -134,6 +134,12 @@ enum WhisperModelType: String, CaseIterable, Identifiable {
         let perfInfo = "\(speedDescription) • \(accuracyDescription) accuracy"
         return "\(langInfo) • \(fileSizeFormatted) • \(perfInfo)"
     }
+    
+    /// Short description for compact UI elements
+    var shortDescription: String {
+        let langInfo = isEnglishOnly ? "EN" : "Multi"
+        return "\(langInfo) • \(fileSizeFormatted)"
+    }
 
     var detailedDescription: String {
         let lang = isEnglishOnly ? "optimized for English" : "supports 74+ languages"
@@ -191,6 +197,18 @@ enum WhisperModelType: String, CaseIterable, Identifiable {
         case .mediumEn, .medium: return "12 GB"
         case .large: return "16 GB"
         }
+    }
+    
+    // MARK: - SHA256 Checksums
+    
+    /// SHA256 checksum for model file verification.
+    /// Note: These checksums are from the ggerganov/whisper.cpp Hugging Face repository.
+    /// If nil, checksum verification is skipped during download.
+    /// TODO: Update checksums when model versions stabilize
+    var sha256Checksum: String? {
+        // Disabled for now - model files on Hugging Face are frequently updated
+        // and checksums change. Re-enable once we pin to specific model versions.
+        return nil
     }
 
     // MARK: - Helpers

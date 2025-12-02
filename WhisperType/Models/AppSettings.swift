@@ -161,7 +161,7 @@ class AppSettings: ObservableObject {
            let mode = HotkeyMode(rawValue: modeString) {
             self._hotkeyMode = mode
         } else {
-            self._hotkeyMode = .hold
+            self._hotkeyMode = HotkeyMode(rawValue: Constants.Defaults.hotkeyMode) ?? .toggle
         }
 
         print("AppSettings: Initialized with active model: \(_activeModelId)")

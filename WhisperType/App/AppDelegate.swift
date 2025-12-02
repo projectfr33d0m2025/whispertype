@@ -12,24 +12,36 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     // MARK: - Properties
 
-    var appCoordinator: AppCoordinator?
+    var appCoordinator: AppCoordinator {
+        AppCoordinator.shared
+    }
+    
+    // Reference to settings window
+    private var settingsWindow: NSWindow?
+    
+    // Shared instance for access from other parts of the app
+    static var shared: AppDelegate?
 
     // MARK: - Application Lifecycle
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         print("WhisperType: Application launched")
+        
+        // Store shared instance
+        AppDelegate.shared = self
 
         // Configure app as agent (menu bar only, no dock icon)
         // This is also set via LSUIElement in Info.plist, but we can ensure it here
         NSApp.setActivationPolicy(.accessory)
 
-        // Initialize the app coordinator
-        appCoordinator = AppCoordinator()
-        appCoordinator?.start()
-
-        // Check permissions on launch
+        // Initialize and start the app coordinator asynchronously
         Task { @MainActor in
+            await appCoordinator.start()
+            
+            // Check permissions after coordinator is started
             await checkInitialPermissions()
+            
+            print("WhisperType: Ready! Press hotkey to toggle recording.")
         }
     }
 
@@ -37,12 +49,47 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         print("WhisperType: Application terminating")
 
         // Cleanup
-        appCoordinator?.cleanup()
-        appCoordinator = nil
+        appCoordinator.cleanup()
     }
 
     func applicationSupportsSecureRestorableState(_ app: NSApplication) -> Bool {
         return true
+    }
+    
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        // When the app is activated without visible windows (e.g., clicking dock icon if visible)
+        // Just return true to let the menu bar handle it
+        return true
+    }
+    
+    // MARK: - Settings Window
+    
+    func showSettingsWindow() {
+        // Bring app to foreground
+        NSApp.activate(ignoringOtherApps: true)
+        
+        // Try to find existing settings window
+        if let existingWindow = NSApp.windows.first(where: { $0.identifier?.rawValue == "settings" }) {
+            existingWindow.makeKeyAndOrderFront(nil)
+            return
+        }
+        
+        // Create new settings window if it doesn't exist
+        if settingsWindow == nil || settingsWindow?.isVisible == false {
+            let settingsView = SettingsContainerView()
+            let hostingController = NSHostingController(rootView: settingsView)
+            
+            let window = NSWindow(contentViewController: hostingController)
+            window.title = "WhisperType Settings"
+            window.identifier = NSUserInterfaceItemIdentifier("settings")
+            window.styleMask = [.titled, .closable, .miniaturizable]
+            window.setContentSize(NSSize(width: 550, height: 450))
+            window.center()
+            
+            settingsWindow = window
+        }
+        
+        settingsWindow?.makeKeyAndOrderFront(nil)
     }
 
     // MARK: - Permission Checking
@@ -59,42 +106,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 print("WhisperType: Microphone permission granted")
             } else {
                 print("WhisperType: Microphone permission denied")
-                showPermissionAlert(for: .microphone)
+                appCoordinator.showNotification("Microphone permission denied. Grant access in System Settings.", type: .warning)
             }
         } else if permissions.microphonePermission == .denied {
             print("WhisperType: Microphone permission previously denied")
-            showPermissionAlert(for: .microphone)
+            appCoordinator.showNotification("Microphone access required. Grant access in System Settings.", type: .warning)
         }
 
-        // Check accessibility permission
+        // Check accessibility permission (just warn, don't block)
         if !permissions.accessibilityPermission.isGranted {
             print("WhisperType: Accessibility permission not granted")
-            showPermissionAlert(for: .accessibility)
-        }
-    }
-
-    // MARK: - Alerts
-
-    @MainActor
-    private func showPermissionAlert(for type: Permissions.PermissionType) {
-        let alert = NSAlert()
-        alert.alertStyle = .warning
-
-        switch type {
-        case .microphone:
-            alert.messageText = "Microphone Access Required"
-            alert.informativeText = "WhisperType needs microphone access to record your voice for transcription. Please grant access in System Settings."
-        case .accessibility:
-            alert.messageText = "Accessibility Access Required"
-            alert.informativeText = "WhisperType needs accessibility access to insert transcribed text into other applications. Please grant access in System Settings."
-        }
-
-        alert.addButton(withTitle: "Open System Settings")
-        alert.addButton(withTitle: "Cancel")
-
-        let response = alert.runModal()
-        if response == .alertFirstButtonReturn {
-            Permissions.shared.openSystemSettings(for: type)
+            appCoordinator.showNotification("Accessibility access required for text injection. Grant access in System Settings.", type: .warning, duration: 6.0)
         }
     }
 }
