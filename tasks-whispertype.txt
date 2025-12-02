@@ -351,7 +351,7 @@ Note: See DEPENDENCIES.md for instructions. Packages should be added when projec
 - [x] Add app icon to DMG
 - [x] Add Applications folder shortcut
 - [x] Set DMG background (optional)
-- [ ] Test installation from DMG
+- [x] Test installation from DMG
 
 ### 11.3 GitHub Release (if open source)
 - [x] Create GitHub repository
