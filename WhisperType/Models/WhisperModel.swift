@@ -134,6 +134,12 @@ enum WhisperModelType: String, CaseIterable, Identifiable {
         let perfInfo = "\(speedDescription) • \(accuracyDescription) accuracy"
         return "\(langInfo) • \(fileSizeFormatted) • \(perfInfo)"
     }
+    
+    /// Short description for compact UI elements
+    var shortDescription: String {
+        let langInfo = isEnglishOnly ? "EN" : "Multi"
+        return "\(langInfo) • \(fileSizeFormatted)"
+    }
 
     var detailedDescription: String {
         let lang = isEnglishOnly ? "optimized for English" : "supports 74+ languages"

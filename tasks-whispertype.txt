@@ -214,33 +214,33 @@ Note: See DEPENDENCIES.md for instructions. Packages should be added when projec
 ## Phase 7: Menu Bar UI
 
 ### 7.1 Menu Bar Controller
-- [ ] Create MenuBarController.swift
-- [ ] Create NSStatusItem
-- [ ] Set up status bar button with icon
-- [ ] Create NSMenu with items
+- [x] Create MenuBarController.swift (using SwiftUI MenuBarExtra instead of NSStatusItem)
+- [x] Create NSStatusItem (via MenuBarExtra)
+- [x] Set up status bar button with icon
+- [x] Create NSMenu with items (via SwiftUI)
 
 ### 7.2 Menu Bar Icon States
-- [ ] Create/add icon assets:
-  - Default (waveform or microphone)
-  - Recording (red variant or filled)
-  - Processing (could be same as recording)
-- [ ] Implement updateIcon(state:) method
-- [ ] Add animation for recording state (optional)
+- [x] Create/add icon assets:
+  - Default (waveform or microphone) - using SF Symbol "waveform"
+  - Recording (red variant or filled) - using SF Symbol "mic.fill"
+  - Processing (could be same as recording) - using SF Symbol "ellipsis.circle"
+- [x] Implement updateIcon(state:) method (via reactive SwiftUI binding)
+- [x] Add animation for recording state (optional) - using symbolEffect(.pulse)
 
 ### 7.3 Menu Bar Menu Items
-- [ ] "Recording..." / "Ready" status item (disabled, informational)
-- [ ] Current model indicator
-- [ ] Separator
-- [ ] "Settings..." menu item → open settings window
+- [x] "Recording..." / "Ready" status item (disabled, informational)
+- [x] Current model indicator
+- [x] Separator
+- [x] "Settings..." menu item → open settings window
 - [ ] "Check for Updates..." (future)
-- [ ] Separator
-- [ ] "Quit WhisperType" menu item
+- [x] Separator
+- [x] "Quit WhisperType" menu item
 
 ### 7.4 Menu Bar View (SwiftUI)
-- [ ] Alternative: Use SwiftUI MenuBarExtra (macOS 13+)
-- [ ] Implement popover-style menu with SwiftUI
-- [ ] Show recording status and controls
-- [ ] Quick model switcher dropdown
+- [x] Alternative: Use SwiftUI MenuBarExtra (macOS 13+)
+- [x] Implement popover-style menu with SwiftUI
+- [x] Show recording status and controls
+- [ ] Quick model switcher dropdown (deferred to Phase 8 Settings)
 
 ---
 

@@ -12,6 +12,7 @@
 		7B73EFC62EDD947C0062E68C /* ModelSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B73EFC52EDD947C0062E68C /* ModelSettingsView.swift */; };
 		7B73EFCA2EDD989E0062E68C /* AudioRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B73EFC92EDD989E0062E68C /* AudioRecorder.swift */; };
 		7B73EFCF2EDDD9D10062E68C /* HotKey in Frameworks */ = {isa = PBXBuildFile; productRef = 7B73EFCE2EDDD9D10062E68C /* HotKey */; };
+		A7000001000000000000001 /* MenuBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7000002000000000000001 /* MenuBarView.swift */; };
 		A1000001000000000000001 /* WhisperTypeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000002000000000000001 /* WhisperTypeApp.swift */; };
 		A1000003000000000000001 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1000004000000000000001 /* Assets.xcassets */; };
 		A1000005000000000000001 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1000006000000000000001 /* Accelerate.framework */; };
@@ -39,6 +40,7 @@
 		7B73EFC32EDD946C0062E68C /* ModelRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelRowView.swift; sourceTree = "<group>"; };
 		7B73EFC52EDD947C0062E68C /* ModelSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelSettingsView.swift; sourceTree = "<group>"; };
 		7B73EFC92EDD989E0062E68C /* AudioRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecorder.swift; sourceTree = "<group>"; };
+		A7000002000000000000001 /* MenuBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarView.swift; sourceTree = "<group>"; };
 		A1000002000000000000001 /* WhisperTypeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhisperTypeApp.swift; sourceTree = "<group>"; };
 		A1000004000000000000001 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A1000006000000000000001 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
@@ -213,6 +215,7 @@
 		A1000024000000000000001 /* MenuBar */ = {
 			isa = PBXGroup;
 			children = (
+				A7000002000000000000001 /* MenuBarView.swift */,
 			);
 			path = MenuBar;
 			sourceTree = "<group>";
@@ -328,6 +331,7 @@
 				7B73EFC42EDD946C0062E68C /* ModelRowView.swift in Sources */,
 				7B73EFC62EDD947C0062E68C /* ModelSettingsView.swift in Sources */,
 				7B73EFCA2EDD989E0062E68C /* AudioRecorder.swift in Sources */,
+				A7000001000000000000001 /* MenuBarView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
