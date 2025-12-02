@@ -12,6 +12,7 @@ struct MenuBarView: View {
     @ObservedObject var modelManager = ModelManager.shared
     @ObservedObject var settings = AppSettings.shared
     @Environment(\.openWindow) private var openWindow
+    @Environment(\.dismiss) private var dismiss
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -205,6 +206,8 @@ struct MenuBarView: View {
     }
     
     private func openSettings() {
+        // Dismiss the menu bar popover first
+        dismiss()
         // Use SwiftUI's openWindow environment action
         openWindow(id: "settings")
     }
