@@ -170,11 +170,14 @@ struct MenuBarView: View {
     
     private var actionsSection: some View {
         VStack(spacing: 4) {
-            // Settings Button - Use openWindow to open the settings window
-            Button(action: openSettings) {
-                settingsButtonContent
+            // Settings Button
+            MenuBarButton(
+                title: "Settings...",
+                icon: "gear",
+                shortcut: "⌘,"
+            ) {
+                openSettings()
             }
-            .buttonStyle(.plain)
             
             // Quit Button
             MenuBarButton(
@@ -185,24 +188,6 @@ struct MenuBarView: View {
                 NSApplication.shared.terminate(nil)
             }
         }
-    }
-    
-    private var settingsButtonContent: some View {
-        HStack {
-            Image(systemName: "gear")
-                .frame(width: 20)
-                .foregroundColor(.secondary)
-            
-            Text("Settings...")
-            
-            Spacer()
-            
-            Text("⌘,")
-                .font(.caption)
-                .foregroundColor(.secondary)
-        }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 6)
     }
     
     private func openSettings() {
