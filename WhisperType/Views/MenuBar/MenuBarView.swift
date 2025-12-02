@@ -11,6 +11,7 @@ struct MenuBarView: View {
     @ObservedObject var coordinator: AppCoordinator
     @ObservedObject var modelManager = ModelManager.shared
     @ObservedObject var settings = AppSettings.shared
+    @Environment(\.openWindow) private var openWindow
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -168,19 +169,11 @@ struct MenuBarView: View {
     
     private var actionsSection: some View {
         VStack(spacing: 4) {
-            // Settings Button
-            if #available(macOS 14.0, *) {
-                SettingsLink {
-                    settingsButtonContent
-                }
-                .buttonStyle(.plain)
-            } else {
-                // Fallback for macOS 13.0
-                Button(action: openSettings) {
-                    settingsButtonContent
-                }
-                .buttonStyle(.plain)
+            // Settings Button - Use openWindow to open the settings window
+            Button(action: openSettings) {
+                settingsButtonContent
             }
+            .buttonStyle(.plain)
             
             // Quit Button
             MenuBarButton(
@@ -212,8 +205,8 @@ struct MenuBarView: View {
     }
     
     private func openSettings() {
-        // For macOS 13, use the standard preferences action
-        NSApp.sendAction(Selector(("showPreferencesWindow:")), to: nil, from: nil)
+        // Use SwiftUI's openWindow environment action
+        openWindow(id: "settings")
     }
 }
 

@@ -16,6 +16,9 @@ struct WhisperTypeApp: App {
     // Use ObservedObject for singletons (they're already created elsewhere)
     @ObservedObject private var coordinator = AppCoordinator.shared
     @ObservedObject private var modelManager = ModelManager.shared
+    
+    // State to control settings window visibility
+    @State private var settingsWindowOpen = false
 
     var body: some Scene {
         // Menu Bar Extra - Primary UI for the app
@@ -26,10 +29,12 @@ struct WhisperTypeApp: App {
         }
         .menuBarExtraStyle(.window)
         
-        // Settings Window
-        Settings {
+        // Settings Window - Use Window instead of Settings for better control
+        Window("WhisperType Settings", id: "settings") {
             SettingsContainerView()
         }
+        .windowResizability(.contentSize)
+        .defaultPosition(.center)
     }
 }
 
