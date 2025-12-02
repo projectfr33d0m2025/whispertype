@@ -363,10 +363,15 @@ class AppCoordinator: ObservableObject {
         print("AppCoordinator: 🎤 Starting recording...")
         
         do {
-            playRecordStartSound()
+            // Start recording first - this is the actual async operation
             try await audioRecorder.startRecording()
+            
+            // Only after recording has successfully started:
             isRecording = true
             state = .recording
+            playRecordStartSound()
+            
+            print("AppCoordinator: 🎤 Recording started successfully")
         } catch {
             handleError(error, context: "Starting recording")
         }
