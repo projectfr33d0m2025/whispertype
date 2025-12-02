@@ -392,8 +392,11 @@ struct MenuBarView: View {
     private func openSettings() {
         // Dismiss the menu bar popover first
         dismiss()
-        // Use SwiftUI's openWindow environment action
-        openWindow(id: "settings")
+        
+        // Use AppDelegate's method to show settings window (more reliable for menu bar apps)
+        DispatchQueue.main.async {
+            AppDelegate.shared?.showSettingsWindow()
+        }
     }
 }
 

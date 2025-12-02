@@ -15,11 +15,20 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var appCoordinator: AppCoordinator {
         AppCoordinator.shared
     }
+    
+    // Reference to settings window
+    private var settingsWindow: NSWindow?
+    
+    // Shared instance for access from other parts of the app
+    static var shared: AppDelegate?
 
     // MARK: - Application Lifecycle
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         print("WhisperType: Application launched")
+        
+        // Store shared instance
+        AppDelegate.shared = self
 
         // Configure app as agent (menu bar only, no dock icon)
         // This is also set via LSUIElement in Info.plist, but we can ensure it here
@@ -51,6 +60,36 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // When the app is activated without visible windows (e.g., clicking dock icon if visible)
         // Just return true to let the menu bar handle it
         return true
+    }
+    
+    // MARK: - Settings Window
+    
+    func showSettingsWindow() {
+        // Bring app to foreground
+        NSApp.activate(ignoringOtherApps: true)
+        
+        // Try to find existing settings window
+        if let existingWindow = NSApp.windows.first(where: { $0.identifier?.rawValue == "settings" }) {
+            existingWindow.makeKeyAndOrderFront(nil)
+            return
+        }
+        
+        // Create new settings window if it doesn't exist
+        if settingsWindow == nil || settingsWindow?.isVisible == false {
+            let settingsView = SettingsContainerView()
+            let hostingController = NSHostingController(rootView: settingsView)
+            
+            let window = NSWindow(contentViewController: hostingController)
+            window.title = "WhisperType Settings"
+            window.identifier = NSUserInterfaceItemIdentifier("settings")
+            window.styleMask = [.titled, .closable, .miniaturizable]
+            window.setContentSize(NSSize(width: 550, height: 450))
+            window.center()
+            
+            settingsWindow = window
+        }
+        
+        settingsWindow?.makeKeyAndOrderFront(nil)
     }
 
     // MARK: - Permission Checking
