@@ -168,14 +168,25 @@ struct MenuBarView: View {
     
     private var actionsSection: some View {
         VStack(spacing: 4) {
-            // Settings Button
-            MenuBarButton(
-                title: "Settings...",
-                icon: "gear",
-                shortcut: "⌘,"
-            ) {
-                openSettingsWindow()
+            // Settings Button - Use SettingsLink for proper Settings scene navigation
+            SettingsLink {
+                HStack {
+                    Image(systemName: "gear")
+                        .frame(width: 20)
+                        .foregroundColor(.secondary)
+                    
+                    Text("Settings...")
+                    
+                    Spacer()
+                    
+                    Text("⌘,")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                .padding(.horizontal, 8)
+                .padding(.vertical, 6)
             }
+            .buttonStyle(.plain)
             
             // Quit Button
             MenuBarButton(
@@ -186,24 +197,6 @@ struct MenuBarView: View {
                 NSApplication.shared.terminate(nil)
             }
         }
-    }
-    
-    // MARK: - Actions
-    
-    private func openSettingsWindow() {
-        // Open the Settings window using NSApp
-        // For macOS 13+, we use a notification-based approach
-        NotificationCenter.default.post(name: .openSettingsWindow, object: nil)
-        
-        // Also try the standard approach
-        if #available(macOS 14.0, *) {
-            // On macOS 14+, we could use @Environment(\.openSettings)
-            // but we're using notification for consistency
-        }
-        
-        // Fallback: Activate the app and show settings via menu
-        NSApp.activate(ignoringOtherApps: true)
-        NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
     }
 }
 
@@ -244,12 +237,6 @@ struct MenuBarButton: View {
             isHovered = hovering
         }
     }
-}
-
-// MARK: - Notification Name Extension
-
-extension Notification.Name {
-    static let openSettingsWindow = Notification.Name("openSettingsWindow")
 }
 
 // MARK: - Preview
