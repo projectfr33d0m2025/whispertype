@@ -73,8 +73,8 @@ xcodebuild build \
     -configuration "${CONFIGURATION}" \
     -derivedDataPath "${BUILD_DIR}/DerivedData" \
     CODE_SIGN_IDENTITY="-" \
-    CODE_SIGNING_REQUIRED=NO \
-    CODE_SIGNING_ALLOWED=NO \
+    CODE_SIGNING_REQUIRED=YES \
+    CODE_SIGNING_ALLOWED=YES \
     ONLY_ACTIVE_ARCH=NO \
     | grep -E "^(Build|Compile|Link|Sign|Copy|Process|Write|error:|warning:|\*\*)" || true
 
@@ -91,9 +91,13 @@ fi
 echo_info "Copying app to ${EXPORT_PATH}..."
 cp -R "${BUILT_APP_PATH}" "${APP_PATH}"
 
-# Remove code signature (if any) for unsigned distribution
-echo_info "Removing code signature for unsigned distribution..."
-codesign --remove-signature "${APP_PATH}" 2>/dev/null || true
+# Ad-hoc sign the app for local distribution (required by macOS)
+echo_info "Ad-hoc signing the app for distribution..."
+codesign --force --deep --sign - "${APP_PATH}"
+
+# Verify the signature
+echo_info "Verifying code signature..."
+codesign --verify --verbose "${APP_PATH}" && echo_info "Signature valid" || echo_warn "Signature verification had issues"
 
 # Get version info
 VERSION=$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "${APP_PATH}/Contents/Info.plist")
