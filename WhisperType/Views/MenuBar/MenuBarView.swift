@@ -137,18 +137,15 @@ struct MenuBarView: View {
         case .loading:
             Image(systemName: "ellipsis.circle")
                 .foregroundColor(.orange)
-                .symbolEffect(.pulse)
         case .ready:
             Image(systemName: "waveform")
                 .foregroundColor(.accentColor)
         case .recording:
             Image(systemName: "mic.fill")
                 .foregroundColor(.red)
-                .symbolEffect(.pulse)
         case .processing:
             Image(systemName: "ellipsis.circle")
                 .foregroundColor(.orange)
-                .symbolEffect(.pulse)
         case .error:
             Image(systemName: "exclamationmark.triangle")
                 .foregroundColor(.red)
