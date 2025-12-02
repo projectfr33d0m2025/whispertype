@@ -22,7 +22,7 @@ struct GeneralSettingsView: View {
             // MARK: - Startup Section
             Section {
                 Toggle("Launch WhisperType at login", isOn: $launchAtLoginEnabled)
-                    .onChange(of: launchAtLoginEnabled) { _, newValue in
+                    .onChange(of: launchAtLoginEnabled) { newValue in
                         updateLaunchAtLogin(newValue)
                     }
                 

@@ -68,7 +68,7 @@ struct HotkeySettingsView: View {
                     }
                 }
                 .pickerStyle(.radioGroup)
-                .onChange(of: settings.hotkeyMode) { _, newMode in
+                .onChange(of: settings.hotkeyMode) { newMode in
                     hotkeyManager.updateHotkeyMode(newMode)
                 }
             } header: {
