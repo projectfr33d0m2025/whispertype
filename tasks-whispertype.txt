@@ -341,23 +341,23 @@ Note: See DEPENDENCIES.md for instructions. Packages should be added when projec
 ## Phase 11: Distribution
 
 ### 11.1 Build Configuration
-- [ ] Set up Release build configuration
-- [ ] Configure code signing (or disable for unsigned distribution)
-- [ ] Set version and build numbers
-- [ ] Archive app
+- [x] Set up Release build configuration
+- [x] Configure code signing (or disable for unsigned distribution)
+- [x] Set version and build numbers
+- [x] Archive app
 
 ### 11.2 Create DMG
-- [ ] Create DMG for distribution
-- [ ] Add app icon to DMG
-- [ ] Add Applications folder shortcut
-- [ ] Set DMG background (optional)
+- [x] Create DMG for distribution
+- [x] Add app icon to DMG
+- [x] Add Applications folder shortcut
+- [x] Set DMG background (optional)
 - [ ] Test installation from DMG
 
 ### 11.3 GitHub Release (if open source)
-- [ ] Create GitHub repository
+- [x] Create GitHub repository
 - [ ] Push code
 - [ ] Create release with DMG attached
-- [ ] Write release notes
+- [x] Write release notes
 
 ---
 

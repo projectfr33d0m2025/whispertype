@@ -59,6 +59,26 @@ WhisperType is a free, open-source menu bar application that provides **system-w
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for build instructions.
 
+### Building a Release DMG
+
+To create a distributable DMG:
+
+```bash
+# 1. Build whisper.cpp libraries (if not already done)
+./Scripts/build-whisper.sh
+
+# 2. Build and create DMG in one step
+./Scripts/distribute.sh
+
+# Or run steps separately:
+./Scripts/build-release.sh  # Build the app
+./Scripts/create-dmg.sh     # Create the DMG
+```
+
+The DMG will be created in `build/WhisperType-X.X.X.dmg`.
+
+**Note:** This app is distributed unsigned. Users will need to right-click and select "Open" on first launch.
+
 ## First Launch Setup
 
 When you first launch WhisperType:
