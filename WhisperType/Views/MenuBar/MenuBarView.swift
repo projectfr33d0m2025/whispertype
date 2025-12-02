@@ -12,8 +12,6 @@ struct MenuBarView: View {
     @ObservedObject var modelManager = ModelManager.shared
     @ObservedObject var settings = AppSettings.shared
     
-    @Environment(\.openSettings) private var openSettings
-    
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             // Status Section
@@ -70,20 +68,20 @@ struct MenuBarView: View {
         }
     }
     
+    @ViewBuilder
     private var statusIcon: some View {
-        Group {
-            if coordinator.isProcessing {
-                Image(systemName: "ellipsis.circle")
-                    .foregroundColor(.orange)
-                    .symbolEffect(.pulse)
-            } else if coordinator.isRecording {
-                Image(systemName: "mic.fill")
-                    .foregroundColor(.red)
-                    .symbolEffect(.pulse)
-            } else {
-                Image(systemName: "waveform")
-                    .foregroundColor(.accentColor)
-            }
+        if coordinator.isProcessing {
+            // Processing state - orange ellipsis
+            Image(systemName: "ellipsis.circle")
+                .foregroundColor(.orange)
+        } else if coordinator.isRecording {
+            // Recording state - red mic
+            Image(systemName: "mic.fill")
+                .foregroundColor(.red)
+        } else {
+            // Idle state - accent waveform
+            Image(systemName: "waveform")
+                .foregroundColor(.accentColor)
         }
     }
     
@@ -193,14 +191,19 @@ struct MenuBarView: View {
     // MARK: - Actions
     
     private func openSettingsWindow() {
-        // For macOS 14+, we can use openSettings
-        // For macOS 13, we need a workaround
+        // Open the Settings window using NSApp
+        // For macOS 13+, we use a notification-based approach
+        NotificationCenter.default.post(name: .openSettingsWindow, object: nil)
+        
+        // Also try the standard approach
         if #available(macOS 14.0, *) {
-            openSettings()
-        } else {
-            // Fallback: Send notification to open settings
-            NotificationCenter.default.post(name: .openSettingsWindow, object: nil)
+            // On macOS 14+, we could use @Environment(\.openSettings)
+            // but we're using notification for consistency
         }
+        
+        // Fallback: Activate the app and show settings via menu
+        NSApp.activate(ignoringOtherApps: true)
+        NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
     }
 }
 
