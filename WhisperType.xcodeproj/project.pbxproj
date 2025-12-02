@@ -10,6 +10,9 @@
 		7B73EFC22EDD944D0062E68C /* ModelManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B73EFC12EDD944D0062E68C /* ModelManager.swift */; };
 		7B73EFC42EDD946C0062E68C /* ModelRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B73EFC32EDD946C0062E68C /* ModelRowView.swift */; };
 		7B73EFC62EDD947C0062E68C /* ModelSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B73EFC52EDD947C0062E68C /* ModelSettingsView.swift */; };
+		A8000001000000000000001 /* SettingsContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8000002000000000000001 /* SettingsContainerView.swift */; };
+		A8000003000000000000001 /* GeneralSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8000004000000000000001 /* GeneralSettingsView.swift */; };
+		A8000005000000000000001 /* HotkeySettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8000006000000000000001 /* HotkeySettingsView.swift */; };
 		7B73EFCA2EDD989E0062E68C /* AudioRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B73EFC92EDD989E0062E68C /* AudioRecorder.swift */; };
 		7B73EFCF2EDDD9D10062E68C /* HotKey in Frameworks */ = {isa = PBXBuildFile; productRef = 7B73EFCE2EDDD9D10062E68C /* HotKey */; };
 		A7000001000000000000001 /* MenuBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7000002000000000000001 /* MenuBarView.swift */; };
@@ -39,6 +42,9 @@
 		7B73EFC12EDD944D0062E68C /* ModelManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelManager.swift; sourceTree = "<group>"; };
 		7B73EFC32EDD946C0062E68C /* ModelRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelRowView.swift; sourceTree = "<group>"; };
 		7B73EFC52EDD947C0062E68C /* ModelSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelSettingsView.swift; sourceTree = "<group>"; };
+		A8000002000000000000001 /* SettingsContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsContainerView.swift; sourceTree = "<group>"; };
+		A8000004000000000000001 /* GeneralSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneralSettingsView.swift; sourceTree = "<group>"; };
+		A8000006000000000000001 /* HotkeySettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotkeySettingsView.swift; sourceTree = "<group>"; };
 		7B73EFC92EDD989E0062E68C /* AudioRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecorder.swift; sourceTree = "<group>"; };
 		A7000002000000000000001 /* MenuBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarView.swift; sourceTree = "<group>"; };
 		A1000002000000000000001 /* WhisperTypeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhisperTypeApp.swift; sourceTree = "<group>"; };
@@ -223,6 +229,9 @@
 		A1000025000000000000001 /* Settings */ = {
 			isa = PBXGroup;
 			children = (
+				A8000002000000000000001 /* SettingsContainerView.swift */,
+				A8000004000000000000001 /* GeneralSettingsView.swift */,
+				A8000006000000000000001 /* HotkeySettingsView.swift */,
 				7B73EFC52EDD947C0062E68C /* ModelSettingsView.swift */,
 			);
 			path = Settings;
@@ -330,6 +339,9 @@
 				7B73EFC22EDD944D0062E68C /* ModelManager.swift in Sources */,
 				7B73EFC42EDD946C0062E68C /* ModelRowView.swift in Sources */,
 				7B73EFC62EDD947C0062E68C /* ModelSettingsView.swift in Sources */,
+				A8000001000000000000001 /* SettingsContainerView.swift in Sources */,
+				A8000003000000000000001 /* GeneralSettingsView.swift in Sources */,
+				A8000005000000000000001 /* HotkeySettingsView.swift in Sources */,
 				7B73EFCA2EDD989E0062E68C /* AudioRecorder.swift in Sources */,
 				A7000001000000000000001 /* MenuBarView.swift in Sources */,
 			);

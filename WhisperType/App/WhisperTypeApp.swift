@@ -26,9 +26,9 @@ struct WhisperTypeApp: App {
         }
         .menuBarExtraStyle(.window)
         
-        // Settings Window (placeholder for Phase 8)
+        // Settings Window
         Settings {
-            SettingsPlaceholderView()
+            SettingsContainerView()
         }
     }
 }
@@ -51,49 +51,5 @@ struct MenuBarIcon: View {
         } else {
             return "waveform"
         }
-    }
-}
-
-// MARK: - Settings Placeholder (Phase 8)
-
-struct SettingsPlaceholderView: View {
-    var body: some View {
-        VStack(spacing: 20) {
-            Image(systemName: "gear")
-                .font(.system(size: 48))
-                .foregroundColor(.secondary)
-            
-            Text("Settings")
-                .font(.title)
-            
-            Text("Settings will be implemented in Phase 8")
-                .foregroundColor(.secondary)
-            
-            Divider()
-                .padding(.vertical)
-            
-            // Quick links to test functionality
-            VStack(alignment: .leading, spacing: 12) {
-                Text("Quick Actions:")
-                    .font(.headline)
-                
-                Button("Open Models Folder") {
-                    let modelsPath = ModelManager.shared.modelsDirectory
-                    NSWorkspace.shared.open(modelsPath)
-                }
-                
-                Button("Check Permissions") {
-                    let permissions = Permissions.shared
-                    print("Microphone: \(permissions.microphonePermission)")
-                    print("Accessibility: \(permissions.accessibilityPermission)")
-                }
-            }
-            .padding()
-            .frame(maxWidth: .infinity, alignment: .leading)
-            
-            Spacer()
-        }
-        .padding(40)
-        .frame(width: 450, height: 350)
     }
 }

@@ -247,27 +247,27 @@ Note: See DEPENDENCIES.md for instructions. Packages should be added when projec
 ## Phase 8: Settings Window
 
 ### 8.1 Settings Window Container
-- [ ] Create SettingsWindow.swift using Settings scene (SwiftUI)
-- [ ] Implement tab-based settings (General, Models, Hotkey)
-- [ ] Use native macOS settings appearance
+- [x] Create SettingsWindow.swift using Settings scene (SwiftUI)
+- [x] Implement tab-based settings (General, Models, Hotkey)
+- [x] Use native macOS settings appearance
 
 ### 8.2 General Settings Tab
-- [ ] Launch at login toggle (use SMAppService or LaunchAtLogin library)
-- [ ] Microphone selection dropdown
-- [ ] Audio feedback toggles (sound on record start/stop)
-- [ ] About section with version info
+- [x] Launch at login toggle (use SMAppService or LaunchAtLogin library)
+- [x] Microphone selection dropdown
+- [x] Audio feedback toggles (sound on record start/stop)
+- [x] About section with version info
 
 ### 8.3 Models Settings Tab
-- [ ] Embed ModelSettingsView
-- [ ] Show storage usage
-- [ ] "Open Models Folder" button
+- [x] Embed ModelSettingsView
+- [x] Show storage usage
+- [x] "Open Models Folder" button
 
 ### 8.4 Hotkey Settings Tab
-- [ ] Hotkey recorder control (KeyboardShortcuts or custom)
-- [ ] Display current hotkey
-- [ ] "Record New Hotkey" button
-- [ ] Reset to default button
-- [ ] Mode toggle: Hold-to-record vs Toggle
+- [x] Hotkey recorder control (KeyboardShortcuts or custom)
+- [x] Display current hotkey
+- [x] "Record New Hotkey" button
+- [x] Reset to default button
+- [x] Mode toggle: Hold-to-record vs Toggle
 
 ---
 
