@@ -347,12 +347,13 @@ class AppCoordinator: ObservableObject {
         }
         
         // Check microphone permission
-        guard audioRecorder.checkMicrophonePermission() else {
+        if !audioRecorder.checkMicrophonePermission() {
             showNotification("Microphone permission required", type: .error)
             playErrorSound()
             // Request permission
             do {
                 try await audioRecorder.requestMicrophonePermissionIfNeeded()
+                // Permission granted, continue with recording below
             } catch {
                 handleError(error, context: "Microphone permission")
                 return
