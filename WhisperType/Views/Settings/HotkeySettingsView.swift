@@ -150,6 +150,22 @@ struct HotkeyDisplayView: View {
             // Key name
             KeyCapView(symbol: keyName(for: keyCode))
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(accessibleHotkeyDescription)
+    }
+    
+    /// Spoken description of the hotkey for VoiceOver
+    private var accessibleHotkeyDescription: String {
+        var parts: [String] = []
+        
+        if modifiers.contains(.control) { parts.append("Control") }
+        if modifiers.contains(.option) { parts.append("Option") }
+        if modifiers.contains(.shift) { parts.append("Shift") }
+        if modifiers.contains(.command) { parts.append("Command") }
+        
+        parts.append(keyName(for: keyCode))
+        
+        return parts.joined(separator: " plus ")
     }
 
     private func keyName(for keyCode: UInt32) -> String {
@@ -225,6 +241,7 @@ struct KeyCapView: View {
             .padding(.vertical, 3)
             .background(Color.secondary.opacity(0.2))
             .cornerRadius(4)
+            .accessibilityHidden(true) // Parent view handles accessibility
     }
 }
 
@@ -252,6 +269,8 @@ struct HotkeyRecorderButton: View {
         .onDisappear {
             stopRecording()
         }
+        .accessibilityLabel(isRecording ? "Recording hotkey. Press your desired shortcut." : "Record New Hotkey")
+        .accessibilityHint(isRecording ? "Press any key combination to set as the new hotkey" : "Starts listening for a new keyboard shortcut")
     }
 
     private func toggleRecording() {

@@ -26,6 +26,14 @@ struct MenuBarView: View {
             // Status Section
             statusSection
             
+            // Audio Level Indicator (visible when recording)
+            if coordinator.isRecording {
+                AudioLevelIndicator(level: coordinator.audioLevel)
+                    .padding(.horizontal, 4)
+                    .padding(.top, 8)
+                    .transition(.opacity.combined(with: .scale(scale: 0.8)))
+            }
+            
             Divider()
                 .padding(.vertical, 8)
             
@@ -41,6 +49,7 @@ struct MenuBarView: View {
         .padding(12)
         .frame(width: 280)
         .animation(.easeInOut(duration: 0.2), value: coordinator.notification)
+        .animation(.easeInOut(duration: 0.15), value: coordinator.isRecording)
     }
     
     // MARK: - Notification Banner
@@ -112,6 +121,8 @@ struct MenuBarView: View {
         }
         .buttonStyle(.plain)
         .help("Start Recording (⌥Space)")
+        .accessibilityLabel("Start Recording")
+        .accessibilityHint("Press to begin voice transcription")
     }
     
     private var stopButton: some View {
@@ -126,6 +137,8 @@ struct MenuBarView: View {
         }
         .buttonStyle(.plain)
         .help("Stop Recording (⌥Space)")
+        .accessibilityLabel("Stop Recording")
+        .accessibilityHint("Press to stop recording and transcribe")
     }
     
     @ViewBuilder
@@ -134,21 +147,29 @@ struct MenuBarView: View {
         case .idle:
             Image(systemName: "waveform")
                 .foregroundColor(.secondary)
+                .accessibilityLabel("Idle")
         case .loading:
-            Image(systemName: "ellipsis.circle")
-                .foregroundColor(.orange)
+            ProgressView()
+                .scaleEffect(0.7)
+                .accessibilityLabel("Loading")
         case .ready:
             Image(systemName: "waveform")
                 .foregroundColor(.accentColor)
+                .symbolEffect(.pulse, options: .repeating.speed(0.5), value: false)
+                .accessibilityLabel("Ready")
         case .recording:
             Image(systemName: "mic.fill")
                 .foregroundColor(.red)
+                .symbolEffect(.pulse, options: .repeating, value: coordinator.isRecording)
+                .accessibilityLabel("Recording")
         case .processing:
-            Image(systemName: "ellipsis.circle")
-                .foregroundColor(.orange)
+            ProgressView()
+                .scaleEffect(0.7)
+                .accessibilityLabel("Processing")
         case .error:
             Image(systemName: "exclamationmark.triangle")
                 .foregroundColor(.red)
+                .accessibilityLabel("Error")
         }
     }
     
@@ -258,6 +279,8 @@ struct MenuBarView: View {
             .padding(8)
             .background(Color.secondary.opacity(0.1))
             .cornerRadius(8)
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("Active model: \(activeModel.displayName). \(activeModel.shortDescription). Speed rating \(activeModel.speedRating) out of 5.")
         } else if let selectedModel = modelManager.activeModel {
             // Model selected but not loaded
             HStack {
@@ -290,6 +313,8 @@ struct MenuBarView: View {
             .padding(8)
             .background(Color.orange.opacity(0.1))
             .cornerRadius(8)
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("Model \(selectedModel.displayName) is \(coordinator.state == .loading(message: "") ? "loading" : "not loaded")")
         } else {
             // No model selected
             HStack {
@@ -306,10 +331,14 @@ struct MenuBarView: View {
                 }
                 .buttonStyle(.plain)
                 .foregroundColor(.accentColor)
+                .accessibilityLabel("Select a model")
+                .accessibilityHint("Opens settings to download and select a transcription model")
             }
             .padding(8)
             .background(Color.red.opacity(0.1))
             .cornerRadius(8)
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("No model selected. Select a model to begin.")
         }
     }
     
@@ -392,6 +421,8 @@ struct MenuBarButton: View {
         .onHover { hovering in
             isHovered = hovering
         }
+        .accessibilityLabel(title)
+        .accessibilityHint(shortcut != nil ? "Keyboard shortcut: \(shortcut!)" : "")
     }
 }
 
@@ -407,13 +438,17 @@ struct AudioLevelIndicator: View {
                 RoundedRectangle(cornerRadius: 2)
                     .fill(Color.secondary.opacity(0.2))
                 
-                // Level indicator
+                // Level indicator with smooth animation
                 RoundedRectangle(cornerRadius: 2)
                     .fill(levelColor)
-                    .frame(width: geometry.size.width * CGFloat(level))
+                    .frame(width: geometry.size.width * CGFloat(min(max(level, 0), 1)))
+                    .animation(.easeOut(duration: 0.05), value: level)
             }
         }
         .frame(height: 4)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Audio level")
+        .accessibilityValue("\(Int(level * 100)) percent")
     }
     
     private var levelColor: Color {

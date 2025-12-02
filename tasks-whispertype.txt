@@ -321,20 +321,20 @@ Note: See DEPENDENCIES.md for instructions. Packages should be added when projec
 - [ ] Test on Intel vs Apple Silicon Macs
 
 ### 10.3 UI Polish
-- [ ] Add loading indicators where appropriate
-- [ ] Add success/error feedback (subtle animations or sounds)
-- [ ] Ensure Dark Mode support
-- [ ] Test VoiceOver accessibility
+- [x] Add loading indicators where appropriate
+- [x] Add success/error feedback (subtle animations or sounds)
+- [x] Ensure Dark Mode support
+- [x] Test VoiceOver accessibility
 
 ### 10.4 Documentation
-- [ ] Write README.md with:
+- [x] Write README.md with:
   - App description
   - Installation instructions
   - Usage guide
   - Building from source
   - License info
-- [ ] Add inline code documentation
-- [ ] Create CONTRIBUTING.md (if open source)
+- [x] Add inline code documentation
+- [x] Create CONTRIBUTING.md (if open source)
 
 ---
 

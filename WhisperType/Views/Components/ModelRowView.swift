@@ -74,6 +74,40 @@ struct ModelRowView: View {
             RoundedRectangle(cornerRadius: 8)
                 .stroke(isActive ? Color.green.opacity(0.5) : Color.clear, lineWidth: 2)
         )
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel(accessibilityDescription)
+    }
+    
+    /// Computed accessibility description for the model row
+    private var accessibilityDescription: String {
+        var parts: [String] = [model.displayName]
+        
+        if isActive {
+            parts.append("Active")
+        }
+        
+        if model.isEnglishOnly {
+            parts.append("English only")
+        } else {
+            parts.append("Multilingual")
+        }
+        
+        parts.append("Size: \(model.fileSizeFormatted)")
+        parts.append("Speed rating: \(model.speedRating) out of 5")
+        parts.append("Accuracy rating: \(model.accuracyRating) out of 5")
+        
+        switch downloadState {
+        case .notDownloaded:
+            parts.append("Not downloaded")
+        case .downloading(let progress):
+            parts.append("Downloading: \(Int(progress * 100)) percent")
+        case .downloaded:
+            parts.append("Downloaded")
+        case .failed(let error):
+            parts.append("Download failed: \(error)")
+        }
+        
+        return parts.joined(separator: ". ")
     }
 
     
@@ -103,11 +137,15 @@ struct ModelRowView: View {
                 Label("Download", systemImage: "arrow.down.circle")
             }
             .buttonStyle(.borderedProminent)
+            .accessibilityLabel("Download \(model.displayName)")
+            .accessibilityHint("Downloads the \(model.fileSizeFormatted) model file")
             
         case .downloading(let progress):
             VStack(spacing: 4) {
                 ProgressView(value: progress)
                     .frame(width: 80)
+                    .accessibilityLabel("Download progress")
+                    .accessibilityValue("\(Int(progress * 100)) percent")
                 
                 HStack {
                     Text("\(Int(progress * 100))%")
@@ -120,6 +158,7 @@ struct ModelRowView: View {
                     }
                     .buttonStyle(.plain)
                     .help("Cancel download")
+                    .accessibilityLabel("Cancel download")
                 }
             }
             
@@ -128,6 +167,8 @@ struct ModelRowView: View {
                 if !isActive {
                     Button("Set Active", action: onSetActive)
                         .buttonStyle(.bordered)
+                        .accessibilityLabel("Set \(model.displayName) as active model")
+                        .accessibilityHint("This model will be used for transcription")
                 }
                 
                 Button(action: onDelete) {
@@ -136,6 +177,8 @@ struct ModelRowView: View {
                 }
                 .buttonStyle(.bordered)
                 .help("Delete model")
+                .accessibilityLabel("Delete \(model.displayName)")
+                .accessibilityHint("Removes the downloaded model file")
             }
             
         case .failed(let error):
@@ -151,6 +194,8 @@ struct ModelRowView: View {
                 Button("Retry", action: onDownload)
                     .buttonStyle(.bordered)
                     .controlSize(.small)
+                    .accessibilityLabel("Retry download")
+                    .accessibilityHint("Download failed: \(error). Tap to try again.")
             }
             .help(error)
         }
