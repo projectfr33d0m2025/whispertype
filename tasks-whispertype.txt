@@ -248,7 +248,7 @@ Note: See DEPENDENCIES.md for instructions. Packages should be added when projec
 
 ### 8.1 Settings Window Container
 - [ ] Create SettingsWindow.swift using Settings scene (SwiftUI)
-- [ ] Implement tab-based settings (General, Models, Vocabulary, History, Hotkey)
+- [ ] Implement tab-based settings (General, Models, Hotkey)
 - [ ] Use native macOS settings appearance
 
 ### 8.2 General Settings Tab
@@ -268,124 +268,6 @@ Note: See DEPENDENCIES.md for instructions. Packages should be added when projec
 - [ ] "Record New Hotkey" button
 - [ ] Reset to default button
 - [ ] Mode toggle: Hold-to-record vs Toggle
-
----
-
-## Phase 8B: Vocabulary & Text Replacements
-
-### 8B.1 Data Models
-- [ ] Create VocabularyWord struct:
-  - word: String
-  - dateAdded: Date
-- [ ] Create TextReplacement struct:
-  - fromText: String
-  - toText: String
-  - caseSensitive: Bool
-  - enabled: Bool
-  - dateAdded: Date
-- [ ] Create VocabularyManager.swift as @Observable singleton
-
-### 8B.2 Vocabulary Storage
-- [ ] Store vocabulary in JSON file: ~/Library/Application Support/WhisperType/vocabulary.json
-- [ ] Implement loadVocabulary() on app start
-- [ ] Implement saveVocabulary() after changes
-- [ ] Add word limit (recommend max 20-30 words)
-
-### 8B.3 Vocabulary Integration with Whisper
-- [ ] Modify WhisperWrapper to accept vocabulary words
-- [ ] Build initial_prompt string from vocabulary words
-- [ ] Pass initial_prompt to whisper_full_params
-- [ ] Test that vocabulary words improve recognition
-
-### 8B.4 Text Replacements Engine
-- [ ] Implement TextReplacementEngine.swift
-- [ ] Method: applyReplacements(text: String) → String
-- [ ] Use word boundary matching (whole words only)
-- [ ] Support case-sensitive and case-insensitive modes
-- [ ] Apply replacements in order (first match wins)
-- [ ] Handle edge cases: punctuation, multiple spaces
-
-### 8B.5 Vocabulary Settings UI
-- [ ] Create VocabularySettingsView.swift
-- [ ] Two sections: Vocabulary Words, Text Replacements
-- [ ] Vocabulary section:
-  - List of current vocabulary words
-  - Add new word text field + button
-  - Delete button for each word
-  - Word count indicator (e.g., "5/30 words")
-- [ ] Replacements section:
-  - List showing "from" → "to" pairs
-  - Add replacement: two text fields + case-sensitive toggle
-  - Enable/disable toggle per replacement
-  - Delete button for each replacement
-  - Reorder capability (drag and drop)
-
-### 8B.6 Import/Export
-- [ ] Export vocabulary & replacements to JSON file
-- [ ] Import from JSON file
-- [ ] Validate imported data
-
----
-
-## Phase 8C: Transcription History
-
-### 8C.1 History Data Model
-- [ ] Create TranscriptionRecord struct:
-  - id: UUID
-  - timestamp: Date
-  - rawTranscription: String (before replacements)
-  - finalText: String (after replacements)
-  - duration: TimeInterval
-  - modelUsed: WhisperModelType
-  - audioFilePath: String? (optional, if keeping audio)
-- [ ] Create HistoryManager.swift as @Observable singleton
-
-### 8C.2 History Storage
-- [ ] Store history in JSON file: ~/Library/Application Support/WhisperType/history.json
-- [ ] Implement append(record:) - add new transcription
-- [ ] Implement loadHistory() on app start
-- [ ] Implement saveHistory() after changes
-- [ ] Implement configurable max history size (e.g., 500 entries)
-- [ ] Auto-prune old entries when limit exceeded
-
-### 8C.3 Audio File Storage (Optional)
-- [ ] Create audio storage directory: ~/Library/Application Support/WhisperType/AudioHistory/
-- [ ] Save audio file with UUID filename
-- [ ] Link audio path in TranscriptionRecord
-- [ ] Implement cleanup of orphaned audio files
-- [ ] Add setting: "Keep audio recordings" toggle
-- [ ] Add setting: "Audio retention period" (e.g., 7 days, 30 days, forever)
-
-### 8C.4 History Integration
-- [ ] After transcription completes, create TranscriptionRecord
-- [ ] Store raw text before applying replacements
-- [ ] Store final text after applying replacements
-- [ ] Save to history via HistoryManager
-
-### 8C.5 History Settings UI
-- [ ] Create HistorySettingsView.swift
-- [ ] Display list of transcriptions (newest first)
-- [ ] Each row shows:
-  - Timestamp (formatted: "Today 2:34 PM" or "Dec 1, 2025")
-  - Preview of text (truncated to ~50 chars)
-  - Duration
-  - Model used
-- [ ] Click row to expand and show full text
-- [ ] Copy button for each entry
-- [ ] Delete button for each entry (with confirmation)
-- [ ] "Clear All History" button (with confirmation)
-
-### 8C.6 History Search & Filter
-- [ ] Search bar to filter by text content
-- [ ] Date filter (Today, Last 7 days, Last 30 days, All)
-- [ ] Show result count
-
-### 8C.7 History Actions
-- [ ] Copy to clipboard action
-- [ ] Delete single entry action
-- [ ] Delete all entries action
-- [ ] Play audio (if audio file exists)
-- [ ] (Future) Reprocess with different model
 
 ---
 
@@ -494,10 +376,6 @@ Note: See DEPENDENCIES.md for instructions. Packages should be added when projec
 - [ ] Smart punctuation
 - [ ] Number formatting
 
-### History Reprocessing
-- [ ] Reprocess audio from history with different model
-- [ ] Reprocess with different vocabulary/replacements
-
 ---
 
 ## Notes for Claude Code
@@ -507,11 +385,9 @@ When implementing:
 2. Phase 2-3 can be developed in parallel
 3. Phase 4 is the core - spend time getting whisper.cpp integration right
 4. Test each phase before moving to next
-5. Phase 8B (Vocabulary) should be done after Phase 4 since it integrates with WhisperWrapper
-6. Phase 8C (History) should be done after Phase 9 since it needs the full transcription flow working
-7. Use `@Observable` (Swift 5.9+) instead of `ObservableObject` where possible
-8. Prefer async/await over completion handlers
-9. Use Swift concurrency (actors) for thread safety where appropriate
+5. Use `@Observable` (Swift 5.9+) instead of `ObservableObject` where possible
+6. Prefer async/await over completion handlers
+7. Use Swift concurrency (actors) for thread safety where appropriate
 
 Key files to reference:
 - whisper.cpp examples: Libraries/whisper.cpp/examples/
@@ -520,6 +396,3 @@ Key files to reference:
 
 Data storage locations:
 - Models: ~/Library/Application Support/WhisperType/Models/
-- Vocabulary: ~/Library/Application Support/WhisperType/vocabulary.json
-- History: ~/Library/Application Support/WhisperType/history.json
-- Audio recordings: ~/Library/Application Support/WhisperType/AudioHistory/
