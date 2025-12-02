@@ -173,14 +173,11 @@ class MicrophoneManager: ObservableObject {
     }
     
     private func loadDevices() {
-        let discoverySession = AVCaptureDevice.DiscoverySession(
-            deviceTypes: [.microphone, .builtInMicrophone, .externalUnknown],
-            mediaType: .audio,
-            position: .unspecified
-        )
+        // Use the simpler devices(for:) method which works on macOS 13.0+
+        let devices = AVCaptureDevice.devices(for: .audio)
         
         DispatchQueue.main.async {
-            self.availableMicrophones = discoverySession.devices
+            self.availableMicrophones = devices
             print("MicrophoneManager: Found \(self.availableMicrophones.count) microphones")
             for mic in self.availableMicrophones {
                 print("  - \(mic.localizedName) (\(mic.uniqueID))")
