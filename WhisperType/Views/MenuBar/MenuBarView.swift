@@ -168,25 +168,19 @@ struct MenuBarView: View {
     
     private var actionsSection: some View {
         VStack(spacing: 4) {
-            // Settings Button - Use SettingsLink for proper Settings scene navigation
-            SettingsLink {
-                HStack {
-                    Image(systemName: "gear")
-                        .frame(width: 20)
-                        .foregroundColor(.secondary)
-                    
-                    Text("Settings...")
-                    
-                    Spacer()
-                    
-                    Text("⌘,")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+            // Settings Button
+            if #available(macOS 14.0, *) {
+                SettingsLink {
+                    settingsButtonContent
                 }
-                .padding(.horizontal, 8)
-                .padding(.vertical, 6)
+                .buttonStyle(.plain)
+            } else {
+                // Fallback for macOS 13.0
+                Button(action: openSettings) {
+                    settingsButtonContent
+                }
+                .buttonStyle(.plain)
             }
-            .buttonStyle(.plain)
             
             // Quit Button
             MenuBarButton(
@@ -197,6 +191,29 @@ struct MenuBarView: View {
                 NSApplication.shared.terminate(nil)
             }
         }
+    }
+    
+    private var settingsButtonContent: some View {
+        HStack {
+            Image(systemName: "gear")
+                .frame(width: 20)
+                .foregroundColor(.secondary)
+            
+            Text("Settings...")
+            
+            Spacer()
+            
+            Text("⌘,")
+                .font(.caption)
+                .foregroundColor(.secondary)
+        }
+        .padding(.horizontal, 8)
+        .padding(.vertical, 6)
+    }
+    
+    private func openSettings() {
+        // For macOS 13, use the standard preferences action
+        NSApp.sendAction(Selector(("showPreferencesWindow:")), to: nil, from: nil)
     }
 }
 
