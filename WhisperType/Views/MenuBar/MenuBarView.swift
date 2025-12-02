@@ -153,15 +153,27 @@ struct MenuBarView: View {
                 .scaleEffect(0.7)
                 .accessibilityLabel("Loading")
         case .ready:
-            Image(systemName: "waveform")
-                .foregroundColor(.accentColor)
-                .symbolEffect(.pulse, options: .repeating.speed(0.5), value: false)
-                .accessibilityLabel("Ready")
+            if #available(macOS 14.0, *) {
+                Image(systemName: "waveform")
+                    .foregroundColor(.accentColor)
+                    .symbolEffect(.pulse, options: .repeating.speed(0.5), value: false)
+                    .accessibilityLabel("Ready")
+            } else {
+                Image(systemName: "waveform")
+                    .foregroundColor(.accentColor)
+                    .accessibilityLabel("Ready")
+            }
         case .recording:
-            Image(systemName: "mic.fill")
-                .foregroundColor(.red)
-                .symbolEffect(.pulse, options: .repeating, value: coordinator.isRecording)
-                .accessibilityLabel("Recording")
+            if #available(macOS 14.0, *) {
+                Image(systemName: "mic.fill")
+                    .foregroundColor(.red)
+                    .symbolEffect(.pulse, options: .repeating, value: coordinator.isRecording)
+                    .accessibilityLabel("Recording")
+            } else {
+                Image(systemName: "mic.fill")
+                    .foregroundColor(.red)
+                    .accessibilityLabel("Recording")
+            }
         case .processing:
             ProgressView()
                 .scaleEffect(0.7)
