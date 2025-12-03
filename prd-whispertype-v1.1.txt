@@ -1,0 +1,193 @@
+# Product Requirements Document: WhisperType v1.1
+
+## Overview
+
+**Product Name:** WhisperType  
+**Version:** 1.1.0  
+**Previous Version:** 1.0.0 (Released)
+**Platform:** macOS 13.0+ (Ventura and later)  
+**Tech Stack:** Swift, SwiftUI, whisper.cpp  
+
+---
+
+## What's New in v1.1
+
+### Feature Summary
+
+1. **F12: Recording Waveform Visualization** - Compact pill-shaped waveform indicator near menu bar
+2. **F13: Language Hint Configuration** - Allow users to specify input language for better accuracy
+
+---
+
+## Feature Specifications
+
+### F12: Recording Waveform Visualization
+
+#### Description
+Display a compact, pill-shaped waveform indicator near the menu bar area when recording is active. The visualization shows thin vertical bars that animate in response to audio input levels, providing real-time visual feedback.
+
+#### UI Design
+- **Shape:** Rounded pill/capsule shape (similar to macOS dictation indicator)
+- **Size:** Approximately 120pt wide × 32pt tall
+- **Position:** Near menu bar area, horizontally centered below the menu bar
+- **Background:** Dark semi-transparent background (#1C1C1E at 90% opacity) with blur effect
+- **Bars:** 40-50 thin vertical bars, light gray/white color
+- **Animation:** Bars respond to real-time audio level (AudioRecorder.audioLevel)
+
+#### Behavior
+1. **Show on recording start:**
+   - Window appears with fade-in animation when recording begins
+   - Position calculated relative to screen (centered horizontally, below menu bar)
+   
+2. **During recording:**
+   - Bars animate based on audio level (0.0 - 1.0)
+   - Center bars reach highest, edges taper off for natural waveform look
+   - Smooth interpolation between audio level updates
+   - Subtle idle animation when no audio detected
+   
+3. **Hide on recording stop:**
+   - Window fades out when recording stops or is cancelled
+   - No residual window after transcription completes
+
+#### Technical Implementation
+- Use NSPanel configured as:
+  - `.floating` level (above other windows)
+  - `.nonactivatingPanel` style mask
+  - Borderless, transparent background
+- SwiftUI view for the waveform visualization
+- Connect to existing AudioRecorder.audioLevel publisher
+- Handle multi-monitor setups (appear on screen with menu bar)
+
+#### Edge Cases
+- Multiple displays: Show on primary display or display with menu bar
+- Full-screen apps: Panel should still be visible (floating level)
+- Esc key: Cancel recording and hide panel immediately
+
+---
+
+### F13: Language Hint Configuration
+
+#### Description
+Allow users to specify the input language for transcription, which improves accuracy for non-English speech and reduces hallucinations when the model auto-detects incorrectly.
+
+#### Settings UI
+Add to General Settings tab:
+- **Section:** "Transcription"
+- **Control:** Dropdown/Picker for language selection
+- **Default:** "Auto-detect" 
+- **Options:**
+  - Auto-detect (let Whisper decide)
+  - English
+  - Chinese (Mandarin)
+  - Spanish
+  - French
+  - German
+  - Japanese
+  - Korean
+  - Portuguese
+  - Russian
+  - Italian
+  - Dutch
+  - Polish
+  - Turkish
+  - Arabic
+  - Hindi
+
+#### Technical Implementation
+- Store selected language in AppSettings as `languageHint: String?`
+- Pass language parameter to WhisperWrapper.transcribe()
+- Update whisper_full_params to set language:
+  - `params.language = "en"` for English
+  - `params.language = nil` for auto-detect
+- Persist setting in UserDefaults
+
+#### Behavior
+- When language is set, Whisper skips language detection step
+- Improves accuracy for known input language
+- Reduces processing time slightly (no detection overhead)
+- Note: English-only models (.en variants) ignore this setting
+
+---
+
+## Technical Architecture Changes
+
+### New Files
+```
+WhisperType/
+├── Views/
+│   ├── Recording/
+│   │   ├── RecordingOverlayWindow.swift    # NSPanel wrapper
+│   │   └── WaveformView.swift              # SwiftUI waveform visualization
+```
+
+### Modified Files
+- `AppSettings.swift` - Add languageHint property
+- `WhisperWrapper.swift` - Pass language parameter to whisper_full_params
+- `AppCoordinator.swift` - Show/hide recording overlay
+- `GeneralSettingsView.swift` - Add language picker
+
+---
+
+## User Experience
+
+### Recording Flow with Visualization
+1. User presses hotkey (Option+Space)
+2. Menu bar icon changes to recording state
+3. **NEW:** Waveform overlay appears near menu bar with fade-in
+4. Waveform bars animate based on audio input
+5. User releases hotkey or presses again to stop
+6. **NEW:** Waveform overlay fades out
+7. Menu bar icon changes to processing state
+8. Text is transcribed and injected
+
+### Language Selection Flow
+1. User opens Settings → General
+2. User selects preferred language from dropdown
+3. Setting is saved automatically
+4. Next transcription uses specified language hint
+
+---
+
+## Testing Checklist
+
+### Waveform Visualization
+- [ ] Overlay appears when recording starts
+- [ ] Overlay disappears when recording stops
+- [ ] Overlay disappears when recording is cancelled (Esc)
+- [ ] Bars animate based on actual audio input
+- [ ] Smooth animation without stuttering
+- [ ] Works on multiple monitor setups
+- [ ] Visible over full-screen applications
+- [ ] Appears in correct position (near menu bar)
+- [ ] Dark mode and light mode appearance correct
+
+### Language Hint
+- [ ] Setting persists across app restarts
+- [ ] Auto-detect works when no language specified
+- [ ] English setting improves English transcription
+- [ ] Non-English languages work correctly
+- [ ] English-only models handle language hint gracefully
+
+---
+
+## Future Considerations (v1.2+)
+
+- **Alternative ASR Models:** Research Parakeet (via parakeet-mlx) or other models for potential integration
+- **Real-time streaming:** Show partial transcription as user speaks
+- **Voice commands:** "Delete that", "New line", etc.
+- **Per-app settings:** Different models for different applications
+- **Translation mode:** Translate speech to different language
+
+---
+
+## Release Notes Draft
+
+### WhisperType 1.1.0
+
+**New Features:**
+- 🎵 **Recording Waveform Visualization** - See a beautiful animated waveform indicator while recording, providing real-time visual feedback of your voice input
+- 🌍 **Language Hint** - Specify your input language in Settings for improved transcription accuracy
+
+**Improvements:**
+- Better visual feedback during recording
+- Reduced hallucinations when input language is known

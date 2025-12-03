@@ -1,0 +1,189 @@
+# WhisperType v1.1 - Implementation Tasks
+
+## Overview
+This document breaks down the WhisperType v1.1 implementation into phases and actionable tasks.
+Check off tasks as they are completed.
+
+---
+
+## Phase 12: Recording Waveform Visualization
+
+### 12.1 Waveform View Component
+- [ ] Create WaveformView.swift with SwiftUI Canvas/Shape
+- [ ] Implement bar-based visualization (40-50 thin vertical bars)
+- [ ] Add @Binding for audioLevel (0.0 - 1.0)
+- [ ] Implement natural waveform shape (center bars taller, edges taper)
+- [ ] Add smooth animation with spring/easeOut timing
+- [ ] Add subtle idle animation when audio level is low
+- [ ] Test with varying audio levels
+
+### 12.2 Recording Overlay Window
+- [ ] Create RecordingOverlayWindow.swift as NSPanel wrapper
+- [ ] Configure panel properties:
+  - Level: .floating (above other windows)
+  - Collection behavior: .canJoinAllSpaces, .fullScreenAuxiliary
+  - Style: .borderless, .nonactivatingPanel
+  - Background: .clear
+- [ ] Create SwiftUI hosting view for WaveformView
+- [ ] Implement show() with fade-in animation
+- [ ] Implement hide() with fade-out animation
+- [ ] Calculate position (centered horizontally, below menu bar)
+- [ ] Handle screen changes and multi-monitor setups
+
+### 12.3 Overlay Container View
+- [ ] Create RecordingOverlayContentView.swift (SwiftUI)
+- [ ] Design pill-shaped container:
+  - Rounded rectangle with corner radius ~16pt
+  - Dark background (#1C1C1E) with 90% opacity
+  - Visual effect blur (.dark material)
+  - Approximate size: 120pt × 32pt
+- [ ] Embed WaveformView inside container
+- [ ] Add subtle shadow for depth
+
+### 12.4 Integration with AppCoordinator
+- [ ] Add RecordingOverlayWindow instance to AppCoordinator
+- [ ] Show overlay when state changes to .recording
+- [ ] Hide overlay when state changes from .recording to any other state
+- [ ] Connect WaveformView to AudioRecorder.audioLevel
+- [ ] Ensure overlay hides on Esc key cancellation
+- [ ] Test complete recording flow with visualization
+
+### 12.5 Polish and Edge Cases
+- [ ] Test on multiple monitor setups
+- [ ] Test with full-screen applications
+- [ ] Verify appearance in light and dark mode
+- [ ] Optimize animation performance (60fps target)
+- [ ] Ensure no memory leaks (overlay properly released)
+
+---
+
+## Phase 13: Language Hint Configuration
+
+### 13.1 Settings Model Updates
+- [ ] Add languageHint: String? to AppSettings
+- [ ] Add default value: nil (auto-detect)
+- [ ] Add UserDefaults persistence for languageHint
+- [ ] Create SupportedLanguage enum with common languages:
+  - auto (nil) - Auto-detect
+  - en - English
+  - zh - Chinese
+  - es - Spanish
+  - fr - French
+  - de - German
+  - ja - Japanese
+  - ko - Korean
+  - pt - Portuguese
+  - ru - Russian
+  - it - Italian
+  - nl - Dutch
+  - pl - Polish
+  - tr - Turkish
+  - ar - Arabic
+  - hi - Hindi
+
+### 13.2 Settings UI
+- [ ] Add "Transcription" section to GeneralSettingsView
+- [ ] Create language picker with Picker control
+- [ ] Display language name and code
+- [ ] Bind picker to AppSettings.languageHint
+- [ ] Add descriptive label: "Input Language"
+- [ ] Add helper text explaining the benefit
+
+### 13.3 WhisperWrapper Updates
+- [ ] Modify transcribe() to accept optional language parameter
+- [ ] Update whisper_full_params initialization:
+  - Set params.language to specified language code
+  - Handle nil/auto case appropriately
+- [ ] Read language setting from AppSettings in AppCoordinator
+- [ ] Pass language to WhisperWrapper during transcription
+
+### 13.4 Testing
+- [ ] Test auto-detect (default) behavior
+- [ ] Test English language hint with English audio
+- [ ] Test non-English language hint (e.g., Spanish, Chinese)
+- [ ] Verify English-only models handle language hint gracefully
+- [ ] Test setting persistence across app restarts
+
+---
+
+## Phase 14: Polish & Release
+
+### 14.1 Final Testing
+- [ ] Complete end-to-end testing of all v1.1 features
+- [ ] Test on Intel Mac (if available)
+- [ ] Test on Apple Silicon Mac
+- [ ] Performance profiling (waveform animation fps)
+- [ ] Memory usage monitoring
+
+### 14.2 Documentation
+- [ ] Update README.md with v1.1 features
+- [ ] Add waveform visualization screenshot
+- [ ] Document language hint feature
+- [ ] Write release notes
+
+### 14.3 Distribution
+- [ ] Update version to 1.1.0
+- [ ] Build Release configuration
+- [ ] Create DMG
+- [ ] Test installation from DMG
+- [ ] Create GitHub release
+- [ ] Upload DMG and write release notes
+
+---
+
+## Implementation Order
+
+**Recommended order:**
+1. Phase 12 (Waveform) - Most visible feature, provides immediate value
+2. Phase 13 (Language Hint) - Requires WhisperWrapper changes
+3. Phase 14 (Polish & Release)
+
+**Estimated effort:**
+- Phase 12: 3-4 hours (SwiftUI animation + NSPanel)
+- Phase 13: 1-2 hours (Settings + WhisperWrapper)
+- Phase 14: 1-2 hours (Testing + packaging)
+
+---
+
+## Notes for Implementation
+
+### Waveform Animation Tips
+- Use `withAnimation(.spring(response: 0.3, dampingFraction: 0.7))` for natural movement
+- Update at ~30Hz is sufficient (don't need 60fps for audio visualization)
+- Consider using `TimelineView` for smooth continuous animation
+- Keep bar count reasonable (40-50) for performance
+
+### NSPanel Configuration
+```swift
+let panel = NSPanel(
+    contentRect: NSRect(x: 0, y: 0, width: 120, height: 32),
+    styleMask: [.borderless, .nonactivatingPanel],
+    backing: .buffered,
+    defer: false
+)
+panel.level = .floating
+panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
+panel.isOpaque = false
+panel.backgroundColor = .clear
+panel.hasShadow = true
+```
+
+### Language Codes for Whisper
+Common language codes supported by Whisper:
+- "en" - English
+- "zh" - Chinese
+- "es" - Spanish
+- "fr" - French
+- "de" - German
+- "ja" - Japanese
+- "ko" - Korean
+- "pt" - Portuguese
+- "ru" - Russian
+- "it" - Italian
+- "nl" - Dutch
+- "pl" - Polish
+- "tr" - Turkish
+- "ar" - Arabic
+- "hi" - Hindi
+
+Pass `nil` or omit the parameter for auto-detection.
