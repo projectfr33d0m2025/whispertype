@@ -114,6 +114,11 @@ class AppCoordinator: ObservableObject {
     private var successSound: NSSound?
     private var errorSound: NSSound?
     
+    // MARK: - Recording Overlay
+    
+    private var recordingOverlay: RecordingOverlayWindow?
+    private var audioLevelUpdateTimer: Timer?
+    
     // MARK: - Notification Auto-Dismiss Timer
     
     private var notificationDismissTask: Task<Void, Never>?
@@ -137,6 +142,9 @@ class AppCoordinator: ObservableObject {
         // Set up audio feedback sounds
         setupAudioFeedback()
         
+        // Set up recording overlay
+        setupRecordingOverlay()
+        
         // Set up hotkey callbacks
         setupHotkeyManager()
         
@@ -157,6 +165,11 @@ class AppCoordinator: ObservableObject {
         if isRecording {
             audioRecorder.cancelRecording()
         }
+        
+        // Clean up recording overlay
+        hideRecordingOverlay()
+        recordingOverlay?.cleanup()
+        recordingOverlay = nil
         
         // Unregister hotkeys
         hotkeyManager.unregisterHotkey()
@@ -217,6 +230,42 @@ class AppCoordinator: ObservableObject {
     private func playErrorSound() {
         guard settings.playAudioFeedback else { return }
         errorSound?.play()
+    }
+    
+    // MARK: - Recording Overlay Setup
+    
+    private func setupRecordingOverlay() {
+        recordingOverlay = RecordingOverlayWindow()
+        print("AppCoordinator: Recording overlay initialized")
+    }
+    
+    /// Show the recording overlay and start audio level updates
+    private func showRecordingOverlay() {
+        recordingOverlay?.show()
+        startAudioLevelUpdates()
+    }
+    
+    /// Hide the recording overlay and stop audio level updates
+    private func hideRecordingOverlay() {
+        stopAudioLevelUpdates()
+        recordingOverlay?.hide()
+    }
+    
+    /// Start timer to update audio level for waveform visualization
+    private func startAudioLevelUpdates() {
+        // Update at ~25Hz to match AudioRecorder's level update rate
+        audioLevelUpdateTimer = Timer.scheduledTimer(withTimeInterval: 0.04, repeats: true) { [weak self] _ in
+            Task { @MainActor in
+                guard let self = self else { return }
+                self.recordingOverlay?.updateAudioLevel(self.audioRecorder.audioLevel)
+            }
+        }
+    }
+    
+    /// Stop the audio level update timer
+    private func stopAudioLevelUpdates() {
+        audioLevelUpdateTimer?.invalidate()
+        audioLevelUpdateTimer = nil
     }
     
     // MARK: - Hotkey Setup
@@ -370,6 +419,7 @@ class AppCoordinator: ObservableObject {
             isRecording = true
             state = .recording
             playRecordStartSound()
+            showRecordingOverlay()
             
             print("AppCoordinator: 🎤 Recording started successfully")
         } catch {
@@ -387,6 +437,7 @@ class AppCoordinator: ObservableObject {
         print("AppCoordinator: ⏹️ Stopping recording and starting transcription...")
         
         playRecordStopSound()
+        hideRecordingOverlay()
         isRecording = false
         isProcessing = true
         state = .processing
@@ -423,6 +474,7 @@ class AppCoordinator: ObservableObject {
         guard isRecording else { return }
         
         print("AppCoordinator: ❌ Cancelling recording...")
+        hideRecordingOverlay()
         audioRecorder.cancelRecording()
         isRecording = false
         state = .ready
