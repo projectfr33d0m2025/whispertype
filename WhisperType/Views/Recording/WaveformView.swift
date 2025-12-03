@@ -30,17 +30,17 @@ struct WaveformView: View {
     
     // MARK: - Constants
     
-    private let barSpacing: CGFloat = 1.5
-    private let minBarHeight: CGFloat = 3.0
+    private let barSpacing: CGFloat = 1.2
+    private let minBarHeight: CGFloat = 2.0
     private let maxBarHeight: CGFloat = 22.0
-    private let idleBarHeight: CGFloat = 3.0
+    private let idleBarHeight: CGFloat = 2.0
     
     // Animation timing
     private let frameRate: Double = 60.0
     
     // MARK: - Initialization
     
-    init(audioLevel: Binding<Float>, barCount: Int = 28, isActive: Bool = true) {
+    init(audioLevel: Binding<Float>, barCount: Int = 45, isActive: Bool = true) {
         self._audioLevel = audioLevel
         self.barCount = barCount
         self.isActive = isActive
@@ -66,7 +66,7 @@ struct WaveformView: View {
     
     private func drawWaveform(context: GraphicsContext, size: CGSize, date: Date) {
         let totalBarWidth = size.width / CGFloat(barCount)
-        let barWidth = max(2.5, totalBarWidth - barSpacing)  // Minimum 2.5pt for thicker bars
+        let barWidth = max(1.5, totalBarWidth - barSpacing)
         let centerY = size.height / 2
         
         // Time for animations
