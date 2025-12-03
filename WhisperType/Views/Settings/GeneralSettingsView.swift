@@ -2,7 +2,7 @@
 //  GeneralSettingsView.swift
 //  WhisperType
 //
-//  General settings tab: launch at login, microphone, audio feedback, about.
+//  General settings tab: launch at login, microphone, audio feedback, transcription, about.
 //
 
 import SwiftUI
@@ -12,10 +12,18 @@ import ServiceManagement
 struct GeneralSettingsView: View {
     
     @ObservedObject private var settings = AppSettings.shared
+    @ObservedObject private var modelManager = ModelManager.shared
     @StateObject private var microphoneManager = MicrophoneManager()
     
     @State private var launchAtLoginEnabled: Bool = false
     @State private var launchAtLoginError: String?
+    @State private var selectedLanguage: SupportedLanguage = .english
+    
+    /// Whether the currently active model is English-only
+    private var isEnglishOnlyModel: Bool {
+        guard let activeModel = modelManager.activeModel else { return false }
+        return activeModel.isEnglishOnly
+    }
     
     var body: some View {
         Form {
@@ -66,6 +74,37 @@ struct GeneralSettingsView: View {
             } header: {
                 Label("Audio Input", systemImage: "mic")
             }
+            
+            // MARK: - Transcription Section
+            Section {
+                Picker("Input Language", selection: $selectedLanguage) {
+                    ForEach(SupportedLanguage.allCases) { language in
+                        Text(language.displayName)
+                            .tag(language)
+                    }
+                }
+                .pickerStyle(.menu)
+                .disabled(isEnglishOnlyModel)
+                .onChange(of: selectedLanguage) { newValue in
+                    settings.languageHint = newValue.rawValue
+                }
+                
+                if isEnglishOnlyModel {
+                    HStack {
+                        Image(systemName: "info.circle")
+                            .foregroundColor(.blue)
+                        Text("Language selection is disabled for English-only models")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                } else {
+                    Text("Setting a language improves accuracy and reduces processing time")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+            } header: {
+                Label("Transcription", systemImage: "text.bubble")
+            }
 
             // MARK: - Audio Feedback Section
             Section {
@@ -114,6 +153,7 @@ struct GeneralSettingsView: View {
         .formStyle(.grouped)
         .onAppear {
             loadLaunchAtLoginStatus()
+            loadLanguageSetting()
         }
     }
 
@@ -142,6 +182,12 @@ struct GeneralSettingsView: View {
             // Revert the toggle
             launchAtLoginEnabled = !enabled
         }
+    }
+    
+    // MARK: - Language Setting
+    
+    private func loadLanguageSetting() {
+        selectedLanguage = SupportedLanguage(fromStored: settings.languageHint)
     }
 }
 

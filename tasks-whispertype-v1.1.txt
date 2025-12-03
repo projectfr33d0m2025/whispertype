@@ -62,10 +62,10 @@ Check off tasks as they are completed.
 ## Phase 13: Language Hint Configuration
 
 ### 13.1 Settings Model Updates
-- [ ] Add languageHint: String? to AppSettings
-- [ ] Add default value: nil (auto-detect)
-- [ ] Add UserDefaults persistence for languageHint
-- [ ] Create SupportedLanguage enum with common languages:
+- [x] Add languageHint: String? to AppSettings
+- [x] Add default value: nil (auto-detect)
+- [x] Add UserDefaults persistence for languageHint
+- [x] Create SupportedLanguage enum with common languages:
   - auto (nil) - Auto-detect
   - en - English
   - zh - Chinese
@@ -84,20 +84,21 @@ Check off tasks as they are completed.
   - hi - Hindi
 
 ### 13.2 Settings UI
-- [ ] Add "Transcription" section to GeneralSettingsView
-- [ ] Create language picker with Picker control
-- [ ] Display language name and code
-- [ ] Bind picker to AppSettings.languageHint
-- [ ] Add descriptive label: "Input Language"
-- [ ] Add helper text explaining the benefit
+- [x] Add "Transcription" section to GeneralSettingsView
+- [x] Create language picker with Picker control
+- [x] Display language name and code
+- [x] Bind picker to AppSettings.languageHint
+- [x] Add descriptive label: "Input Language"
+- [x] Add helper text explaining the benefit
+- [x] Disable picker when English-only model is selected
 
 ### 13.3 WhisperWrapper Updates
-- [ ] Modify transcribe() to accept optional language parameter
-- [ ] Update whisper_full_params initialization:
+- [x] Modify transcribe() to accept optional language parameter
+- [x] Update whisper_full_params initialization:
   - Set params.language to specified language code
   - Handle nil/auto case appropriately
-- [ ] Read language setting from AppSettings in AppCoordinator
-- [ ] Pass language to WhisperWrapper during transcription
+- [x] Read language setting from AppSettings in AppCoordinator
+- [x] Pass language to WhisperWrapper during transcription
 
 ### 13.4 Testing
 - [ ] Test auto-detect (default) behavior

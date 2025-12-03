@@ -85,6 +85,7 @@ enum Constants {
         static let audioRetentionDays = "audioRetentionDays"
         static let playAudioFeedback = "playAudioFeedback"
         static let hotkeyMode = "hotkeyMode" // "hold" or "toggle"
+        static let languageHint = "languageHint" // Language code for transcription
     }
 
     // MARK: - Default Values
@@ -104,6 +105,9 @@ enum Constants {
 
         // Hotkey mode
         static let hotkeyMode = "toggle" // "hold" or "toggle"
+        
+        // Language hint (default to English)
+        static let languageHint = "en"
     }
 
     // MARK: - Audio Settings

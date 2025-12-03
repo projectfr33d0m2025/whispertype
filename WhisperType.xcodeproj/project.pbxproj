@@ -25,6 +25,7 @@
 		A1000050000000000000001 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000051000000000000001 /* AppDelegate.swift */; };
 		A1000052000000000000001 /* AppCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000053000000000000001 /* AppCoordinator.swift */; };
 		A1000054000000000000001 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000055000000000000001 /* AppSettings.swift */; };
+		B1300001000000000000001 /* SupportedLanguage.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1300002000000000000001 /* SupportedLanguage.swift */; };
 		A1000056000000000000001 /* WhisperModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000057000000000000001 /* WhisperModel.swift */; };
 		A1000058000000000000001 /* TranscriptionResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000059000000000000001 /* TranscriptionResult.swift */; };
 		A1000060000000000000001 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000061000000000000001 /* Constants.swift */; };
@@ -63,6 +64,7 @@
 		A1000051000000000000001 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		A1000053000000000000001 /* AppCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCoordinator.swift; sourceTree = "<group>"; };
 		A1000055000000000000001 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
+		B1300002000000000000001 /* SupportedLanguage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportedLanguage.swift; sourceTree = "<group>"; };
 		A1000057000000000000001 /* WhisperModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhisperModel.swift; sourceTree = "<group>"; };
 		A1000059000000000000001 /* TranscriptionResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptionResult.swift; sourceTree = "<group>"; };
 		A1000061000000000000001 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
@@ -171,6 +173,7 @@
 			isa = PBXGroup;
 			children = (
 				A1000055000000000000001 /* AppSettings.swift */,
+				B1300002000000000000001 /* SupportedLanguage.swift */,
 				A1000057000000000000001 /* WhisperModel.swift */,
 				A1000059000000000000001 /* TranscriptionResult.swift */,
 			);
@@ -346,6 +349,7 @@
 				A1000050000000000000001 /* AppDelegate.swift in Sources */,
 				A1000052000000000000001 /* AppCoordinator.swift in Sources */,
 				A1000054000000000000001 /* AppSettings.swift in Sources */,
+				B1300001000000000000001 /* SupportedLanguage.swift in Sources */,
 				A1000056000000000000001 /* WhisperModel.swift in Sources */,
 				A1000058000000000000001 /* TranscriptionResult.swift in Sources */,
 				A1000060000000000000001 /* Constants.swift in Sources */,

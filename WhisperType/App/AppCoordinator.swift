@@ -495,8 +495,10 @@ class AppCoordinator: ObservableObject {
     private func transcribeAudio(_ samples: [Float]) async throws -> String {
         print("AppCoordinator: Transcribing \(samples.count) samples...")
         
-        // Get language setting (could be user preference in future)
-        let language = "en"
+        // Get language setting from AppSettings
+        // whisperLanguageCode returns nil for auto-detect, or the language code
+        let language = settings.whisperLanguageCode
+        print("AppCoordinator: Using language hint: \(language ?? "auto-detect")")
         
         // Transcribe using Whisper
         let transcription = try await whisperWrapper.transcribe(

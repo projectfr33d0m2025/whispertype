@@ -89,12 +89,12 @@ actor WhisperContext {
     /// Transcribe audio samples to text
     /// - Parameters:
     ///   - samples: Float32 audio samples at 16kHz mono
-    ///   - language: Language code (e.g., "en", "auto" for auto-detect)
+    ///   - language: Language code (e.g., "en", nil for auto-detect)
     ///   - vocabulary: Optional vocabulary words for initial prompt
     /// - Returns: Array of transcription segments
     func transcribe(
         samples: [Float],
-        language: String = "en",
+        language: String? = "en",
         vocabulary: [String] = []
     ) throws -> [TranscriptionSegment] {
         guard let ctx = context else {
@@ -115,30 +115,48 @@ actor WhisperContext {
         // Build initial prompt from vocabulary words
         let initialPrompt = vocabulary.isEmpty ? nil : vocabulary.joined(separator: ", ")
         
-        // Configure parameters using withCString for string handling
-        return try language.withCString { langPtr in
-            params.print_realtime = false
-            params.print_progress = false
-            params.print_timestamps = false
-            params.print_special = false
-            params.translate = false
-            params.language = langPtr
-            params.n_threads = threadCount
-            params.offset_ms = 0
-            params.no_context = true
-            params.single_segment = false
-            params.suppress_blank = true
-            params.suppress_nst = true
-            
-            // Set initial prompt if vocabulary is provided
-            if let prompt = initialPrompt {
-                return try prompt.withCString { promptPtr in
-                    params.initial_prompt = promptPtr
-                    return try performTranscription(ctx: ctx, samples: samples, params: params)
-                }
-            } else {
-                return try performTranscription(ctx: ctx, samples: samples, params: params)
+        // Set common parameters
+        params.print_realtime = false
+        params.print_progress = false
+        params.print_timestamps = false
+        params.print_special = false
+        params.translate = false
+        params.n_threads = threadCount
+        params.offset_ms = 0
+        params.no_context = true
+        params.single_segment = false
+        params.suppress_blank = true
+        params.suppress_nst = true
+        
+        // Handle language parameter - nil means auto-detect
+        if let language = language {
+            return try language.withCString { langPtr in
+                params.language = langPtr
+                return try performTranscriptionWithPrompt(ctx: ctx, samples: samples, params: params, initialPrompt: initialPrompt)
             }
+        } else {
+            // Auto-detect: set language to nil (Whisper will detect)
+            params.language = nil
+            return try performTranscriptionWithPrompt(ctx: ctx, samples: samples, params: params, initialPrompt: initialPrompt)
+        }
+    }
+    
+    private func performTranscriptionWithPrompt(
+        ctx: OpaquePointer,
+        samples: [Float],
+        params: whisper_full_params,
+        initialPrompt: String?
+    ) throws -> [TranscriptionSegment] {
+        var mutableParams = params
+        
+        // Set initial prompt if vocabulary is provided
+        if let prompt = initialPrompt {
+            return try prompt.withCString { promptPtr in
+                mutableParams.initial_prompt = promptPtr
+                return try performTranscription(ctx: ctx, samples: samples, params: mutableParams)
+            }
+        } else {
+            return try performTranscription(ctx: ctx, samples: samples, params: mutableParams)
         }
     }
     
@@ -306,12 +324,12 @@ class WhisperWrapper: ObservableObject {
     /// Transcribe audio samples to text
     /// - Parameters:
     ///   - samples: Float32 audio samples at 16kHz mono
-    ///   - language: Language code (default: "en")
+    ///   - language: Language code (nil for auto-detect, default: "en")
     ///   - vocabulary: Optional vocabulary words to improve recognition
     /// - Returns: Transcribed text
     func transcribe(
         samples: [Float],
-        language: String = "en",
+        language: String? = "en",
         vocabulary: [String] = []
     ) async throws -> String {
         guard let context = whisperContext else {
@@ -350,12 +368,12 @@ class WhisperWrapper: ObservableObject {
     /// Transcribe audio samples and return detailed segments
     /// - Parameters:
     ///   - samples: Float32 audio samples at 16kHz mono
-    ///   - language: Language code (default: "en")
+    ///   - language: Language code (nil for auto-detect, default: "en")
     ///   - vocabulary: Optional vocabulary words to improve recognition
     /// - Returns: Array of transcription segments with timing info
     func transcribeWithSegments(
         samples: [Float],
-        language: String = "en",
+        language: String? = "en",
         vocabulary: [String] = []
     ) async throws -> [TranscriptionSegment] {
         guard let context = whisperContext else {

@@ -27,6 +27,7 @@ class AppSettings: ObservableObject {
     private var _audioRetentionDays: Int = 0
     private var _playAudioFeedback: Bool = false
     private var _hotkeyMode: HotkeyMode = .hold
+    private var _languageHint: String = ""
 
     // MARK: - Public Computed Properties
 
@@ -121,6 +122,22 @@ class AppSettings: ObservableObject {
         }
     }
 
+    var languageHint: String {
+        get { _languageHint }
+        set {
+            objectWillChange.send()
+            _languageHint = newValue
+            UserDefaults.standard.set(newValue, forKey: Constants.UserDefaultsKeys.languageHint)
+            print("AppSettings: Language hint changed to \(newValue)")
+        }
+    }
+    
+    /// Get the language code to pass to Whisper (nil for auto-detect)
+    var whisperLanguageCode: String? {
+        let language = SupportedLanguage(fromStored: _languageHint)
+        return language.whisperCode
+    }
+
     // MARK: - Initialization
 
     private init() {
@@ -164,6 +181,9 @@ class AppSettings: ObservableObject {
             self._hotkeyMode = HotkeyMode(rawValue: Constants.Defaults.hotkeyMode) ?? .toggle
         }
 
+        self._languageHint = defaults.string(forKey: Constants.UserDefaultsKeys.languageHint)
+            ?? Constants.Defaults.languageHint
+
         print("AppSettings: Initialized with active model: \(_activeModelId)")
     }
 
@@ -179,6 +199,7 @@ class AppSettings: ObservableObject {
         audioRetentionDays = Constants.Defaults.audioRetentionDays
         playAudioFeedback = Constants.Defaults.playAudioFeedback
         hotkeyMode = .hold
+        languageHint = Constants.Defaults.languageHint
 
         print("AppSettings: Reset to defaults")
     }
