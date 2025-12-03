@@ -361,23 +361,6 @@ Note: See DEPENDENCIES.md for instructions. Packages should be added when projec
 
 ---
 
-## Future Enhancements (Post v1.0)
-
-### CoreML Acceleration
-- [ ] Download CoreML model variants
-- [ ] Configure whisper.cpp to use CoreML backend
-- [ ] Benchmark performance improvement
-
-### Voice Commands
-- [ ] Detect command phrases: "delete that", "new line", etc.
-- [ ] Execute commands instead of typing
-
-### Improved Text Formatting
-- [ ] Auto-capitalization
-- [ ] Smart punctuation
-- [ ] Number formatting
-
----
 
 ## Notes for Claude Code
 
