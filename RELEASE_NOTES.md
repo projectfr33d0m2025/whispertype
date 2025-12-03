@@ -1,6 +1,48 @@
-# Release Notes - WhisperType v1.0.0
+# Release Notes
 
-## What's New
+---
+
+## WhisperType v1.1.0
+
+### New Features
+
+🎵 **Recording Waveform Visualization**
+- Beautiful animated waveform indicator appears while recording
+- Real-time visual feedback showing your audio input levels
+- Compact pill-shaped overlay positioned near the menu bar
+- Smooth animations that respond to your voice
+
+🌍 **Language Hint Configuration**
+- Specify your input language in Settings → General for improved accuracy
+- Supports 15+ languages including English, Chinese, Spanish, French, German, Japanese, Korean, and more
+- Reduces transcription errors when Whisper knows which language to expect
+- "Auto-detect" option available for mixed-language use
+
+### Improvements
+
+- Better visual feedback during recording
+- Reduced hallucinations when input language is specified
+- Slightly faster transcription when language is set (skips detection step)
+
+### System Requirements
+
+- macOS 13.0 (Ventura) or later
+- Apple Silicon (M1/M2/M3) or Intel Mac
+- Microphone
+- ~75MB to 3.1GB storage for Whisper models
+
+### Installation
+
+1. Download `WhisperType-1.1.0.dmg`
+2. Open the DMG and drag WhisperType to Applications
+3. Right-click WhisperType and select "Open" (required for unsigned apps)
+4. Grant Microphone and Accessibility permissions when prompted
+
+---
+
+## WhisperType v1.0.0
+
+### What's New
 
 This is the initial release of WhisperType, a free, privacy-focused voice transcription app for macOS.
 
@@ -40,17 +82,11 @@ This is the initial release of WhisperType, a free, privacy-focused voice transc
 - Large models (medium, large) require significant RAM and may be slow on older machines
 - No real-time streaming transcription (coming in future versions)
 
-### Checksums
-
-```
-SHA256: [CHECKSUM_HERE]
-```
-
 ---
 
 ## Feedback & Issues
 
-Please report issues on GitHub: https://github.com/YOUR_USERNAME/whispertype/issues
+Please report issues on GitHub: https://github.com/projectfr33d0m2025/whispertype/issues
 
 ## License
 

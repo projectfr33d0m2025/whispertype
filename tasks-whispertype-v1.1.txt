@@ -112,22 +112,22 @@ Check off tasks as they are completed.
 ## Phase 14: Polish & Release
 
 ### 14.1 Final Testing
-- [ ] Complete end-to-end testing of all v1.1 features
-- [ ] Test on Intel Mac (if available)
-- [ ] Test on Apple Silicon Mac
-- [ ] Performance profiling (waveform animation fps)
-- [ ] Memory usage monitoring
+- [x] Complete end-to-end testing of all v1.1 features
+- [x] Test on Intel Mac (if available)
+- [x] Test on Apple Silicon Mac
+- [x] Performance profiling (waveform animation fps)
+- [x] Memory usage monitoring
 
 ### 14.2 Documentation
-- [ ] Update README.md with v1.1 features
-- [ ] Add waveform visualization screenshot
-- [ ] Document language hint feature
-- [ ] Write release notes
+- [x] Update README.md with v1.1 features
+- [x] Add waveform visualization screenshot
+- [x] Document language hint feature
+- [x] Write release notes
 
 ### 14.3 Distribution
-- [ ] Update version to 1.1.0
-- [ ] Build Release configuration
-- [ ] Create DMG
+- [x] Update version to 1.1.0
+- [x] Build Release configuration
+- [x] Create DMG
 - [ ] Test installation from DMG
 - [ ] Create GitHub release
 - [ ] Upload DMG and write release notes

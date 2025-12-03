@@ -36,6 +36,8 @@ WhisperType is a free, open-source menu bar application that provides **system-w
 - ⌨️ **Global hotkey** — Quick activation with customizable shortcut (default: `⌥Space`)
 - 📦 **Multiple model sizes** — From tiny (75 MB) to large (3.1 GB)
 - 🌍 **Multi-language support** — English-only or multilingual models available
+- 🎵 **Recording waveform** — Real-time animated visual feedback while recording
+- 🗣️ **Language hints** — Specify input language for improved accuracy
 - 🎯 **Menu bar app** — Unobtrusive, always accessible
 - 🔊 **Audio feedback** — Optional sounds for recording start/stop
 
@@ -110,9 +112,10 @@ When you first launch WhisperType:
 
 1. **Click in any text field** where you want to type
 2. **Press and hold** `⌥Space` (or your configured hotkey)
-3. **Speak** your text naturally
-4. **Release** the hotkey
-5. Your speech is transcribed and inserted at the cursor
+3. **Watch the waveform** — A floating indicator appears showing your audio input
+4. **Speak** your text naturally
+5. **Release** the hotkey
+6. Your speech is transcribed and inserted at the cursor
 
 ### Recording Modes
 
@@ -179,6 +182,7 @@ Access settings by clicking the menu bar icon → **Settings**.
 - **Launch at Login** — Start WhisperType when you log in
 - **Microphone** — Select which microphone to use
 - **Audio Feedback** — Play sounds when recording starts/stops
+- **Input Language** — Specify the language you'll be speaking for improved accuracy (default: Auto-detect)
 
 ### Models Tab
 
@@ -227,6 +231,7 @@ Access settings by clicking the menu bar icon → **Settings**.
 
 - **Speak clearly** and at a normal pace
 - **Reduce background noise** or use a better microphone
+- **Set your language** — Go to Settings → General and select your input language instead of "Auto-detect"
 - Try a **larger model** (Small or Medium)
 - For non-English, use **multilingual models**
 
