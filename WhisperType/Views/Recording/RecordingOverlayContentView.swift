@@ -19,16 +19,16 @@ struct RecordingOverlayContentView: View {
     private let containerWidth: CGFloat = 120
     private let containerHeight: CGFloat = 32
     private let cornerRadius: CGFloat = 16
-    private let backgroundColor = Color(red: 0.11, green: 0.11, blue: 0.12) // #1C1C1E
-    private let backgroundOpacity: Double = 0.90
+    private let backgroundColor = Color(red: 0.05, green: 0.05, blue: 0.06) // Darker background
+    private let backgroundOpacity: Double = 0.95
     
     // MARK: - Body
     
     var body: some View {
         ZStack {
-            // Background with blur effect
+            // Background with dark blur effect
             RoundedRectangle(cornerRadius: cornerRadius)
-                .fill(.ultraThinMaterial)
+                .fill(.thickMaterial)
                 .background(
                     RoundedRectangle(cornerRadius: cornerRadius)
                         .fill(backgroundColor.opacity(backgroundOpacity))

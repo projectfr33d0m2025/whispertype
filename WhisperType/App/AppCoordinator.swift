@@ -478,7 +478,7 @@ class AppCoordinator: ObservableObject {
         audioRecorder.cancelRecording()
         isRecording = false
         state = .ready
-        showNotification("Recording cancelled", type: .info)
+        // No toast notification - the overlay disappearing is sufficient feedback
     }
     
     /// Toggle recording on/off (for toggle mode)
