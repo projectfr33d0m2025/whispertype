@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B1200001000000000000001 /* WaveformView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1200002000000000000001 /* WaveformView.swift */; };
 		7B73EFC22EDD944D0062E68C /* ModelManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B73EFC12EDD944D0062E68C /* ModelManager.swift */; };
 		7B73EFC42EDD946C0062E68C /* ModelRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B73EFC32EDD946C0062E68C /* ModelRowView.swift */; };
 		7B73EFC62EDD947C0062E68C /* ModelSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B73EFC52EDD947C0062E68C /* ModelSettingsView.swift */; };
@@ -39,6 +40,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		B1200002000000000000001 /* WaveformView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaveformView.swift; sourceTree = "<group>"; };
 		7B73EFC12EDD944D0062E68C /* ModelManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelManager.swift; sourceTree = "<group>"; };
 		7B73EFC32EDD946C0062E68C /* ModelRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelRowView.swift; sourceTree = "<group>"; };
 		7B73EFC52EDD947C0062E68C /* ModelSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelSettingsView.swift; sourceTree = "<group>"; };
@@ -187,6 +189,7 @@
 			isa = PBXGroup;
 			children = (
 				A1000024000000000000001 /* MenuBar */,
+				B1200003000000000000001 /* Recording */,
 				A1000025000000000000001 /* Settings */,
 				A1000026000000000000001 /* Components */,
 			);
@@ -243,6 +246,14 @@
 				7B73EFC32EDD946C0062E68C /* ModelRowView.swift */,
 			);
 			path = Components;
+			sourceTree = "<group>";
+		};
+		B1200003000000000000001 /* Recording */ = {
+			isa = PBXGroup;
+			children = (
+				B1200002000000000000001 /* WaveformView.swift */,
+			);
+			path = Recording;
 			sourceTree = "<group>";
 		};
 		A1000101000000000000001 /* Config */ = {
@@ -344,6 +355,7 @@
 				A8000005000000000000001 /* HotkeySettingsView.swift in Sources */,
 				7B73EFCA2EDD989E0062E68C /* AudioRecorder.swift in Sources */,
 				A7000001000000000000001 /* MenuBarView.swift in Sources */,
+				B1200001000000000000001 /* WaveformView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -9,12 +9,12 @@ Check off tasks as they are completed.
 ## Phase 12: Recording Waveform Visualization
 
 ### 12.1 Waveform View Component
-- [ ] Create WaveformView.swift with SwiftUI Canvas/Shape
-- [ ] Implement bar-based visualization (40-50 thin vertical bars)
-- [ ] Add @Binding for audioLevel (0.0 - 1.0)
-- [ ] Implement natural waveform shape (center bars taller, edges taper)
-- [ ] Add smooth animation with spring/easeOut timing
-- [ ] Add subtle idle animation when audio level is low
+- [x] Create WaveformView.swift with SwiftUI Canvas/Shape
+- [x] Implement bar-based visualization (40-50 thin vertical bars)
+- [x] Add @Binding for audioLevel (0.0 - 1.0)
+- [x] Implement natural waveform shape (center bars taller, edges taper)
+- [x] Add smooth animation with spring/easeOut timing
+- [x] Add subtle idle animation when audio level is low
 - [ ] Test with varying audio levels
 
 ### 12.2 Recording Overlay Window
