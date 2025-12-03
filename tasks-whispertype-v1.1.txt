@@ -18,27 +18,27 @@ Check off tasks as they are completed.
 - [ ] Test with varying audio levels
 
 ### 12.2 Recording Overlay Window
-- [ ] Create RecordingOverlayWindow.swift as NSPanel wrapper
-- [ ] Configure panel properties:
+- [x] Create RecordingOverlayWindow.swift as NSPanel wrapper
+- [x] Configure panel properties:
   - Level: .floating (above other windows)
   - Collection behavior: .canJoinAllSpaces, .fullScreenAuxiliary
   - Style: .borderless, .nonactivatingPanel
   - Background: .clear
-- [ ] Create SwiftUI hosting view for WaveformView
-- [ ] Implement show() with fade-in animation
-- [ ] Implement hide() with fade-out animation
-- [ ] Calculate position (centered horizontally, below menu bar)
-- [ ] Handle screen changes and multi-monitor setups
+- [x] Create SwiftUI hosting view for WaveformView
+- [x] Implement show() with fade-in animation
+- [x] Implement hide() with fade-out animation
+- [x] Calculate position (centered horizontally, below menu bar)
+- [x] Handle screen changes and multi-monitor setups
 
 ### 12.3 Overlay Container View
-- [ ] Create RecordingOverlayContentView.swift (SwiftUI)
-- [ ] Design pill-shaped container:
+- [x] Create RecordingOverlayContentView.swift (SwiftUI)
+- [x] Design pill-shaped container:
   - Rounded rectangle with corner radius ~16pt
   - Dark background (#1C1C1E) with 90% opacity
   - Visual effect blur (.dark material)
   - Approximate size: 120pt × 32pt
-- [ ] Embed WaveformView inside container
-- [ ] Add subtle shadow for depth
+- [x] Embed WaveformView inside container
+- [x] Add subtle shadow for depth
 
 ### 12.4 Integration with AppCoordinator
 - [ ] Add RecordingOverlayWindow instance to AppCoordinator

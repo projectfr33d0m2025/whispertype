@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		B1200001000000000000001 /* WaveformView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1200002000000000000001 /* WaveformView.swift */; };
+		B1200004000000000000001 /* RecordingOverlayWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1200005000000000000001 /* RecordingOverlayWindow.swift */; };
+		B1200006000000000000001 /* RecordingOverlayContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1200007000000000000001 /* RecordingOverlayContentView.swift */; };
 		7B73EFC22EDD944D0062E68C /* ModelManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B73EFC12EDD944D0062E68C /* ModelManager.swift */; };
 		7B73EFC42EDD946C0062E68C /* ModelRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B73EFC32EDD946C0062E68C /* ModelRowView.swift */; };
 		7B73EFC62EDD947C0062E68C /* ModelSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B73EFC52EDD947C0062E68C /* ModelSettingsView.swift */; };
@@ -41,6 +43,8 @@
 
 /* Begin PBXFileReference section */
 		B1200002000000000000001 /* WaveformView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaveformView.swift; sourceTree = "<group>"; };
+		B1200005000000000000001 /* RecordingOverlayWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingOverlayWindow.swift; sourceTree = "<group>"; };
+		B1200007000000000000001 /* RecordingOverlayContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingOverlayContentView.swift; sourceTree = "<group>"; };
 		7B73EFC12EDD944D0062E68C /* ModelManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelManager.swift; sourceTree = "<group>"; };
 		7B73EFC32EDD946C0062E68C /* ModelRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelRowView.swift; sourceTree = "<group>"; };
 		7B73EFC52EDD947C0062E68C /* ModelSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelSettingsView.swift; sourceTree = "<group>"; };
@@ -252,6 +256,8 @@
 			isa = PBXGroup;
 			children = (
 				B1200002000000000000001 /* WaveformView.swift */,
+				B1200005000000000000001 /* RecordingOverlayWindow.swift */,
+				B1200007000000000000001 /* RecordingOverlayContentView.swift */,
 			);
 			path = Recording;
 			sourceTree = "<group>";
@@ -356,6 +362,8 @@
 				7B73EFCA2EDD989E0062E68C /* AudioRecorder.swift in Sources */,
 				A7000001000000000000001 /* MenuBarView.swift in Sources */,
 				B1200001000000000000001 /* WaveformView.swift in Sources */,
+				B1200004000000000000001 /* RecordingOverlayWindow.swift in Sources */,
+				B1200006000000000000001 /* RecordingOverlayContentView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
