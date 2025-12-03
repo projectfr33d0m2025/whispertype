@@ -28,10 +28,11 @@ struct WaveformView: View {
     // MARK: - Constants
     
     private let barSpacing: CGFloat = 1.5
-    private let minBarHeight: CGFloat = 3
+    private let minBarHeight: CGFloat = 2
     private let maxBarHeight: CGFloat = 20
-    private let idleAnimationAmplitude: CGFloat = 2
-    private let idleAnimationFrequency: Double = 1.0 // Hz
+    private let idleBarHeight: CGFloat = 1.5  // Very short bars when idle
+    private let idleAnimationAmplitude: CGFloat = 0.8  // Subtle movement when idle
+    private let idleAnimationFrequency: Double = 1.2 // Hz
     
     // MARK: - Initialization
     
@@ -85,9 +86,9 @@ struct WaveformView: View {
             var barHeight: CGFloat
             
             if isIdle && isActive {
-                // Idle breathing animation
+                // Idle: very short bars with subtle breathing animation
                 let idleEnvelope = gaussianEnvelope(x: normalizedPosition, sigma: 0.6)
-                barHeight = minBarHeight + (idleOffset + idleAnimationAmplitude) * idleEnvelope
+                barHeight = idleBarHeight + (idleOffset + idleAnimationAmplitude) * idleEnvelope * 0.5
             } else {
                 // Active audio visualization
                 let audioContribution = effectiveAudioLevel * (maxBarHeight - minBarHeight) * envelope
@@ -96,7 +97,7 @@ struct WaveformView: View {
             }
             
             // Clamp height
-            barHeight = max(minBarHeight, min(maxBarHeight, barHeight))
+            barHeight = max(idleBarHeight, min(maxBarHeight, barHeight))
             
             // Calculate bar position
             let x = CGFloat(i) * totalBarWidth + barSpacing / 2
