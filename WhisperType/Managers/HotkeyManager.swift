@@ -8,7 +8,6 @@
 import Foundation
 import AppKit
 import HotKey
-import UserNotifications
 
 @MainActor
 class HotkeyManager: ObservableObject {
@@ -33,7 +32,6 @@ class HotkeyManager: ObservableObject {
     
     private init() {
         print("HotkeyManager: Initializing...")
-        requestNotificationPermission()
     }
     
     // MARK: - Setup
@@ -159,10 +157,7 @@ class HotkeyManager: ObservableObject {
         print("HotkeyManager: 🎤 Starting recording...")
         isRecording = true
         
-        // Show notification for testing
-        showNotification(title: "WhisperType", body: "🎤 Recording started...")
-        
-        // Notify callback
+        // Notify callback (AppCoordinator will show waveform overlay)
         onRecordingToggle?(true)
     }
     
@@ -171,10 +166,7 @@ class HotkeyManager: ObservableObject {
         isRecording = false
         isProcessing = true  // Mark as processing until transcription completes
         
-        // Show notification for testing
-        showNotification(title: "WhisperType", body: "⏹️ Recording stopped, transcribing...")
-        
-        // Notify callback
+        // Notify callback (AppCoordinator will hide waveform overlay and start transcription)
         onRecordingToggle?(false)
     }
     
@@ -305,37 +297,6 @@ class HotkeyManager: ObservableObject {
         }
         
         return result
-    }
-    
-    // MARK: - Notifications (for testing feedback)
-    
-    private func requestNotificationPermission() {
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { granted, error in
-            if granted {
-                print("HotkeyManager: Notification permission granted")
-            } else if let error = error {
-                print("HotkeyManager: Notification permission error: \(error)")
-            }
-        }
-    }
-    
-    private func showNotification(title: String, body: String) {
-        let content = UNMutableNotificationContent()
-        content.title = title
-        content.body = body
-        content.sound = nil // No sound for quick feedback
-        
-        let request = UNNotificationRequest(
-            identifier: UUID().uuidString,
-            content: content,
-            trigger: nil // Deliver immediately
-        )
-        
-        UNUserNotificationCenter.current().add(request) { error in
-            if let error = error {
-                print("HotkeyManager: Failed to show notification: \(error)")
-            }
-        }
     }
     
     // MARK: - Error Handling
