@@ -68,9 +68,9 @@ class AudioRecorder: ObservableObject {
     private var recordingStartTime: Date?
     private var durationTimer: Timer?
     
-    // Audio level metering (throttled to ~25 Hz)
+    // Audio level metering (throttled to ~30 Hz for smooth animation)
     private var lastLevelUpdateTime: Date = .distantPast
-    private let levelUpdateInterval: TimeInterval = 0.04 // ~25 Hz
+    private let levelUpdateInterval: TimeInterval = 0.033 // ~30 Hz
     
     // Device sample rate (will be set from input node)
     private var deviceSampleRate: Double = 44100.0
@@ -344,7 +344,7 @@ class AudioRecorder: ObservableObject {
     
     // MARK: - Audio Level Metering
     
-    /// Update the audio level for visualization (throttled to ~25 Hz)
+    /// Update the audio level for visualization (throttled to ~30 Hz for smoother animation)
     private func updateAudioLevel(samples: [Float]) {
         let now = Date()
         guard now.timeIntervalSince(lastLevelUpdateTime) >= levelUpdateInterval else {
@@ -357,13 +357,31 @@ class AudioRecorder: ObservableObject {
         vDSP_measqv(samples, 1, &rms, vDSP_Length(samples.count))
         rms = sqrt(rms)
         
-        // Convert to a 0-1 range with some scaling for visual appeal
-        // RMS values are typically very small, so we scale up
-        let scaledLevel = min(1.0, rms * 5.0)
+        // Also calculate peak level for more responsiveness
+        var peak: Float = 0
+        vDSP_maxv(samples, 1, &peak, vDSP_Length(samples.count))
+        peak = abs(peak)
         
-        // Apply smoothing for visual appeal
-        let smoothingFactor: Float = 0.3
-        audioLevel = audioLevel * (1 - smoothingFactor) + scaledLevel * smoothingFactor
+        // Blend RMS and peak for balanced responsiveness
+        // RMS gives average loudness, peak catches transients
+        let blendedLevel = rms * 0.6 + peak * 0.4
+        
+        // Convert to a 0-1 range with improved scaling
+        // Use a slight logarithmic curve for more natural perception
+        let scaled = min(1.0, blendedLevel * 4.5)
+        let scaledLevel = pow(scaled, 0.9) // Slight compression for better visual range
+        
+        // Apply asymmetric smoothing: fast attack, slower decay
+        let currentLevel = audioLevel
+        if scaledLevel > currentLevel {
+            // Fast attack for responsiveness
+            let attackSmoothing: Float = 0.5
+            audioLevel = currentLevel + (scaledLevel - currentLevel) * attackSmoothing
+        } else {
+            // Slower decay for fluid animation
+            let decaySmoothing: Float = 0.15
+            audioLevel = currentLevel + (scaledLevel - currentLevel) * decaySmoothing
+        }
     }
     
     // MARK: - Duration Timer
