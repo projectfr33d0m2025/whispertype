@@ -14,7 +14,32 @@ Check off tasks as they are completed.
 
 ---
 
+## Architecture Note: Independent Testability
+
+Each phase is designed to be **independently testable** without requiring subsequent phases.
+This is achieved through:
+
+1. **Protocol-based design**: Interfaces defined early, implementations added later
+2. **Stub implementations**: Placeholder implementations allow testing before real code exists
+3. **Feature flags**: New features can be disabled to test core functionality
+4. **Clear boundaries**: Each phase produces testable artifacts
+
+---
+
 ## Phase 1: Core Processing Pipeline (Week 1-2)
+
+### Phase 1 Testability
+After completing Phase 1, you can test:
+- ✅ Raw, Clean, and Formatted modes (fully functional)
+- ✅ Polished and Professional modes (fall back to Formatted, show "AI unavailable" indicator)
+- ✅ Filler removal with 20+ test cases
+- ✅ Settings persistence
+- ✅ Processing Settings UI
+- ✅ End-to-end transcription flow
+
+**What's stubbed:** LLMEngine protocol exists but returns `.unavailable` status.
+
+---
 
 ### 1.1 Processing Mode Foundation
 - [ ] Create ProcessingMode.swift enum with 5 modes:
@@ -64,46 +89,91 @@ Check off tasks as they are completed.
 - [ ] Implement apply(_ text: String) -> String
 - [ ] Write unit tests for formatting rules
 
-### 1.5 Post-Processor Orchestration
+### 1.5 LLM Engine Protocol (Stub for Phase 2)
+- [ ] Create LLMEngineProtocol.swift:
+  ```swift
+  protocol LLMEngineProtocol {
+      var status: LLMEngineStatus { get async }
+      func process(_ text: String, mode: ProcessingMode, context: TranscriptionContext) async throws -> String
+  }
+  ```
+- [ ] Create LLMEngineStatus enum:
+  - available(provider: String)
+  - unavailable(reason: String)
+  - processing
+- [ ] Create StubLLMEngine.swift:
+  - Always returns `.unavailable(reason: "AI enhancement not configured")`
+  - process() throws LLMError.notAvailable
+- [ ] Write tests for stub behavior
+
+### 1.6 Post-Processor Orchestration
 - [ ] Create PostProcessor.swift class
+- [ ] Inject LLMEngineProtocol via initializer (dependency injection)
 - [ ] Define processing chain based on mode:
   - raw: pass-through
   - clean: FillerRemover only
   - formatted: FillerRemover + FormattingRules
-  - polished: FillerRemover + FormattingRules + LLM
-  - professional: FillerRemover + FormattingRules + LLM
+  - polished: FillerRemover + FormattingRules + LLM (if available)
+  - professional: FillerRemover + FormattingRules + LLM (if available)
 - [ ] Implement process(_ text: String, mode: ProcessingMode, context: TranscriptionContext) async -> String
-- [ ] Handle LLM unavailability gracefully (fallback to formatted)
+- [ ] **Fallback logic**: If LLM unavailable for polished/professional, use formatted processing
+- [ ] Return tuple: (processedText: String, actualModeUsed: ProcessingMode)
 - [ ] Add timing/performance logging
-- [ ] Write integration tests
+- [ ] Write integration tests with StubLLMEngine
 
-### 1.6 Processing Settings UI
+### 1.7 Processing Settings UI
 - [ ] Create ProcessingSettingsView.swift (SwiftUI)
 - [ ] Add Processing tab to SettingsView
 - [ ] Implement mode selection with visual cards:
   - Icon, name, description for each mode
   - "Recommended" badge on Formatted
   - "AI Required" badge on Polished/Professional
+  - **"AI Not Configured" warning** when LLM unavailable and AI mode selected
 - [ ] Add filler removal toggle with description
-- [ ] Add "AI Enhancement Engine" section (placeholder for Phase 2)
-- [ ] Add navigation to Vocabulary (placeholder)
-- [ ] Add navigation to App Rules (placeholder)
+- [ ] Add "AI Enhancement Engine" section:
+  - Show current status (Stub shows "Not Configured")
+  - Placeholder text: "Configure in Phase 2"
+- [ ] Add navigation to Vocabulary (placeholder, disabled)
+- [ ] Add navigation to App Rules (placeholder, disabled)
 - [ ] Bind all controls to AppSettings
 - [ ] Test settings persistence and UI state
 
-### 1.7 Integration with Transcription Flow
+### 1.8 Integration with Transcription Flow
 - [ ] Update AppCoordinator to read processingMode from settings
-- [ ] Inject PostProcessor into transcription pipeline
+- [ ] Inject PostProcessor with StubLLMEngine into transcription pipeline
 - [ ] Update transcription flow:
   1. Whisper transcribes audio
   2. PostProcessor processes based on mode
   3. TextInjector inserts processed text
-- [ ] Update RecordingOverlayContentView to show current mode
-- [ ] Test end-to-end flow with all 5 modes
+- [ ] Update RecordingOverlayContentView to show:
+  - Current mode name
+  - "AI unavailable" indicator if mode requires LLM but unavailable
+- [ ] Test end-to-end flow with all 5 modes (polished/professional fall back)
+
+### 1.9 Phase 1 Verification Tests
+- [ ] Unit test: FillerRemover removes all filler patterns
+- [ ] Unit test: FormattingRules capitalizes correctly
+- [ ] Unit test: PostProcessor chains correctly for each mode
+- [ ] Unit test: PostProcessor falls back when LLM unavailable
+- [ ] Integration test: Settings persist across app restart
+- [ ] Integration test: Full transcription flow with formatted mode
 
 ---
 
 ## Phase 2: LLM Integration (Week 3-4)
+
+### Phase 2 Testability
+After completing Phase 2, you can test:
+- ✅ Ollama connection and model detection
+- ✅ OpenAI API integration
+- ✅ LLM fallback chain (local → cloud → basic)
+- ✅ All 5 processing modes with real LLM enhancement
+- ✅ Rate limiting and error handling
+- ✅ First launch AI setup flow
+
+**Dependencies:** Requires Phase 1 completion (PostProcessor, ProcessingMode).
+
+---
 
 ### 2.1 LLM Provider Protocol
 - [ ] Create LLMProvider.swift protocol:
@@ -120,7 +190,7 @@ Check off tasks as they are completed.
 - [ ] Create LLMResponse struct:
   - processedText, processingTime, tokensUsed, providerUsed
 - [ ] Create LLMError enum:
-  - rateLimited, invalidAPIKey, networkError, timeout, modelNotFound
+  - rateLimited, invalidAPIKey, networkError, timeout, modelNotFound, notAvailable
 
 ### 2.2 Prompt Builder
 - [ ] Create PromptBuilder.swift class
@@ -131,13 +201,13 @@ Check off tasks as they are completed.
   - Formatted: Fillers + punctuation + capitalization
   - Polished: Grammar + clarity
   - Professional: Formal tone + complete sentences
-- [ ] Add context injection:
-  - App name hint
-  - Vocabulary terms
+- [ ] Add placeholder for vocabulary injection (used in Phase 3):
+  - Method signature: setVocabularyTerms(_ terms: [String])
+  - Currently no-op, stores terms for later use
 - [ ] Write tests verifying prompt structure
 
 ### 2.3 Ollama Provider Implementation
-- [ ] Create OllamaProvider.swift class
+- [ ] Create OllamaProvider.swift class implementing LLMProvider
 - [ ] Implement configuration:
   - host, port, model, timeout
 - [ ] Implement status check (GET /api/tags)
@@ -166,7 +236,7 @@ Check off tasks as they are completed.
 - [ ] Write tests for recommendation logic
 
 ### 2.5 OpenAI Provider Implementation
-- [ ] Create OpenAIProvider.swift class
+- [ ] Create OpenAIProvider.swift class implementing LLMProvider
 - [ ] Implement API key storage in Keychain:
   - Save key securely
   - Retrieve key
@@ -183,25 +253,26 @@ Check off tasks as they are completed.
 - [ ] Handle authentication errors (401)
 - [ ] Write unit tests with mock HTTP
 
-### 2.6 LLM Engine Orchestration
-- [ ] Create LLMEngine.swift ObservableObject class
+### 2.6 LLM Engine Implementation
+- [ ] Create LLMEngine.swift class implementing LLMEngineProtocol
+- [ ] Replace StubLLMEngine in AppCoordinator with real LLMEngine
 - [ ] Implement provider management:
   - localProvider: OllamaProvider?
   - cloudProvider: OpenAIProvider?
 - [ ] Implement LLMPreference enum:
-  - localOnly, localFirst, cloudFirst, cloudOnly
+  - localOnly, localFirst, cloudFirst, cloudOnly, disabled
 - [ ] Implement process() with fallback logic:
   1. Determine provider order from preference
   2. Try first available provider
   3. On failure, try next provider
-  4. On all failures, return basic processed text
+  4. On all failures, throw error (PostProcessor handles fallback)
 - [ ] Publish currentStatus for UI binding
 - [ ] Publish lastProviderUsed for transparency
 - [ ] Implement setupProviders() from settings
 - [ ] Write integration tests
 
 ### 2.7 LLM Settings UI
-- [ ] Update ProcessingSettingsView with AI Engine section
+- [ ] Update ProcessingSettingsView "AI Enhancement Engine" section
 - [ ] Create provider selection cards:
   - Local (Ollama) - Lock icon, "Private" badge
   - Cloud (OpenAI) - Cloud icon
@@ -246,13 +317,39 @@ Check off tasks as they are completed.
   - "Current Mode: Formatted" with submenu
   - "AI Engine: Local (Ollama)" with status indicator
 - [ ] Add mode submenu with all 5 modes
-- [ ] Add "Use App-Aware Mode" toggle in submenu
+- [ ] Add "Use App-Aware Mode" toggle in submenu (disabled until Phase 4)
 - [ ] Show connection status icon (●) next to engine
 - [ ] Test menu updates on settings change
+
+### 2.11 Phase 2 Verification Tests
+- [ ] Unit test: OllamaProvider connects and generates
+- [ ] Unit test: OpenAIProvider handles rate limits
+- [ ] Unit test: LLMEngine falls back correctly
+- [ ] Integration test: Polished mode produces enhanced text
+- [ ] Integration test: Professional mode produces formal text
+- [ ] Integration test: Fallback notification appears when LLM unavailable
 
 ---
 
 ## Phase 3: Vocabulary System (Week 5-6)
+
+### Phase 3 Testability
+Phase 3 is split into two parts for independent testability:
+
+**Part A (3.1-3.4, 3.7-3.12): Vocabulary Core** - Can be tested independently
+- ✅ Vocabulary CRUD operations
+- ✅ Storage and persistence
+- ✅ Fuzzy matching correction
+- ✅ Auto-learning detection
+- ✅ Full vocabulary UI
+
+**Part B (3.5-3.6): Vocabulary Integrations** - Requires Phase 1+2
+- ✅ Whisper initial_prompt hints
+- ✅ LLM prompt vocabulary injection
+
+---
+
+### Part A: Vocabulary Core (Independent)
 
 ### 3.1 Vocabulary Data Model
 - [ ] Create VocabularyEntry.swift struct:
@@ -306,20 +403,6 @@ Check off tasks as they are completed.
 - [ ] Implement incrementUsage(_ term: String):
   - Update useCount and lastUsed
 - [ ] Write tests for prioritization logic
-
-### 3.5 Whisper Integration
-- [ ] Update WhisperWrapper.transcribe() to accept initialPrompt
-- [ ] Modify whisper_full_params to set initial_prompt
-- [ ] Update AppCoordinator to get hints from VocabularyManager
-- [ ] Inject vocabulary hints into transcription call
-- [ ] Test transcription with vocabulary hints
-
-### 3.6 LLM Vocabulary Injection
-- [ ] Update PromptBuilder to accept vocabulary list
-- [ ] Append vocabulary terms to prompts:
-  - "Important terms to spell correctly: [TERMS]"
-- [ ] Update PostProcessor to fetch vocabulary for context
-- [ ] Test LLM output with vocabulary terms
 
 ### 3.7 Post-Processing Fuzzy Matching
 - [ ] Create VocabularyCorrector.swift class
@@ -403,9 +486,61 @@ Check off tasks as they are completed.
 - [ ] Handle import conflicts (merge strategy)
 - [ ] Test import/export round-trip
 
+### Part A Verification Tests
+- [ ] Unit test: VocabularyManager CRUD operations
+- [ ] Unit test: 200 entry limit enforced
+- [ ] Unit test: VocabularyCorrector fuzzy matching
+- [ ] Unit test: Auto-learning suggestion detection
+- [ ] Integration test: Vocabulary UI add/edit/delete
+- [ ] Integration test: Import/export round-trip
+
+---
+
+### Part B: Vocabulary Integrations (Requires Phase 1+2)
+
+### 3.5 Whisper Integration
+- [ ] Update WhisperWrapper.transcribe() to accept initialPrompt parameter
+- [ ] Modify whisper_full_params to set initial_prompt
+- [ ] Update AppCoordinator to get hints from VocabularyManager
+- [ ] Inject vocabulary hints into transcription call
+- [ ] Test transcription with vocabulary hints
+
+### 3.6 LLM Vocabulary Injection
+- [ ] Update PromptBuilder.setVocabularyTerms() to actually inject terms
+- [ ] Append vocabulary terms to prompts:
+  - "Important terms to spell correctly: [TERMS]"
+- [ ] Update PostProcessor to fetch vocabulary for context
+- [ ] Test LLM output with vocabulary terms
+
+### 3.13 Vocabulary in Processing Pipeline
+- [ ] Add VocabularyCorrector to PostProcessor chain:
+  - Run after FillerRemover
+  - Run before LLM (so LLM sees corrected input)
+- [ ] Update PostProcessor to accept VocabularyManager
+- [ ] Increment vocabulary usage after successful correction
+- [ ] Write integration tests
+
+### Part B Verification Tests
+- [ ] Integration test: Whisper uses vocabulary hints
+- [ ] Integration test: LLM prompt includes vocabulary
+- [ ] Integration test: Full pipeline with vocabulary correction
+
 ---
 
 ## Phase 4: App-Aware Context (Week 7)
+
+### Phase 4 Testability
+After completing Phase 4, you can test:
+- ✅ App detection via NSWorkspace
+- ✅ Default presets for 18 apps
+- ✅ Custom rule creation and persistence
+- ✅ Mode switching based on frontmost app
+- ✅ App Rules UI
+
+**Dependencies:** Requires Phase 1 completion (ProcessingMode).
+**Optional Enhancement:** If Phase 2 complete, menu bar shows LLM status per app.
+
+---
 
 ### 4.1 Context Detection
 - [ ] Create ContextDetector.swift class
@@ -460,14 +595,14 @@ Check off tasks as they are completed.
 - [ ] Update AppCoordinator to use ContextDetector
 - [ ] Get current app on recording start
 - [ ] Query AppAwareManager for appropriate mode
-- [ ] Override global mode with app-specific mode
+- [ ] Override global mode with app-specific mode (if enabled)
 - [ ] Log app detection for debugging
 - [ ] Test with various apps
 
 ### 4.6 Recording Overlay Updates
 - [ ] Update RecordingOverlayContentView to show:
   - Current mode
-  - App-specific indicator (if different from default)
+  - App-specific indicator: "(for VS Code)" when different from default
 - [ ] Add small app icon or name hint (optional)
 - [ ] Test overlay with app switching
 
@@ -507,14 +642,35 @@ Check off tasks as they are completed.
 - [ ] Update menu bar to show app-aware mode:
   - "Mode: Formatted (VS Code)" when app-specific
   - "Mode: Formatted" when using default
-- [ ] Add checkmark on "Use App-Aware Mode" when enabled
+- [ ] Enable "Use App-Aware Mode" toggle in submenu
 - [ ] Test indicator updates on app switch
+
+### 4.11 Phase 4 Verification Tests
+- [ ] Unit test: ContextDetector returns correct app info
+- [ ] Unit test: AppAwareManager priority logic (custom > preset > default)
+- [ ] Unit test: All 18 presets have unique bundle IDs
+- [ ] Integration test: Mode switches when changing apps
+- [ ] Integration test: Custom rules persist across restart
 
 ---
 
 ## Phase 5: Polish & Release (Week 8)
 
-### 5.1 UI Polish
+### Phase 5 Testability
+Phase 5 is integration and release work. All previous phases must be complete.
+
+---
+
+### 5.1 Enable All Features
+- [ ] Enable Vocabulary navigation in Processing Settings (was placeholder)
+- [ ] Enable App Rules navigation in Processing Settings (was placeholder)
+- [ ] Connect all components in AppCoordinator:
+  - LLMEngine (real, not stub)
+  - VocabularyManager
+  - AppAwareManager
+- [ ] Verify all feature flags are enabled
+
+### 5.2 UI Polish
 - [ ] Review all new UI for consistency
 - [ ] Verify dark mode appearance
 - [ ] Verify light mode appearance
@@ -522,7 +678,7 @@ Check off tasks as they are completed.
 - [ ] Verify all animations are smooth
 - [ ] Check all error messages for clarity
 
-### 5.2 Documentation Updates
+### 5.3 Documentation Updates
 - [ ] Update README.md:
   - Add v1.2 features section
   - Add Processing Modes documentation
@@ -533,23 +689,22 @@ Check off tasks as they are completed.
 - [ ] Update troubleshooting section
 - [ ] Review and update FAQ
 
-### 5.3 Code Cleanup
+### 5.4 Code Cleanup
 - [ ] Remove debug logging
+- [ ] Remove StubLLMEngine (replaced by real LLMEngine)
 - [ ] Review TODOs and FIXMEs
 - [ ] Ensure consistent code style
 - [ ] Add missing documentation comments
 - [ ] Review error handling coverage
 
-### 5.4 Release Preparation
+### 5.5 Release Preparation
 - [ ] Update version to 1.2.0 in Xcode project
 - [ ] Update RELEASE_NOTES.md
 - [ ] Build Release configuration
 - [ ] Code sign application
 - [ ] Create DMG with updated background
-- [ ] Test installation from DMG
-- [ ] Test upgrade from v1.1 (settings migration)
 
-### 5.5 GitHub Release
+### 5.6 GitHub Release
 - [ ] Create v1.2.0 tag
 - [ ] Write release notes with:
   - Feature highlights
@@ -587,6 +742,31 @@ enum ProcessingMode: String, Codable, CaseIterable {
         case .polished: return "Polished"
         case .professional: return "Professional"
         }
+    }
+}
+```
+
+### LLM Engine Protocol (Phase 1 Stub)
+```swift
+protocol LLMEngineProtocol: AnyObject {
+    var status: LLMEngineStatus { get async }
+    func process(_ text: String, mode: ProcessingMode, context: TranscriptionContext) async throws -> String
+}
+
+enum LLMEngineStatus {
+    case available(provider: String)
+    case unavailable(reason: String)
+    case processing
+}
+
+// Stub implementation for Phase 1
+class StubLLMEngine: LLMEngineProtocol {
+    var status: LLMEngineStatus {
+        get async { .unavailable(reason: "AI enhancement not configured") }
+    }
+    
+    func process(_ text: String, mode: ProcessingMode, context: TranscriptionContext) async throws -> String {
+        throw LLMError.notAvailable
     }
 }
 ```
@@ -712,12 +892,13 @@ func levenshteinDistance(_ s1: String, _ s2: String) -> Int {
 
 | Phase | Description | Duration | Tasks |
 |-------|-------------|----------|-------|
-| 1 | Core Processing Pipeline | 2 weeks | 34 tasks |
-| 2 | LLM Integration | 2 weeks | 47 tasks |
-| 3 | Vocabulary System | 2 weeks | 45 tasks |
-| 4 | App-Aware Context | 1 week | 27 tasks |
-| 5 | Polish & Release | 1 week | 16 tasks |
-| **Total** | | **8 weeks** | **169 tasks** |
+| 1 | Core Processing Pipeline | 2 weeks | 38 tasks |
+| 2 | LLM Integration | 2 weeks | 48 tasks |
+| 3A | Vocabulary Core | 1.5 weeks | 35 tasks |
+| 3B | Vocabulary Integrations | 0.5 weeks | 10 tasks |
+| 4 | App-Aware Context | 1 week | 29 tasks |
+| 5 | Polish & Release | 1 week | 18 tasks |
+| **Total** | | **8 weeks** | **178 tasks** |
 
 ---
 
@@ -729,11 +910,35 @@ func levenshteinDistance(_ s1: String, _ s2: String) -> Int {
 - Ollama (user-installed, optional)
 - OpenAI API (user-configured, optional)
 
-### Internal Dependencies
-- Phase 2 depends on Phase 1 (PostProcessor foundation)
-- Phase 3 depends on Phase 2 (LLM prompts accept vocabulary)
-- Phase 4 depends on Phase 1 (mode selection infrastructure)
-- Phase 5 depends on all previous phases
+### Internal Dependencies (Updated for Testability)
+```
+Phase 1 ──────────────────────────────────────────┐
+    │                                              │
+    │ Creates: ProcessingMode, PostProcessor,      │
+    │          LLMEngineProtocol (stub)            │
+    │                                              │
+    ▼                                              │
+Phase 2 ──────────────────────────────────────────┤
+    │                                              │
+    │ Creates: Real LLMEngine, Providers           │
+    │ Replaces: StubLLMEngine                      │
+    │                                              │
+    ▼                                              │
+Phase 3A (Vocabulary Core) ◄───────────────────────┼─── Can run in parallel!
+    │                                              │
+    │ Independent: VocabularyManager, UI           │
+    │                                              │
+    ▼                                              │
+Phase 3B (Vocabulary Integrations) ◄───────────────┘
+    │
+    │ Requires: Phase 1 + 2
+    │
+    ▼
+Phase 4 (App-Aware) ◄─── Requires Phase 1 only
+    │
+    ▼
+Phase 5 (Polish) ◄─── Requires all previous
+```
 
 ### Build Dependencies
 - macOS 13.0+ SDK
@@ -745,22 +950,31 @@ func levenshteinDistance(_ s1: String, _ s2: String) -> Int {
 ## Risk Mitigation Checkpoints
 
 ### End of Phase 1
-- [ ] All 5 modes work without LLM
+- [ ] All 5 modes selectable in UI
+- [ ] Raw, Clean, Formatted work fully
+- [ ] Polished, Professional gracefully fall back to Formatted
+- [ ] UI shows "AI not configured" when LLM modes selected
 - [ ] Filler removal accuracy > 90%
 - [ ] Settings persist correctly
 - [ ] No performance regression from v1.1
 
 ### End of Phase 2
 - [ ] Ollama integration stable
-- [ ] Fallback behavior reliable
+- [ ] Fallback behavior reliable (local → cloud → basic)
 - [ ] Cloud integration optional and secure
 - [ ] < 2s latency with local LLM
+- [ ] All 5 modes work with real enhancement
 
-### End of Phase 3
-- [ ] Vocabulary improves transcription accuracy
-- [ ] Auto-learning suggestions are relevant
-- [ ] UI handles 200 entries smoothly
-- [ ] Import/export works correctly
+### End of Phase 3A
+- [ ] Vocabulary CRUD works correctly
+- [ ] 200 entry limit enforced
+- [ ] Import/export works
+- [ ] UI handles large lists smoothly
+
+### End of Phase 3B
+- [ ] Whisper uses vocabulary hints
+- [ ] LLM prompts include vocabulary
+- [ ] Post-processing corrects based on vocabulary
 
 ### End of Phase 4
 - [ ] App detection is reliable
@@ -827,3 +1041,4 @@ This section is for manual testing by the developer. Not tracked as implementati
 - Keep privacy messaging consistent throughout
 - Test thoroughly on both Intel and Apple Silicon Macs
 - Consider beta release after Phase 4 for early feedback
+- Phase 3A can be developed in parallel with Phase 2 for faster delivery
