@@ -1,0 +1,829 @@
+# WhisperType v1.2 - Implementation Tasks
+
+## Overview
+This document breaks down the WhisperType v1.2 implementation into phases and actionable tasks.
+Check off tasks as they are completed.
+
+**Version:** 1.2.0
+**Target Duration:** 8 weeks
+**Major Features:**
+1. Processing Modes (Writing Improvement + Auto-Format)
+2. LLM Integration (Local-first with optional cloud)
+3. Custom Vocabulary System
+4. App-Aware Context System
+
+---
+
+## Phase 1: Core Processing Pipeline (Week 1-2)
+
+### 1.1 Processing Mode Foundation
+- [ ] Create ProcessingMode.swift enum with 5 modes:
+  - raw, clean, formatted, polished, professional
+- [ ] Add computed properties:
+  - displayName: String
+  - description: String
+  - icon: String (emoji)
+  - requiresLLM: Bool
+- [ ] Add Codable conformance for persistence
+- [ ] Add CaseIterable for UI enumeration
+- [ ] Write unit tests for ProcessingMode
+
+### 1.2 Settings Model Updates
+- [ ] Add processingMode: ProcessingMode to AppSettings (default: .formatted)
+- [ ] Add fillerRemovalEnabled: Bool (default: true)
+- [ ] Add llmPreference: LLMPreference enum (default: .localFirst)
+- [ ] Add ollamaModel: String (default: "llama3.2:3b")
+- [ ] Add ollamaHost: String (default: "localhost")
+- [ ] Add ollamaPort: Int (default: 11434)
+- [ ] Add UserDefaults persistence for all new settings
+- [ ] Write unit tests for settings persistence
+
+### 1.3 Filler Removal Implementation
+- [ ] Create FillerRemover.swift class
+- [ ] Define primary filler patterns (regex):
+  - um, umm, uh, uhh, uhm, er, erm, ah, ahh, hmm, hm
+- [ ] Define contextual filler patterns:
+  - "like" (when filler, not comparison)
+  - "you know" (standalone/sentence-end)
+  - "sort of", "kind of", "I mean", "basically"
+- [ ] Implement false start detection:
+  - Pattern: "X— Y" where X and Y start similarly
+- [ ] Implement remove(_ text: String) -> String
+- [ ] Handle edge cases:
+  - Preserve "um" in words like "umbrella"
+  - Preserve "like" in comparisons
+- [ ] Write comprehensive unit tests (20+ test cases)
+
+### 1.4 Basic Formatting Rules
+- [ ] Create FormattingRules.swift class
+- [ ] Implement capitalizeFirstLetter()
+- [ ] Implement capitalizeAfterPunctuation()
+- [ ] Implement capitalizeI() - standalone "i" → "I"
+- [ ] Implement normalizeWhitespace()
+- [ ] Implement normalizeEllipsis() - "..." consistency
+- [ ] Implement apply(_ text: String) -> String
+- [ ] Write unit tests for formatting rules
+
+### 1.5 Post-Processor Orchestration
+- [ ] Create PostProcessor.swift class
+- [ ] Define processing chain based on mode:
+  - raw: pass-through
+  - clean: FillerRemover only
+  - formatted: FillerRemover + FormattingRules
+  - polished: FillerRemover + FormattingRules + LLM
+  - professional: FillerRemover + FormattingRules + LLM
+- [ ] Implement process(_ text: String, mode: ProcessingMode, context: TranscriptionContext) async -> String
+- [ ] Handle LLM unavailability gracefully (fallback to formatted)
+- [ ] Add timing/performance logging
+- [ ] Write integration tests
+
+### 1.6 Processing Settings UI
+- [ ] Create ProcessingSettingsView.swift (SwiftUI)
+- [ ] Add Processing tab to SettingsView
+- [ ] Implement mode selection with visual cards:
+  - Icon, name, description for each mode
+  - "Recommended" badge on Formatted
+  - "AI Required" badge on Polished/Professional
+- [ ] Add filler removal toggle with description
+- [ ] Add "AI Enhancement Engine" section (placeholder for Phase 2)
+- [ ] Add navigation to Vocabulary (placeholder)
+- [ ] Add navigation to App Rules (placeholder)
+- [ ] Bind all controls to AppSettings
+- [ ] Test settings persistence and UI state
+
+### 1.7 Integration with Transcription Flow
+- [ ] Update AppCoordinator to read processingMode from settings
+- [ ] Inject PostProcessor into transcription pipeline
+- [ ] Update transcription flow:
+  1. Whisper transcribes audio
+  2. PostProcessor processes based on mode
+  3. TextInjector inserts processed text
+- [ ] Update RecordingOverlayContentView to show current mode
+- [ ] Test end-to-end flow with all 5 modes
+
+---
+
+## Phase 2: LLM Integration (Week 3-4)
+
+### 2.1 LLM Provider Protocol
+- [ ] Create LLMProvider.swift protocol:
+  - id: String
+  - displayName: String
+  - isLocal: Bool
+  - status: LLMProviderStatus (async)
+  - process(_ request: LLMRequest) async throws -> LLMResponse
+  - cancel()
+- [ ] Create LLMProviderStatus enum:
+  - available, unavailable(reason), connecting, rateLimit(retryAfter)
+- [ ] Create LLMRequest struct:
+  - text, mode, context, timeout
+- [ ] Create LLMResponse struct:
+  - processedText, processingTime, tokensUsed, providerUsed
+- [ ] Create LLMError enum:
+  - rateLimited, invalidAPIKey, networkError, timeout, modelNotFound
+
+### 2.2 Prompt Builder
+- [ ] Create PromptBuilder.swift class
+- [ ] Implement buildSystemPrompt(mode: ProcessingMode) -> String
+- [ ] Implement buildUserPrompt(text: String, context: TranscriptionContext) -> String
+- [ ] Define prompts for each mode:
+  - Clean: Remove fillers only
+  - Formatted: Fillers + punctuation + capitalization
+  - Polished: Grammar + clarity
+  - Professional: Formal tone + complete sentences
+- [ ] Add context injection:
+  - App name hint
+  - Vocabulary terms
+- [ ] Write tests verifying prompt structure
+
+### 2.3 Ollama Provider Implementation
+- [ ] Create OllamaProvider.swift class
+- [ ] Implement configuration:
+  - host, port, model, timeout
+- [ ] Implement status check (GET /api/tags)
+- [ ] Implement model list retrieval
+- [ ] Implement process() via POST /api/generate:
+  - Build request body (model, prompt, options)
+  - Set temperature: 0.1, top_p: 0.9
+  - Parse response
+- [ ] Implement cancel() to abort request
+- [ ] Handle connection errors gracefully
+- [ ] Handle timeout (default: 10s)
+- [ ] Write unit tests with mock HTTP
+
+### 2.4 Ollama Model Detection
+- [ ] Create OllamaModelManager.swift class
+- [ ] Define known model ratings dictionary:
+  - llama3.2:1b, llama3.2:3b, llama3.1:8b, mistral:7b, etc.
+  - Speed rating (1-5), Quality rating (1-5)
+- [ ] Implement detectInstalledModels() async -> [ModelInfo]
+- [ ] Implement recommendModel(from: [ModelInfo]) -> ModelInfo?
+- [ ] Prioritization logic:
+  1. llama3.2:3b if installed
+  2. Any 3B model with speed >= 4
+  3. Any 7-8B model
+  4. First available
+- [ ] Write tests for recommendation logic
+
+### 2.5 OpenAI Provider Implementation
+- [ ] Create OpenAIProvider.swift class
+- [ ] Implement API key storage in Keychain:
+  - Save key securely
+  - Retrieve key
+  - Delete key
+- [ ] Implement status check (verify key exists)
+- [ ] Implement process() via POST /v1/chat/completions:
+  - Model: gpt-4o-mini
+  - Build messages array (system + user)
+  - Set temperature: 0.1, max_tokens: 500
+  - Parse response
+- [ ] Handle rate limiting (429 response):
+  - Parse Retry-After header
+  - Throw rateLimited error
+- [ ] Handle authentication errors (401)
+- [ ] Write unit tests with mock HTTP
+
+### 2.6 LLM Engine Orchestration
+- [ ] Create LLMEngine.swift ObservableObject class
+- [ ] Implement provider management:
+  - localProvider: OllamaProvider?
+  - cloudProvider: OpenAIProvider?
+- [ ] Implement LLMPreference enum:
+  - localOnly, localFirst, cloudFirst, cloudOnly
+- [ ] Implement process() with fallback logic:
+  1. Determine provider order from preference
+  2. Try first available provider
+  3. On failure, try next provider
+  4. On all failures, return basic processed text
+- [ ] Publish currentStatus for UI binding
+- [ ] Publish lastProviderUsed for transparency
+- [ ] Implement setupProviders() from settings
+- [ ] Write integration tests
+
+### 2.7 LLM Settings UI
+- [ ] Update ProcessingSettingsView with AI Engine section
+- [ ] Create provider selection cards:
+  - Local (Ollama) - Lock icon, "Private" badge
+  - Cloud (OpenAI) - Cloud icon
+  - Disabled - X icon
+- [ ] Show Ollama connection status:
+  - Connected (green)
+  - Not Running (yellow)
+  - Error (red)
+- [ ] Add Ollama model picker (from detected models)
+- [ ] Add "Configure API Key" button for OpenAI
+- [ ] Create APIKeyInputSheet for secure key entry
+- [ ] Show masked API key if configured
+- [ ] Test all UI states
+
+### 2.8 Fallback Notifications
+- [ ] Create NotificationManager.swift (or extend existing)
+- [ ] Implement showLLMFallbackNotification():
+  - "AI enhancement unavailable. Using basic processing."
+  - Yellow/amber styling
+  - Auto-dismiss after 5 seconds
+  - [Settings] action button
+- [ ] Implement showRateLimitNotification():
+  - "OpenAI rate limited. Switched to local processing."
+  - Auto-dismiss after 5 seconds
+- [ ] Integrate notifications with LLMEngine
+- [ ] Test notification appearance and dismissal
+
+### 2.9 First Launch AI Setup
+- [ ] Update FirstLaunchView with AI setup step
+- [ ] Implement Ollama detection flow:
+  - Show "Detecting local AI..." spinner
+  - If found: Show model name, "Your transcriptions stay private"
+  - If not found: Show installation instructions
+- [ ] Add options:
+  - [Use Local AI] - Set preference to localFirst
+  - [Configure Cloud] - Open cloud settings
+  - [Skip Enhancement] - Set preference to disabled
+- [ ] Test all first-launch paths
+
+### 2.10 Menu Bar Updates
+- [ ] Update menu bar dropdown with mode/engine info:
+  - "Current Mode: Formatted" with submenu
+  - "AI Engine: Local (Ollama)" with status indicator
+- [ ] Add mode submenu with all 5 modes
+- [ ] Add "Use App-Aware Mode" toggle in submenu
+- [ ] Show connection status icon (●) next to engine
+- [ ] Test menu updates on settings change
+
+---
+
+## Phase 3: Vocabulary System (Week 5-6)
+
+### 3.1 Vocabulary Data Model
+- [ ] Create VocabularyEntry.swift struct:
+  - id: UUID
+  - term: String
+  - phonetic: String?
+  - aliases: [String]
+  - contexts: [String]
+  - source: VocabularySource (manual, learned, contacts, calendar)
+  - isPinned: Bool
+  - useCount: Int
+  - createdAt: Date
+  - lastUsed: Date?
+- [ ] Add Codable conformance
+- [ ] Add Identifiable conformance
+- [ ] Add Hashable conformance
+- [ ] Write unit tests for model
+
+### 3.2 Vocabulary Storage
+- [ ] Create VocabularyStorage.swift class
+- [ ] Define storage path: ~/Library/Application Support/WhisperType/vocabulary.json
+- [ ] Implement load() -> [VocabularyEntry]
+- [ ] Implement save(_ entries: [VocabularyEntry])
+- [ ] Implement atomic writes (write to temp, rename)
+- [ ] Handle migration from older formats (future-proofing)
+- [ ] Write unit tests for storage
+
+### 3.3 Vocabulary Manager Core
+- [ ] Create VocabularyManager.swift ObservableObject
+- [ ] Define maxEntries: 200
+- [ ] Implement CRUD operations:
+  - add(_ entry: VocabularyEntry) throws
+  - update(_ entry: VocabularyEntry)
+  - delete(_ id: UUID)
+  - get(_ id: UUID) -> VocabularyEntry?
+- [ ] Implement search(_ query: String) -> [VocabularyEntry]
+- [ ] Implement sorting:
+  - byName, byUsage, byDate, bySource
+- [ ] Validate entry count limit on add
+- [ ] Publish entries for UI binding
+- [ ] Write unit tests for all operations
+
+### 3.4 Vocabulary Prioritization
+- [ ] Implement getWhisperHints() -> [String]:
+  - Top 20 entries by useCount
+  - Return term strings only
+- [ ] Implement getLLMVocabulary(context: TranscriptionContext) -> [String]:
+  - All pinned entries (up to 20)
+  - Context-relevant entries
+  - Fill remaining with top usage (total max: 50)
+- [ ] Implement incrementUsage(_ term: String):
+  - Update useCount and lastUsed
+- [ ] Write tests for prioritization logic
+
+### 3.5 Whisper Integration
+- [ ] Update WhisperWrapper.transcribe() to accept initialPrompt
+- [ ] Modify whisper_full_params to set initial_prompt
+- [ ] Update AppCoordinator to get hints from VocabularyManager
+- [ ] Inject vocabulary hints into transcription call
+- [ ] Test transcription with vocabulary hints
+
+### 3.6 LLM Vocabulary Injection
+- [ ] Update PromptBuilder to accept vocabulary list
+- [ ] Append vocabulary terms to prompts:
+  - "Important terms to spell correctly: [TERMS]"
+- [ ] Update PostProcessor to fetch vocabulary for context
+- [ ] Test LLM output with vocabulary terms
+
+### 3.7 Post-Processing Fuzzy Matching
+- [ ] Create VocabularyCorrector.swift class
+- [ ] Implement Levenshtein distance calculation
+- [ ] Implement correct(_ text: String, vocabulary: [VocabularyEntry]) -> String:
+  - Tokenize text into words
+  - For each word, check against all entries + aliases
+  - If distance <= 2 and entry exists, replace
+- [ ] Handle case preservation
+- [ ] Handle punctuation preservation
+- [ ] Write comprehensive unit tests
+
+### 3.8 Auto-Learning Detection
+- [ ] Create VocabularySuggestion.swift struct:
+  - term: String
+  - possibleAlias: String?
+  - reason: String
+  - detectedAt: Date
+- [ ] Implement detectSuggestions(original: String, corrected: String) -> [VocabularySuggestion]:
+  - Compare word sets
+  - Find added/changed words
+  - Filter: capitalized, length > 2, not common word
+  - Find similar word in original (potential alias)
+- [ ] Add suggestions queue to VocabularyManager
+- [ ] Implement acceptSuggestion(_ suggestion: VocabularySuggestion)
+- [ ] Implement rejectSuggestion(_ suggestion: VocabularySuggestion)
+- [ ] Write tests for suggestion detection
+
+### 3.9 Vocabulary Settings UI - Main View
+- [ ] Create VocabularySettingsView.swift (SwiftUI)
+- [ ] Implement as separate window (NSWindow wrapper)
+- [ ] Add header:
+  - Entry count display: "187 / 200 entries"
+  - Search field
+- [ ] Add "Add new term" input with button
+- [ ] Show suggestions section (if any pending):
+  - Yellow/amber background
+  - Term + reason
+  - Accept/Reject buttons
+- [ ] Write layout tests
+
+### 3.10 Vocabulary Settings UI - Entry List
+- [ ] Create VocabularyEntryRow.swift component
+- [ ] Display entry info:
+  - Term (bold)
+  - Phonetic (if exists)
+  - Source badge (manual/learned)
+  - Usage count
+- [ ] Add row actions:
+  - Edit button
+  - Delete button
+  - Pin/unpin toggle
+- [ ] Implement sections:
+  - Pinned (always active)
+  - Frequently Used
+  - Auto-Learned
+  - All (sortable)
+- [ ] Add sort picker
+- [ ] Test list performance with 200 entries
+
+### 3.11 Vocabulary Entry Editor
+- [ ] Create VocabularyEntryEditorView.swift
+- [ ] Implement as sheet/modal
+- [ ] Form fields:
+  - Term (required)
+  - Phonetic (optional)
+  - Aliases (comma-separated or chips)
+  - Contexts (multi-select)
+  - Pinned toggle
+- [ ] Add validation:
+  - Term not empty
+  - Term not duplicate
+- [ ] Save/Cancel buttons
+- [ ] Test form validation
+
+### 3.12 Vocabulary Import/Export
+- [ ] Implement exportToCSV() -> URL
+- [ ] Implement importFromCSV(_ url: URL) throws
+- [ ] Add Export button to VocabularySettingsView
+- [ ] Add Import button with file picker
+- [ ] Handle import conflicts (merge strategy)
+- [ ] Test import/export round-trip
+
+---
+
+## Phase 4: App-Aware Context (Week 7)
+
+### 4.1 Context Detection
+- [ ] Create ContextDetector.swift class
+- [ ] Implement detectFrontmostApp() -> AppInfo:
+  - Use NSWorkspace.shared.frontmostApplication
+  - Extract bundleIdentifier and localizedName
+- [ ] Create AppInfo struct:
+  - bundleIdentifier: String
+  - name: String
+- [ ] Handle nil/unknown app gracefully
+- [ ] Write tests with mock workspace
+
+### 4.2 App Preset Model
+- [ ] Create AppPreset.swift struct:
+  - bundleIdentifier: String
+  - displayName: String
+  - defaultMode: ProcessingMode
+  - rationale: String
+- [ ] Create AppRule.swift struct (user overrides):
+  - bundleIdentifier: String
+  - mode: ProcessingMode
+  - isCustom: Bool
+- [ ] Add Codable conformance
+- [ ] Write unit tests
+
+### 4.3 Default Presets Data
+- [ ] Create DefaultAppPresets.swift with static data
+- [ ] Add all 18 presets:
+  - Development: Terminal, VS Code, Xcode, Sublime Text
+  - Email: Mail, Outlook
+  - Messaging: Slack, Discord, Teams, WhatsApp
+  - Browsers: Safari, Chrome
+  - Documents: Notes, Word, Pages, TextEdit
+  - Spreadsheets: Excel, Numbers
+- [ ] Write validation tests (no duplicate bundle IDs)
+
+### 4.4 App-Aware Manager
+- [ ] Create AppAwareManager.swift ObservableObject
+- [ ] Implement storage: ~/Library/Application Support/WhisperType/app-rules.json
+- [ ] Implement getModeForApp(_ bundleId: String) -> ProcessingMode:
+  1. Check user custom rules
+  2. Check default presets
+  3. Return global default
+- [ ] Implement setCustomRule(_ bundleId: String, mode: ProcessingMode)
+- [ ] Implement removeCustomRule(_ bundleId: String)
+- [ ] Implement resetAllRules()
+- [ ] Add appAwarenessEnabled: Bool setting
+- [ ] Publish rules for UI binding
+- [ ] Write comprehensive tests
+
+### 4.5 Integration with Processing Pipeline
+- [ ] Update AppCoordinator to use ContextDetector
+- [ ] Get current app on recording start
+- [ ] Query AppAwareManager for appropriate mode
+- [ ] Override global mode with app-specific mode
+- [ ] Log app detection for debugging
+- [ ] Test with various apps
+
+### 4.6 Recording Overlay Updates
+- [ ] Update RecordingOverlayContentView to show:
+  - Current mode
+  - App-specific indicator (if different from default)
+- [ ] Add small app icon or name hint (optional)
+- [ ] Test overlay with app switching
+
+### 4.7 App Rules Settings UI - Main View
+- [ ] Create AppRulesSettingsView.swift (SwiftUI)
+- [ ] Implement as separate window
+- [ ] Add header:
+  - Enable/disable app-awareness toggle
+- [ ] Add app list with:
+  - App icon (from bundle)
+  - App name
+  - Current mode (dropdown)
+  - Source indicator (default/custom)
+- [ ] Add "Reset to default" per-app action
+- [ ] Write layout tests
+
+### 4.8 App Rules Settings UI - Add App
+- [ ] Create AddAppSheet.swift
+- [ ] Implement "Select from running apps" option:
+  - List currently running apps
+  - Filter out system apps
+- [ ] Implement "Browse Applications" option:
+  - File picker for /Applications
+  - Extract bundle info
+- [ ] Add mode selection
+- [ ] Validate against existing rules
+- [ ] Test both app selection methods
+
+### 4.9 App Rules Import/Export
+- [ ] Implement exportRules() -> URL (JSON)
+- [ ] Implement importRules(_ url: URL) throws
+- [ ] Add Export/Import buttons to UI
+- [ ] Handle import conflicts
+- [ ] Test round-trip
+
+### 4.10 Menu Bar App-Aware Indicator
+- [ ] Update menu bar to show app-aware mode:
+  - "Mode: Formatted (VS Code)" when app-specific
+  - "Mode: Formatted" when using default
+- [ ] Add checkmark on "Use App-Aware Mode" when enabled
+- [ ] Test indicator updates on app switch
+
+---
+
+## Phase 5: Polish & Release (Week 8)
+
+### 5.1 UI Polish
+- [ ] Review all new UI for consistency
+- [ ] Verify dark mode appearance
+- [ ] Verify light mode appearance
+- [ ] Check all icon sizes and alignments
+- [ ] Verify all animations are smooth
+- [ ] Check all error messages for clarity
+
+### 5.2 Documentation Updates
+- [ ] Update README.md:
+  - Add v1.2 features section
+  - Add Processing Modes documentation
+  - Add Vocabulary documentation
+  - Add App-Aware documentation
+  - Add LLM setup guide
+- [ ] Add screenshots of new UI
+- [ ] Update troubleshooting section
+- [ ] Review and update FAQ
+
+### 5.3 Code Cleanup
+- [ ] Remove debug logging
+- [ ] Review TODOs and FIXMEs
+- [ ] Ensure consistent code style
+- [ ] Add missing documentation comments
+- [ ] Review error handling coverage
+
+### 5.4 Release Preparation
+- [ ] Update version to 1.2.0 in Xcode project
+- [ ] Update RELEASE_NOTES.md
+- [ ] Build Release configuration
+- [ ] Code sign application
+- [ ] Create DMG with updated background
+- [ ] Test installation from DMG
+- [ ] Test upgrade from v1.1 (settings migration)
+
+### 5.5 GitHub Release
+- [ ] Create v1.2.0 tag
+- [ ] Write release notes with:
+  - Feature highlights
+  - Breaking changes (if any)
+  - Known issues
+  - Upgrade instructions
+- [ ] Upload DMG
+- [ ] Publish release
+
+---
+
+## Implementation Notes
+
+### Processing Mode Constants
+```swift
+enum ProcessingMode: String, Codable, CaseIterable {
+    case raw
+    case clean
+    case formatted
+    case polished
+    case professional
+    
+    var requiresLLM: Bool {
+        switch self {
+        case .raw, .clean, .formatted: return false
+        case .polished, .professional: return true
+        }
+    }
+    
+    var displayName: String {
+        switch self {
+        case .raw: return "Raw"
+        case .clean: return "Clean"
+        case .formatted: return "Formatted"
+        case .polished: return "Polished"
+        case .professional: return "Professional"
+        }
+    }
+}
+```
+
+### Filler Word Regex Patterns
+```swift
+// Primary fillers (always remove)
+let primaryFillers = #/\b(uh+m*|um+|er+m?|ah+|hm+)\b/#
+
+// Contextual fillers (remove when standalone)
+let contextualFillers = #/\b(you know|I mean|like,?\s+(you know)?|sort of|kind of|basically)\b/#
+
+// False starts (remove first part)
+let falseStarts = #/(\b\w+\b)\s*[—–-]\s*/#
+```
+
+### Ollama API Endpoints
+```
+GET  http://localhost:11434/api/tags      # List installed models
+POST http://localhost:11434/api/generate  # Generate completion
+
+Request body:
+{
+  "model": "llama3.2:3b",
+  "prompt": "...",
+  "stream": false,
+  "options": {
+    "temperature": 0.1,
+    "top_p": 0.9,
+    "num_predict": 500
+  }
+}
+```
+
+### OpenAI API Endpoint
+```
+POST https://api.openai.com/v1/chat/completions
+Headers:
+  Authorization: Bearer <API_KEY>
+  Content-Type: application/json
+
+Request body:
+{
+  "model": "gpt-4o-mini",
+  "messages": [
+    {"role": "system", "content": "..."},
+    {"role": "user", "content": "..."}
+  ],
+  "temperature": 0.1,
+  "max_tokens": 500
+}
+```
+
+### Vocabulary Storage Path
+```swift
+let vocabularyURL = FileManager.default
+    .urls(for: .applicationSupportDirectory, in: .userDomainMask)
+    .first!
+    .appendingPathComponent("WhisperType")
+    .appendingPathComponent("vocabulary.json")
+```
+
+### App Bundle Identifiers Reference
+```swift
+// Development
+"com.apple.Terminal"
+"com.microsoft.VSCode"
+"com.apple.dt.Xcode"
+"com.sublimetext.4"
+
+// Email
+"com.apple.mail"
+"com.microsoft.Outlook"
+
+// Messaging
+"com.tinyspeck.slackmacgap"
+"com.hnc.Discord"
+"com.microsoft.teams2"
+"net.whatsapp.WhatsApp"
+
+// Browsers
+"com.apple.Safari"
+"com.google.Chrome"
+
+// Documents
+"com.apple.Notes"
+"com.microsoft.Word"
+"com.apple.iWork.Pages"
+"com.apple.TextEdit"
+
+// Spreadsheets
+"com.microsoft.Excel"
+"com.apple.iWork.Numbers"
+```
+
+### Levenshtein Distance Implementation
+```swift
+func levenshteinDistance(_ s1: String, _ s2: String) -> Int {
+    let s1 = Array(s1.lowercased())
+    let s2 = Array(s2.lowercased())
+    var dist = [[Int]](repeating: [Int](repeating: 0, count: s2.count + 1), count: s1.count + 1)
+    
+    for i in 0...s1.count { dist[i][0] = i }
+    for j in 0...s2.count { dist[0][j] = j }
+    
+    for i in 1...s1.count {
+        for j in 1...s2.count {
+            let cost = s1[i-1] == s2[j-1] ? 0 : 1
+            dist[i][j] = min(
+                dist[i-1][j] + 1,      // deletion
+                dist[i][j-1] + 1,      // insertion
+                dist[i-1][j-1] + cost  // substitution
+            )
+        }
+    }
+    return dist[s1.count][s2.count]
+}
+```
+
+---
+
+## Estimated Effort by Phase
+
+| Phase | Description | Duration | Tasks |
+|-------|-------------|----------|-------|
+| 1 | Core Processing Pipeline | 2 weeks | 34 tasks |
+| 2 | LLM Integration | 2 weeks | 47 tasks |
+| 3 | Vocabulary System | 2 weeks | 45 tasks |
+| 4 | App-Aware Context | 1 week | 27 tasks |
+| 5 | Polish & Release | 1 week | 16 tasks |
+| **Total** | | **8 weeks** | **169 tasks** |
+
+---
+
+## Dependencies
+
+### External Dependencies
+- whisper.cpp (existing)
+- HotKey (existing)
+- Ollama (user-installed, optional)
+- OpenAI API (user-configured, optional)
+
+### Internal Dependencies
+- Phase 2 depends on Phase 1 (PostProcessor foundation)
+- Phase 3 depends on Phase 2 (LLM prompts accept vocabulary)
+- Phase 4 depends on Phase 1 (mode selection infrastructure)
+- Phase 5 depends on all previous phases
+
+### Build Dependencies
+- macOS 13.0+ SDK
+- Xcode 15+
+- Swift 5.9+
+
+---
+
+## Risk Mitigation Checkpoints
+
+### End of Phase 1
+- [ ] All 5 modes work without LLM
+- [ ] Filler removal accuracy > 90%
+- [ ] Settings persist correctly
+- [ ] No performance regression from v1.1
+
+### End of Phase 2
+- [ ] Ollama integration stable
+- [ ] Fallback behavior reliable
+- [ ] Cloud integration optional and secure
+- [ ] < 2s latency with local LLM
+
+### End of Phase 3
+- [ ] Vocabulary improves transcription accuracy
+- [ ] Auto-learning suggestions are relevant
+- [ ] UI handles 200 entries smoothly
+- [ ] Import/export works correctly
+
+### End of Phase 4
+- [ ] App detection is reliable
+- [ ] Mode switching is seamless
+- [ ] All 18 presets are correct
+- [ ] Custom rules persist correctly
+
+---
+
+## Manual Testing Checklist (User)
+
+This section is for manual testing by the developer. Not tracked as implementation tasks.
+
+### End-to-End Testing
+- [ ] Test complete flow: Record → Transcribe → Process → Inject
+- [ ] Test all 5 processing modes with real speech
+- [ ] Test LLM fallback scenarios:
+  - [ ] Ollama not running
+  - [ ] OpenAI rate limited
+  - [ ] Network offline
+- [ ] Test vocabulary integration at all points
+- [ ] Test app-aware mode switching between apps
+
+### Performance Testing
+- [ ] Measure transcription + processing latency
+  - Target: < 2 seconds for local LLM
+  - Target: < 500ms for cloud LLM
+- [ ] Profile memory usage (idle, during transcription, with vocabulary)
+- [ ] Profile CPU usage during LLM processing
+
+### Edge Cases
+- [ ] Very long transcriptions (5+ minutes)
+- [ ] Empty/silent audio
+- [ ] Rapid successive recordings
+- [ ] 200 vocabulary entries loaded
+- [ ] 18+ app rules configured
+- [ ] Settings changes during recording
+- [ ] App switching during recording
+
+### Multi-Monitor
+- [ ] Recording overlay positioning
+- [ ] Different monitor arrangements
+- [ ] External display as primary
+- [ ] Hot-plugging displays
+
+### Accessibility
+- [ ] VoiceOver compatibility for new UI
+- [ ] Keyboard navigation in settings
+- [ ] Focus management in modals
+- [ ] Reduced motion preference
+
+### Installation & Upgrade
+- [ ] Fresh install from DMG
+- [ ] Upgrade from v1.1 (settings migration)
+- [ ] First launch setup flow
+- [ ] Permissions prompts work correctly
+
+---
+
+## Notes
+
+- All new features should have feature flags for gradual rollout
+- Prioritize local-first experience in all UX decisions
+- Keep privacy messaging consistent throughout
+- Test thoroughly on both Intel and Apple Silicon Macs
+- Consider beta release after Phase 4 for early feedback

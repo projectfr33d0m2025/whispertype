@@ -1,0 +1,1021 @@
+================================================================================
+                        WHISPERTYPE v1.2 - PRODUCT REQUIREMENTS DOCUMENT
+================================================================================
+
+Document Version: 1.0
+Date: December 10, 2025
+Author: Eng Leong Lee
+Status: Draft
+
+================================================================================
+                                TABLE OF CONTENTS
+================================================================================
+
+1. Executive Summary
+2. Background & Motivation
+3. Goals & Success Metrics
+4. Feature Specifications
+   4.1 Processing Modes (Writing Improvement + Auto-Format)
+   4.2 LLM Integration Architecture
+   4.3 Custom Vocabulary System
+   4.4 App-Aware Context System
+5. User Experience
+6. Technical Architecture
+7. Settings & Configuration
+8. Privacy & Security
+9. Implementation Phases
+10. Risks & Mitigations
+11. Future Considerations
+
+================================================================================
+                            1. EXECUTIVE SUMMARY
+================================================================================
+
+WhisperType v1.2 introduces intelligent text enhancement while preserving the
+core privacy-first philosophy. Three major features transform raw voice
+transcriptions into polished, context-appropriate text:
+
+  1. PROCESSING MODES - Five levels of text enhancement from raw transcription
+     to professionally formatted output
+
+  2. CUSTOM VOCABULARY - User-defined terms with auto-learning from corrections
+     to eliminate repeated misspellings of names, jargon, and technical terms
+
+  3. APP-AWARE CONTEXT - Automatic adjustment of processing behavior based on
+     the active application (Terminal vs Email vs Slack, etc.)
+
+Key architectural decision: LOCAL-FIRST AI with optional cloud fallback.
+Users can enable advanced features using Ollama (100% on-device) or optionally
+configure cloud providers (OpenAI) for faster processing.
+
+================================================================================
+                          2. BACKGROUND & MOTIVATION
+================================================================================
+
+2.1 CURRENT STATE (v1.1)
+------------------------
+WhisperType v1.1 provides:
+- System-wide voice-to-text using whisper.cpp
+- Multiple Whisper model sizes (tiny to large)
+- Global hotkey activation
+- 100% local, privacy-preserving transcription
+
+2.2 USER PAIN POINTS
+--------------------
+Based on usage patterns and feedback:
+
+  PAIN POINT 1: Filler Words
+  Users consistently report unwanted "um", "uh", "like", "you know" in output.
+  Manual cleanup is tedious and breaks flow.
+
+  PAIN POINT 2: Inconsistent Formatting
+  Whisper's punctuation and capitalization is inconsistent, especially for:
+  - Proper nouns and names
+  - Technical terms and acronyms
+  - Sentence boundaries in natural speech
+
+  PAIN POINT 3: Repeated Corrections
+  Users with unusual names, company jargon, or technical vocabulary find
+  themselves correcting the same mistakes repeatedly.
+
+  PAIN POINT 4: Context Mismatch
+  Users want different behavior when dictating:
+  - Code comments (raw, no auto-capitalization)
+  - Professional emails (polished, formal)
+  - Quick Slack messages (casual but punctuated)
+
+2.3 MARKET CONTEXT
+------------------
+Competitors like Whisper Memos, MacWhisper, and Superwhisper offer:
+- Cloud-based enhancement (breaks privacy model)
+- Basic filler removal
+- No vocabulary learning
+- No app-awareness
+
+WhisperType v1.2 differentiates by offering LOCAL-FIRST AI enhancement,
+preserving our privacy advantage while matching or exceeding competitor features.
+
+================================================================================
+                         3. GOALS & SUCCESS METRICS
+================================================================================
+
+3.1 PRIMARY GOALS
+-----------------
+G1: Reduce post-transcription editing time by 50%+
+G2: Maintain 100% local processing as default (privacy preservation)
+G3: Provide intelligent enhancement without changing user's intended meaning
+G4: Support power users with customization while remaining simple for casual use
+
+3.2 SUCCESS METRICS
+-------------------
+| Metric                          | Target        | Measurement Method       |
+|---------------------------------|---------------|--------------------------|
+| Filler word removal accuracy    | >95%          | User feedback, testing   |
+| User correction frequency       | -40%          | Before/after comparison  |
+| Processing latency (local)      | <2 seconds    | Performance monitoring   |
+| Processing latency (cloud)      | <500ms        | Performance monitoring   |
+| Vocabulary auto-learn accuracy  | >80%          | User acceptance rate     |
+| App-detection accuracy          | >99%          | Testing                  |
+
+3.3 NON-GOALS
+-------------
+- Real-time translation (future version)
+- Voice commands/control (different product)
+- Multi-speaker diarization (future version)
+- Streaming transcription display (future version)
+
+================================================================================
+                         4. FEATURE SPECIFICATIONS
+================================================================================
+
+--------------------------------------------------------------------------------
+4.1 PROCESSING MODES
+--------------------------------------------------------------------------------
+
+4.1.1 Overview
+--------------
+Five processing modes provide graduated levels of text enhancement:
+
+| Mode         | Filler  | Punctuation | Grammar | Tone    | LLM Required |
+|--------------|---------|-------------|---------|---------|--------------|
+| Raw          | Keep    | Whisper     | No      | As-is   | No           |
+| Clean        | Remove  | Whisper     | No      | As-is   | No           |
+| Formatted    | Remove  | Enhanced    | Light   | As-is   | No*          |
+| Polished     | Remove  | Enhanced    | Yes     | Natural | Yes          |
+| Professional | Remove  | Enhanced    | Yes     | Formal  | Yes          |
+
+* Formatted mode works without LLM but benefits from LLM when available.
+
+4.1.2 Mode Details
+------------------
+
+RAW MODE
+  - Exact Whisper output with no modifications
+  - Use case: Code dictation, data entry, debugging transcription issues
+  - Processing: Pass-through only
+
+CLEAN MODE
+  - Remove filler words: um, uh, uhm, er, erm, ah, like (as filler), you know
+  - Remove false starts: "I want to— I need to" → "I need to"
+  - Normalize whitespace
+  - Use case: Quick notes, casual messaging
+  - Processing: Regex-based, no LLM
+
+FORMATTED MODE
+  - All Clean mode processing, plus:
+  - Fix obvious capitalization (sentence starts, "I")
+  - Enhanced punctuation from context
+  - Apply custom vocabulary corrections
+  - Use case: General purpose, default mode
+  - Processing: Rule-based + optional LLM boost
+
+POLISHED MODE
+  - All Formatted mode processing, plus:
+  - Grammar correction
+  - Clarity improvements (without changing meaning)
+  - Natural sentence structure
+  - Use case: Important messages, documentation
+  - Processing: Requires LLM
+
+PROFESSIONAL MODE
+  - All Polished mode processing, plus:
+  - Formal tone adjustment
+  - Complete sentence construction from fragments
+  - Business-appropriate language
+  - Use case: Business emails, formal documents
+  - Processing: Requires LLM
+
+4.1.3 Filler Word Removal (All modes except Raw)
+------------------------------------------------
+Target patterns (case-insensitive):
+
+  Primary fillers:
+    um, umm, uh, uhh, uhm, er, erm, ah, ahh, hmm, hm
+
+  Contextual fillers (removed when used as filler, not content):
+    "like" (when not comparison: "like you know" → remove)
+    "you know" (standalone or sentence-end)
+    "sort of", "kind of" (hedging usage)
+    "I mean" (false start indicator)
+    "basically", "literally" (overused qualifiers)
+
+  False start detection:
+    Pattern: repeated/corrected phrases
+    "I want to— I need to" → "I need to"
+    "The thing is— what I mean is" → "What I mean is"
+
+4.1.4 Default Mode Selection
+----------------------------
+Default: FORMATTED
+Rationale: Best balance of cleanup without over-processing for new users.
+Users can change default in Settings.
+
+--------------------------------------------------------------------------------
+4.2 LLM INTEGRATION ARCHITECTURE
+--------------------------------------------------------------------------------
+
+4.2.1 Design Principles
+-----------------------
+P1: LOCAL-FIRST - Default to on-device processing
+P2: TRANSPARENT - Always show which engine is active
+P3: GRACEFUL DEGRADATION - Fall back to basic processing if LLM unavailable
+P4: USER CONTROL - Never send data to cloud without explicit configuration
+
+4.2.2 Provider Hierarchy
+------------------------
+Preference setting: Local Only | Local First | Cloud First | Cloud Only
+
+Default: LOCAL FIRST
+
+Processing flow:
+  1. Check user preference
+  2. For "Local First": Try Ollama → Fall back to Cloud → Fall back to Basic
+  3. For "Cloud First": Try Cloud → Fall back to Ollama → Fall back to Basic
+  4. Show notification on fallback
+
+4.2.3 Local Provider: Ollama
+----------------------------
+Integration method: HTTP API (localhost:11434)
+
+Model selection:
+  - Auto-detect installed models via GET /api/tags
+  - Recommend based on speed/quality ratings
+  - Default recommendation: llama3.2:3b
+
+Known model ratings:
+| Model           | Speed | Quality | RAM Required |
+|-----------------|-------|---------|--------------|
+| llama3.2:1b     | 5/5   | 2/5     | 2GB          |
+| llama3.2:3b     | 4/5   | 3/5     | 4GB          | ← RECOMMENDED
+| llama3.1:8b     | 3/5   | 4/5     | 8GB          |
+| mistral:7b      | 3/5   | 4/5     | 8GB          |
+| phi3:mini       | 4/5   | 3/5     | 4GB          |
+| gemma2:2b       | 4/5   | 3/5     | 4GB          |
+
+Connection handling:
+  - Health check on app launch
+  - Retry with exponential backoff (max 3 attempts)
+  - Cache connection status for 30 seconds
+
+Timeout configuration:
+  - Connection timeout: 2 seconds
+  - Request timeout: 10 seconds (user-configurable)
+
+4.2.4 Cloud Provider: OpenAI
+----------------------------
+Model: gpt-4o-mini (cost-effective, fast, high quality)
+
+Authentication:
+  - User provides API key in Settings
+  - Key stored in macOS Keychain (encrypted)
+  - Key validated on entry
+
+Rate limiting handling:
+  - Detect 429 response
+  - Parse Retry-After header
+  - Auto-switch to local provider
+  - Show notification: "OpenAI rate limited. Switched to local processing."
+
+Cost visibility:
+  - Track tokens used per session
+  - Show estimated cost in Settings (optional)
+
+4.2.5 Prompt Engineering
+------------------------
+System prompts optimized per mode:
+
+CLEAN MODE PROMPT:
+  "Remove filler words (um, uh, like, you know) and false starts.
+   Keep exact meaning and tone. Output only cleaned text."
+
+FORMATTED MODE PROMPT:
+  "Clean this voice transcription:
+   1. Remove filler words
+   2. Fix capitalization (sentences, proper nouns)
+   3. Add missing punctuation
+   Keep speaker's voice. Output only formatted text."
+
+POLISHED MODE PROMPT:
+  "Improve this transcription for clarity:
+   1. Remove fillers and false starts
+   2. Fix grammar and punctuation
+   3. Improve clarity without changing meaning
+   4. Preserve tone and intent
+   Output only improved text."
+
+PROFESSIONAL MODE PROMPT:
+  "Transform this transcription to professional writing:
+   1. Remove all fillers and informal patterns
+   2. Use proper grammar and punctuation
+   3. Apply professional tone
+   4. Complete fragments into full sentences
+   Output only professional text."
+
+Context injection (appended to prompts):
+  - "Context: Writing in [APP_NAME]."
+  - "Important terms: [VOCABULARY_LIST]"
+
+LLM parameters:
+  - Temperature: 0.1 (low for consistency)
+  - Max tokens: 500 (cap output length)
+  - Top-p: 0.9
+
+4.2.6 Fallback Behavior
+-----------------------
+When LLM unavailable:
+  1. Show notification: "AI enhancement unavailable. Using basic processing."
+  2. Apply mode-appropriate basic processing:
+     - Polished → Formatted (rule-based)
+     - Professional → Formatted (rule-based)
+  3. Notification persists for 5 seconds, non-blocking
+  4. Log event for diagnostics
+
+Notification styling:
+  - Yellow/amber indicator (not red/error)
+  - Small, unobtrusive
+  - Dismissible
+
+--------------------------------------------------------------------------------
+4.3 CUSTOM VOCABULARY SYSTEM
+--------------------------------------------------------------------------------
+
+4.3.1 Overview
+--------------
+User-defined vocabulary improves transcription accuracy for:
+  - Personal and colleague names
+  - Company and product names
+  - Technical jargon and acronyms
+  - Industry-specific terminology
+
+4.3.2 Vocabulary Entry Structure
+--------------------------------
+Each entry contains:
+  - term: The correct spelling (e.g., "Eng Leong")
+  - phonetic: Optional pronunciation hint (e.g., "eng lee-ong")
+  - aliases: Common misrecognitions (e.g., ["England", "English long"])
+  - contexts: App contexts where term is relevant (e.g., ["work", "email"])
+  - source: Origin of entry (manual | learned | contacts | calendar)
+  - isPinned: Always include in active vocabulary
+  - useCount: Usage frequency for prioritization
+  - createdAt: Entry creation timestamp
+  - lastUsed: Last usage timestamp
+
+4.3.3 Capacity Limits
+---------------------
+Maximum entries: 200
+Rationale: Balances comprehensiveness with prompt length constraints
+
+Active vocabulary limits:
+  - Whisper hints (initial_prompt): 20 entries (by usage frequency)
+  - LLM context: 50 entries (pinned + context-relevant + top usage)
+  - Post-processing matching: All 200 entries
+
+4.3.4 Vocabulary Application Points
+-----------------------------------
+Three integration points:
+
+1. WHISPER INITIAL_PROMPT
+   When: Before transcription
+   What: Top 20 terms by usage
+   How: Injected as initial_prompt parameter
+   Effect: Biases Whisper toward correct spellings
+
+2. LLM CONTEXT
+   When: During LLM processing (Formatted+)
+   What: Up to 50 relevant terms
+   How: Appended to prompt as "Important terms to spell correctly"
+   Effect: LLM corrects/preserves these terms
+
+3. POST-PROCESSING
+   When: After transcription/LLM, before injection
+   What: All 200 entries
+   How: Fuzzy matching with Levenshtein distance
+   Effect: Catches remaining misrecognitions
+
+4.3.5 Auto-Learning from Corrections
+------------------------------------
+Trigger: User edits text after transcription and re-submits
+(Future: clipboard monitoring with user consent)
+
+Learning algorithm:
+  1. Compare original transcription with corrected text
+  2. Identify added/changed words
+  3. Filter candidates:
+     - Proper nouns (capitalized, not sentence start)
+     - Length > 2 characters
+     - Not common dictionary words
+  4. For each candidate:
+     - Find similar word in original (Levenshtein distance < 3)
+     - Create suggestion with term + probable alias
+  5. Show suggestion to user (not auto-add)
+
+Suggestion UI:
+  "Add to vocabulary?"
+  [Term] - detected in recent transcription
+  [Accept] [Ignore] [Always Ignore]
+
+User controls:
+  - Enable/disable auto-learning (default: enabled)
+  - Review all learned entries
+  - Promote learned to manual (increases trust score)
+
+4.3.6 Vocabulary Management UI
+------------------------------
+Features:
+  - Add/edit/delete entries
+  - Pin important entries
+  - Bulk import (CSV)
+  - Export vocabulary
+  - Search/filter entries
+  - Sort by: name, usage, date added, source
+  - Usage statistics
+
+
+--------------------------------------------------------------------------------
+4.4 APP-AWARE CONTEXT SYSTEM
+--------------------------------------------------------------------------------
+
+4.4.1 Overview
+--------------
+Automatically adjust processing mode based on the frontmost application.
+Users can override defaults and create custom rules.
+
+4.4.2 Detection Method
+----------------------
+Primary: NSWorkspace.shared.frontmostApplication
+  - Bundle identifier (most reliable)
+  - Application name (fallback)
+
+Detection timing:
+  - On hotkey press (before recording)
+  - Cached for duration of transcription
+
+4.4.3 Default App Presets
+-------------------------
+Ship with 18 pre-configured applications:
+
+DEVELOPMENT (Raw/Clean - preserve exact input)
+| App           | Bundle ID                    | Mode  | Rationale                |
+|---------------|------------------------------|-------|--------------------------|
+| Terminal      | com.apple.Terminal           | Raw   | Commands need exact input|
+| VS Code       | com.microsoft.VSCode         | Clean | Minimal code interference|
+| Xcode         | com.apple.dt.Xcode           | Clean | Minimal code interference|
+| Sublime Text  | com.sublimetext.4            | Clean | Minimal code interference|
+
+EMAIL (Professional - polished business communication)
+| App           | Bundle ID                    | Mode        | Rationale           |
+|---------------|------------------------------|-------------|---------------------|
+| Mail          | com.apple.mail               | Professional| Emails need polish  |
+| Outlook       | com.microsoft.Outlook        | Professional| Business email      |
+
+MESSAGING (Formatted/Clean - casual but readable)
+| App           | Bundle ID                    | Mode      | Rationale             |
+|---------------|------------------------------|-----------|----------------------|
+| Slack         | com.tinyspeck.slackmacgap    | Formatted | Work chat, punctuated|
+| Discord       | com.hnc.Discord              | Clean     | Very casual          |
+| Teams         | com.microsoft.teams2         | Formatted | Semi-formal work chat|
+| WhatsApp      | net.whatsapp.WhatsApp        | Clean     | Casual messaging     |
+
+BROWSERS (Formatted - general web forms)
+| App           | Bundle ID                    | Mode      | Rationale            |
+|---------------|------------------------------|-----------|----------------------|
+| Safari        | com.apple.Safari             | Formatted | General web forms    |
+| Chrome        | com.google.Chrome            | Formatted | General web forms    |
+
+DOCUMENTS (Polished/Raw - context-dependent)
+| App           | Bundle ID                    | Mode      | Rationale            |
+|---------------|------------------------------|-----------|----------------------|
+| Notes         | com.apple.Notes              | Formatted | Clean personal notes |
+| Word          | com.microsoft.Word           | Polished  | Documents need grammar|
+| Pages         | com.apple.iWork.Pages        | Polished  | Documents need grammar|
+| TextEdit      | com.apple.TextEdit           | Formatted | General text editing |
+
+SPREADSHEETS (Raw - data entry must be precise)
+| App           | Bundle ID                    | Mode      | Rationale            |
+|---------------|------------------------------|-----------|----------------------|
+| Excel         | com.microsoft.Excel          | Raw       | Data precision       |
+| Numbers       | com.apple.iWork.Numbers      | Raw       | Data precision       |
+
+4.4.4 Preset Override Behavior
+------------------------------
+Priority order (highest to lowest):
+  1. User-defined rule for specific app
+  2. Default preset for app
+  3. Global default mode
+
+User can:
+  - Override any default preset
+  - Add rules for unlisted apps
+  - Disable app-awareness entirely (use global default always)
+
+4.4.5 Custom App Rules UI
+-------------------------
+Features:
+  - List all configured apps with current mode
+  - Edit mode for any app
+  - Add new app (file picker or manual bundle ID)
+  - Reset individual apps to default
+  - Reset all to defaults
+  - Import/export rules
+
+Add App flow:
+  1. Click "Add Application"
+  2. Choose: "Select from running apps" or "Browse Applications"
+  3. Select app
+  4. Choose processing mode
+  5. Optionally add app-specific vocabulary context
+
+4.4.6 Context Detection (Future - Level 2+)
+-------------------------------------------
+NOT IN v1.2 SCOPE - documented for future reference:
+
+Level 2: Document Context
+  - Read surrounding text via Accessibility APIs
+  - Requires: Screen Recording or Accessibility permission
+  - Privacy concern: Reading other app content
+
+Level 3: System Integration
+  - Contacts app integration for name spelling
+  - Calendar integration for attendee names
+  - Requires: Contacts/Calendar permissions
+
+================================================================================
+                           5. USER EXPERIENCE
+================================================================================
+
+5.1 FIRST LAUNCH (UPDATED FOR v1.2)
+-----------------------------------
+Step 1: Permissions (unchanged from v1.1)
+  - Microphone access
+  - Accessibility permission
+
+Step 2: Whisper Model Selection (unchanged)
+  - Download preferred model
+
+Step 3: AI Enhancement Setup (NEW)
+  "WhisperType can enhance your transcriptions using AI."
+  
+  [Detecting local AI...]
+  
+  IF Ollama detected:
+    "✓ Found local AI: llama3.2:3b
+     Your transcriptions stay 100% private."
+    [Use Local AI] [Configure Cloud] [Skip Enhancement]
+  
+  IF Ollama not detected:
+    "For private, on-device AI enhancement:
+     1. Install Ollama from ollama.ai
+     2. Run: ollama pull llama3.2:3b"
+    [Installation Guide] [Use Cloud AI] [Skip Enhancement]
+
+Step 4: Quick Mode Selection
+  "How would you like WhisperType to process your speech?"
+  
+  ○ Minimal (Clean) - Just remove filler words
+  ● Balanced (Formatted) - Clean up punctuation and capitalization  [Recommended]
+  ○ Enhanced (Polished) - Full grammar and clarity improvements
+  
+  "You can change this anytime, or set different modes per app."
+  [Continue]
+
+5.2 MENU BAR STATUS
+-------------------
+Icon states:
+  - Waveform (blue): Ready
+  - Microphone (red, pulsing): Recording
+  - Spinner: Processing
+  - Warning triangle: Error
+
+Menu dropdown additions for v1.2:
+  ┌─────────────────────────────────────────┐
+  │ WhisperType                     Ready   │
+  │ Press ⌥Space to dictate                 │
+  ├─────────────────────────────────────────┤
+  │ Current Mode: Formatted            ▶    │
+  │ AI Engine: Local (Ollama)    ● Connected│
+  ├─────────────────────────────────────────┤
+  │ Settings...                        ⌘,   │
+  │ Vocabulary...                           │
+  │ App Rules...                            │
+  ├─────────────────────────────────────────┤
+  │ Quit WhisperType                   ⌘Q   │
+  └─────────────────────────────────────────┘
+
+Mode submenu:
+  │ Current Mode: Formatted            ▶  │
+  └───────────────────────────────────────┤
+    │ ✓ Use App-Aware Mode                │
+    ├─────────────────────────────────────┤
+    │   Raw                               │
+    │   Clean                             │
+    │ ✓ Formatted                         │
+    │   Polished              (AI)        │
+    │   Professional          (AI)        │
+    └─────────────────────────────────────┘
+
+5.3 TRANSCRIPTION OVERLAY
+-------------------------
+Visual feedback during transcription:
+
+RECORDING STATE:
+  ┌─────────────────────────────────────────┐
+  │ ● Recording            ⌥Space to stop  │
+  ├─────────────────────────────────────────┤
+  │     ▁▃▅▇▅▃▁▃▅▇▅▃▁▃▅▇▅▃▁   (waveform)  │
+  │                                         │
+  │ "so uhm I wanted to talk about the..."  │
+  └─────────────────────────────────────────┘
+
+PROCESSING STATE:
+  ┌─────────────────────────────────────────┐
+  │ ⟳ Processing with Formatted...   Local │
+  ├─────────────────────────────────────────┤
+  │ Enhancing transcription...              │
+  │                                         │
+  │ "so uhm I wanted to talk about the..."  │
+  │  ↓                                      │
+  │ "I wanted to talk about the..."         │
+  └─────────────────────────────────────────┘
+
+COMPLETE STATE (brief, 1.5s):
+  ┌─────────────────────────────────────────┐
+  │ ✓ Done                                  │
+  ├─────────────────────────────────────────┤
+  │ "I wanted to talk about the new feature.│
+  │                                         │
+  │ Text inserted                           │
+  └─────────────────────────────────────────┘
+
+5.4 NOTIFICATIONS
+-----------------
+Non-blocking, dismissible notifications for:
+
+LLM Fallback:
+  "⚠️ AI enhancement unavailable. Using basic processing."
+  [Settings] [Dismiss]
+
+Rate Limit:
+  "⚠️ OpenAI rate limited. Switched to local processing."
+  [Dismiss]
+
+Vocabulary Suggestion:
+  "💡 Add 'Eng Leong' to vocabulary?"
+  [Add] [Ignore]
+
+Model Download Complete:
+  "✓ llama3.2:3b ready for use"
+  [Dismiss]
+
+================================================================================
+                         6. TECHNICAL ARCHITECTURE
+================================================================================
+
+6.1 COMPONENT DIAGRAM
+---------------------
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                            WhisperType v1.2                                 │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌──────────────┐     ┌──────────────┐     ┌──────────────────────────────┐ │
+│  │ AudioEngine  │────▶│WhisperEngine │────▶│      PostProcessor           │ │
+│  │              │     │              │     │  ┌────────────────────────┐  │ │
+│  │ - Recording  │     │ - whisper.cpp│     │  │ FillerRemover          │  │ │
+│  │ - VAD        │     │ - Model mgmt │     │  │ VocabularyCorrector    │  │ │
+│  └──────────────┘     └──────────────┘     │  │ FormattingRules        │  │ │
+│                              │             │  │ LLMEnhancer            │  │ │
+│                              ▼             │  └────────────────────────┘  │ │
+│                       ┌──────────────┐     └──────────────────────────────┘ │
+│                       │VocabularyMgr │                    │                 │
+│                       │ - Hints      │                    ▼                 │
+│                       │ - Learning   │     ┌──────────────────────────────┐ │
+│                       └──────────────┘     │        LLMEngine             │ │
+│                                            │  ┌────────┐  ┌────────────┐  │ │
+│  ┌──────────────┐     ┌──────────────┐     │  │ Ollama │  │  OpenAI    │  │ │
+│  │ContextDetect │────▶│AppAwareMgr   │     │  │Provider│  │  Provider  │  │ │
+│  │              │     │              │     │  └────────┘  └────────────┘  │ │
+│  │ - App detect │     │ - Presets    │     └──────────────────────────────┘ │
+│  │ - Doc context│     │ - User rules │                    │                 │
+│  └──────────────┘     └──────────────┘                    ▼                 │
+│                                            ┌──────────────────────────────┐ │
+│                                            │      TextInjector            │ │
+│                                            │  - Accessibility API         │ │
+│                                            │  - Clipboard fallback        │ │
+│                                            └──────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+6.2 DATA FLOW
+-------------
+1. User presses hotkey
+2. ContextDetector captures frontmost app
+3. AppAwareManager determines processing mode
+4. AudioEngine starts recording
+5. User releases hotkey (or presses again in toggle mode)
+6. AudioEngine sends audio to WhisperEngine
+7. WhisperEngine transcribes with vocabulary hints
+8. PostProcessor applies mode-appropriate enhancements:
+   a. FillerRemover (regex-based)
+   b. VocabularyCorrector (fuzzy matching)
+   c. FormattingRules (capitalization, etc.)
+   d. LLMEnhancer (if mode requires and available)
+9. TextInjector inserts text at cursor
+10. VocabularyManager logs usage for learning
+
+6.3 NEW CLASSES (v1.2)
+----------------------
+
+// Processing pipeline
+ProcessingMode.swift      - Enum for 5 modes
+PostProcessor.swift       - Orchestrates processing chain
+FillerRemover.swift       - Regex-based filler removal
+FormattingRules.swift     - Rule-based formatting
+
+// LLM integration
+LLMProvider.swift         - Protocol for LLM providers
+OllamaProvider.swift      - Ollama HTTP integration
+OpenAIProvider.swift      - OpenAI API integration
+LLMEngine.swift           - Provider orchestration
+PromptBuilder.swift       - Mode-specific prompt generation
+
+// Vocabulary
+VocabularyEntry.swift     - Entry data model
+VocabularyManager.swift   - CRUD + learning logic
+VocabularySuggestion.swift- Learning suggestion model
+
+// Context
+ContextDetector.swift     - App detection
+AppAwareManager.swift     - Preset/rule management
+AppPreset.swift           - Preset data model
+
+6.4 STORAGE
+-----------
+UserDefaults (existing):
+  - processingMode: String (default mode)
+  - fillerRemovalEnabled: Bool
+  - llmPreference: String (local/cloud/etc.)
+  - ollamaModel: String
+
+Keychain:
+  - openaiAPIKey: String (encrypted)
+
+File storage (~/Library/Application Support/WhisperType/):
+  - vocabulary.json: Custom vocabulary entries
+  - app-rules.json: User app rule overrides
+  - usage-stats.json: Analytics for vocabulary prioritization
+
+================================================================================
+                       7. SETTINGS & CONFIGURATION
+================================================================================
+
+7.1 SETTINGS WINDOW STRUCTURE
+-----------------------------
+Tab-based interface:
+
+TAB: General (existing, minor updates)
+  - Launch at Login
+  - Microphone selection
+  - Audio feedback
+  - Input language hint
+
+TAB: Processing (NEW)
+  - Processing mode selection (5 options with descriptions)
+  - Filler word removal toggle
+  - AI Enhancement Engine section:
+    - Provider selection (Local/Cloud/Disabled)
+    - Ollama configuration (model, host, port)
+    - OpenAI configuration (API key)
+  - Quick links to Vocabulary and App Rules
+
+TAB: Models (existing)
+  - Whisper model management
+
+TAB: Hotkey (existing)
+  - Hotkey configuration
+  - Recording mode (hold/toggle)
+
+7.2 VOCABULARY SETTINGS WINDOW
+------------------------------
+Separate window (modal or floating):
+
+Header:
+  - Entry count: "187 / 200 entries"
+  - Search field
+
+Sections:
+  - Pinned entries (always active)
+  - Frequently used
+  - Auto-learned
+  - All entries (sortable table)
+
+Entry actions:
+  - Edit (inline or modal)
+  - Delete
+  - Pin/unpin
+  - View usage stats
+
+Footer:
+  - Auto-learn toggle
+  - Import/Export buttons
+  - Storage info
+
+7.3 APP RULES SETTINGS WINDOW
+-----------------------------
+Separate window:
+
+Header:
+  - Enable/disable app-awareness toggle
+
+App list:
+  - App icon, name, current mode, source (default/custom)
+  - Click to edit mode
+  - Reset to default option
+
+Actions:
+  - Add application
+  - Reset all to defaults
+  - Import/export rules
+
+================================================================================
+                        8. PRIVACY & SECURITY
+================================================================================
+
+8.1 DATA HANDLING PRINCIPLES
+----------------------------
+P1: All processing LOCAL by default
+P2: Cloud features are OPT-IN only
+P3: No telemetry or usage tracking to external services
+P4: API keys stored encrypted in Keychain
+
+8.2 CLOUD USAGE DISCLOSURE
+--------------------------
+When user enables cloud processing:
+
+  "⚠️ Cloud AI Processing
+  
+   When using cloud AI (OpenAI), your transcribed text is sent to
+   external servers for processing. This includes:
+   
+   - Your spoken words (after transcription)
+   - Custom vocabulary terms
+   - Context hints (app name)
+   
+   Your audio is NEVER sent to the cloud - only text.
+   
+   OpenAI's data usage policy: [link]
+   
+   [Enable Cloud AI] [Keep Local Only]"
+
+8.3 VOCABULARY PRIVACY
+----------------------
+Custom vocabulary is:
+  - Stored locally only
+  - Never uploaded to any service
+  - Included in cloud requests ONLY if cloud mode enabled
+  - Exportable for user backup
+
+8.4 SECURITY MEASURES
+---------------------
+- API keys encrypted via Keychain Services
+- HTTPS for all network requests
+- No logging of transcription content
+- Memory cleared after text injection
+
+================================================================================
+                       9. IMPLEMENTATION PHASES
+================================================================================
+
+PHASE 1: Core Processing (2 weeks)
+----------------------------------
+- Processing mode enum and selection UI
+- Filler removal (regex-based)
+- Basic formatting rules
+- Settings tab for processing options
+- Unit tests for text processing
+
+PHASE 2: LLM Integration (2 weeks)
+----------------------------------
+- LLMProvider protocol
+- OllamaProvider implementation
+- OpenAIProvider implementation
+- LLMEngine orchestration
+- Prompt engineering and testing
+- Fallback behavior and notifications
+- Settings UI for AI configuration
+
+PHASE 3: Vocabulary System (2 weeks)
+------------------------------------
+- VocabularyEntry model
+- VocabularyManager (CRUD, persistence)
+- Whisper initial_prompt integration
+- LLM context injection
+- Post-processing fuzzy matching
+- Auto-learning detection
+- Vocabulary settings UI
+
+PHASE 4: App-Aware Context (1 week)
+-----------------------------------
+- ContextDetector implementation
+- AppAwareManager with presets
+- User rule overrides
+- App rules settings UI
+
+PHASE 5: Polish & Testing (1 week)
+----------------------------------
+- End-to-end testing
+- Performance optimization
+- UI polish
+- Documentation update
+- Beta testing
+
+TOTAL ESTIMATED: 8 weeks
+
+================================================================================
+                        10. RISKS & MITIGATIONS
+================================================================================
+
+RISK 1: LLM changes user's intended meaning
+  Likelihood: Medium
+  Impact: High (trust erosion)
+  Mitigation:
+    - Conservative prompts that emphasize preserving intent
+    - "Polished" and "Professional" clearly labeled as more aggressive
+    - Easy mode switching
+    - Future: Show diff before accepting (optional)
+
+RISK 2: Ollama not installed/running
+  Likelihood: High (new users)
+  Impact: Medium (degraded experience)
+  Mitigation:
+    - Clear installation guide
+    - Graceful fallback to basic processing
+    - Non-intrusive notifications
+    - One-click Ollama install guidance
+
+RISK 3: Cloud API costs surprise users
+  Likelihood: Low
+  Impact: Medium
+  Mitigation:
+    - Local-first default
+    - Clear disclosure before enabling cloud
+    - Optional cost tracking display
+    - gpt-4o-mini chosen for cost efficiency
+
+RISK 4: Vocabulary becomes bloated with bad auto-learns
+  Likelihood: Medium
+  Impact: Low (easily cleaned up)
+  Mitigation:
+    - Suggestions require user approval
+    - Easy bulk delete
+    - Usage stats help identify unused entries
+    - 200 entry cap prevents unbounded growth
+
+RISK 5: App detection fails
+  Likelihood: Low
+  Impact: Low (falls back to default mode)
+  Mitigation:
+    - Bundle ID + app name fallback
+    - Manual mode override always available
+    - Cache detection to avoid repeated failures
+
+================================================================================
+                       11. FUTURE CONSIDERATIONS
+================================================================================
+
+POST-v1.2 FEATURES (not in scope):
+----------------------------------
+- Document context reading (Level 2 context)
+- Contacts/Calendar integration (Level 3 context)
+- Voice commands ("delete last sentence")
+- Real-time streaming transcription display
+- Multi-language translation
+- Speaker diarization
+- Custom LLM fine-tuning for user's style
+- Collaborative vocabulary sharing
+- Whisper model fine-tuning for user's voice
+
+MLX INTEGRATION:
+----------------
+Future alternative to Ollama for native Apple Silicon integration.
+Lower latency, better memory efficiency, no external dependency.
+Requires: MLX Swift bindings maturity, model availability.
+
+FEEDBACK LEARNING:
+------------------
+Track which corrections users make most frequently.
+Use to auto-adjust processing or suggest vocabulary entries.
+Privacy-preserving: all analytics stay local.
+
+================================================================================
+                              END OF DOCUMENT
+================================================================================
+
+Document History:
+-----------------
+v1.0 (2025-12-10) - Initial draft
+
+Approvals:
+----------
+[ ] Product Review
+[ ] Technical Review
+[ ] Design Review
+[ ] Security Review
