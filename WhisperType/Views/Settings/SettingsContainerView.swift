@@ -62,6 +62,9 @@ struct SettingsContainerView: View {
                 .tag(SettingsTab.hotkey)
         }
         .frame(width: 550, height: 520)
+        .onReceive(NotificationCenter.default.publisher(for: .switchToVocabularyTab)) { _ in
+            selectedTab = .vocabulary
+        }
     }
 }
 
