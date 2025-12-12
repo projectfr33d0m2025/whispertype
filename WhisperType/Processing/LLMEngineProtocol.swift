@@ -3,7 +3,6 @@
 //  WhisperType
 //
 //  Protocol defining the interface for LLM-based text enhancement.
-//  Implementations include StubLLMEngine (Phase 1) and real LLMEngine (Phase 2).
 //
 
 import Foundation

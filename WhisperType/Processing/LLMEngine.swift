@@ -3,7 +3,6 @@
 //  WhisperType
 //
 //  Main LLM engine that orchestrates provider selection and fallback.
-//  Replaces StubLLMEngine from Phase 1.
 //
 
 import Foundation

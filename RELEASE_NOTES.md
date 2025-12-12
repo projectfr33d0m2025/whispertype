@@ -2,6 +2,74 @@
 
 ---
 
+## WhisperType v1.2.0
+
+### Major New Features
+
+🪄 **Intelligent Processing Modes**
+- **Five Processing Modes**: Raw, Clean, Formatted, Polished, and Professional
+- **Filler Word Removal**: Automatically removes "um", "uh", "like", "you know" and other hesitations
+- **Smart Formatting**: Automatic capitalization and punctuation improvements
+- **AI Enhancement**: Grammar and clarity improvements with Polished/Professional modes
+
+🤖 **Local-First AI Integration**
+- **Ollama Support**: Connect to local Ollama for 100% private AI text enhancement
+- **Cloud Fallback**: Optional OpenAI/OpenRouter integration for faster processing
+- **Automatic Fallback**: Gracefully degrades to basic processing when AI is unavailable
+- **Privacy Preserved**: Your audio never leaves your device; cloud only receives text (if enabled)
+
+📚 **Custom Vocabulary System**
+- **200 Custom Terms**: Add names, technical jargon, and specialized terminology
+- **Fuzzy Matching**: Automatically corrects common misrecognitions
+- **Whisper Hints**: Improves transcription accuracy with vocabulary priming
+- **Import/Export**: CSV support for vocabulary backup and sharing
+
+🎯 **App-Aware Context**
+- **18 Default Presets**: Pre-configured modes for common apps (VS Code, Slack, Mail, etc.)
+- **Custom Rules**: Override modes for any application
+- **Smart Detection**: Automatically switches modes based on frontmost app
+- **Developer Friendly**: Raw/Clean modes for terminal and code editors
+
+### Improvements
+
+- Redesigned Settings with dedicated tabs for Processing, Vocabulary, and App Rules
+- Processing mode and AI status displayed in menu bar
+- Toast notifications for AI fallback and rate limiting
+- Improved recording overlay showing current mode and app context
+- Better error handling and user feedback
+
+### Technical Changes
+
+- New PostProcessor architecture with modular processing chain
+- LLMEngine with provider abstraction for easy extension
+- VocabularyManager with efficient fuzzy matching
+- AppAwareManager with context detection
+- Performance optimizations for text processing
+
+### System Requirements
+
+- macOS 13.0 (Ventura) or later
+- Apple Silicon (M1/M2/M3) or Intel Mac
+- Microphone
+- ~75MB to 3.1GB storage for Whisper models
+- For AI features: Ollama installed locally, or OpenAI/OpenRouter API key
+
+### Installation
+
+1. Download `WhisperType-1.2.0.dmg`
+2. Open the DMG and drag WhisperType to Applications
+3. Right-click WhisperType and select "Open" (required for unsigned apps)
+4. Grant Microphone and Accessibility permissions when prompted
+
+### Upgrading from v1.1
+
+Your existing settings and model downloads will be preserved. New features will use default settings:
+- Processing mode defaults to "Formatted"
+- App-awareness enabled by default
+- AI enhancement disabled until you configure Ollama or cloud provider
+
+---
+
 ## WhisperType v1.1.0
 
 ### New Features

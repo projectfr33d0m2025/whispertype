@@ -13,6 +13,8 @@ import AppKit
 extension Notification.Name {
     /// Posted to switch to the Vocabulary tab in settings
     static let switchToVocabularyTab = Notification.Name("switchToVocabularyTab")
+    /// Posted to switch to the App Rules tab in settings
+    static let switchToAppRulesTab = Notification.Name("switchToAppRulesTab")
 }
 
 enum Constants {
@@ -20,7 +22,7 @@ enum Constants {
     // MARK: - App Info
 
     static let appName = "WhisperType"
-    static let appVersion = "1.0.0"
+    static let appVersion = "1.2.0"
     static let appBundleIdentifier = "com.whispertype.app"
 
     // MARK: - URLs

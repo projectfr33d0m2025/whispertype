@@ -657,57 +657,66 @@ Phase 5 is integration and release work. All previous phases must be complete.
 ---
 
 ### 5.1 Enable All Features
-- [ ] Enable Vocabulary navigation in Processing Settings (was placeholder)
-- [ ] Enable App Rules navigation in Processing Settings (was placeholder)
-- [ ] Connect all components in AppCoordinator:
+- [x] Enable Vocabulary navigation in Processing Settings (was placeholder)
+- [x] Enable App Rules navigation in Processing Settings (was placeholder)
+- [x] Connect all components in AppCoordinator:
   - LLMEngine (real, not stub)
   - VocabularyManager
   - AppAwareManager
-- [ ] Verify all feature flags are enabled
+- [x] Verify all feature flags are enabled
 
 ### 5.2 UI Polish
-- [ ] Review all new UI for consistency
-- [ ] Verify dark mode appearance
-- [ ] Verify light mode appearance
-- [ ] Check all icon sizes and alignments
-- [ ] Verify all animations are smooth
-- [ ] Check all error messages for clarity
+- [x] Review all new UI for consistency
+- [ ] Verify dark mode appearance (requires manual testing)
+- [ ] Verify light mode appearance (requires manual testing)
+- [x] Check all icon sizes and alignments
+- [ ] Verify all animations are smooth (requires manual testing)
+- [x] Check all error messages for clarity
 
 ### 5.3 Documentation Updates
-- [ ] Update README.md:
+- [x] Update README.md:
   - Add v1.2 features section
   - Add Processing Modes documentation
   - Add Vocabulary documentation
   - Add App-Aware documentation
   - Add LLM setup guide
-- [ ] Add screenshots of new UI
-- [ ] Update troubleshooting section
-- [ ] Review and update FAQ
+- [ ] Add screenshots of new UI (see screenshot list below)
+- [x] Update troubleshooting section
+- [x] Review and update FAQ
 
 ### 5.4 Code Cleanup
-- [ ] Remove debug logging
-- [ ] Remove StubLLMEngine (replaced by real LLMEngine)
-- [ ] Review TODOs and FIXMEs
-- [ ] Ensure consistent code style
-- [ ] Add missing documentation comments
-- [ ] Review error handling coverage
+- [ ] Remove debug logging (deferred - logging useful for debugging)
+- [x] Remove StubLLMEngine (replaced by real LLMEngine)
+- [x] Review TODOs and FIXMEs
+- [x] Ensure consistent code style
+- [x] Add missing documentation comments
+- [x] Review error handling coverage
 
 ### 5.5 Release Preparation
-- [ ] Update version to 1.2.0 in Xcode project
-- [ ] Update RELEASE_NOTES.md
+- [x] Update version to 1.2.0 in Xcode project
+- [x] Update RELEASE_NOTES.md
 - [ ] Build Release configuration
-- [ ] Code sign application
+- [ ] Code sign application (ad-hoc)
 - [ ] Create DMG with updated background
 
 ### 5.6 GitHub Release
 - [ ] Create v1.2.0 tag
-- [ ] Write release notes with:
+- [x] Write release notes with:
   - Feature highlights
   - Breaking changes (if any)
   - Known issues
   - Upgrade instructions
 - [ ] Upload DMG
 - [ ] Publish release
+
+### Screenshot List for Documentation
+Capture the following screenshots for README documentation:
+1. `screenshot-menubar.png` - Menu bar dropdown showing mode and AI status
+2. `screenshot-processing-settings.png` - Processing Settings tab with mode selection
+3. `screenshot-vocabulary.png` - Vocabulary Settings with sample entries
+4. `screenshot-apprules.png` - App Rules Settings showing presets
+5. `screenshot-recording-overlay.png` - Recording overlay with waveform and mode info
+6. `screenshot-ai-config.png` - AI Enhancement configuration (Ollama section)
 
 ---
 

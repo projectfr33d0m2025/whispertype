@@ -73,6 +73,9 @@ struct SettingsContainerView: View {
         .onReceive(NotificationCenter.default.publisher(for: .switchToVocabularyTab)) { _ in
             selectedTab = .vocabulary
         }
+        .onReceive(NotificationCenter.default.publisher(for: .switchToAppRulesTab)) { _ in
+            selectedTab = .appRules
+        }
     }
 }
 

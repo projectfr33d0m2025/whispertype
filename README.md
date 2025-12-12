@@ -31,6 +31,7 @@ WhisperType is a free, open-source menu bar application that provides **system-w
 
 ## Features
 
+### Core Features
 - 🎤 **System-wide voice input** — Dictate in any application (browsers, editors, terminals, etc.)
 - 🔒 **100% local processing** — No internet required after model download
 - ⌨️ **Global hotkey** — Quick activation with customizable shortcut (default: `⌥Space`)
@@ -40,6 +41,15 @@ WhisperType is a free, open-source menu bar application that provides **system-w
 - 🗣️ **Language hints** — Specify input language for improved accuracy
 - 🎯 **Menu bar app** — Unobtrusive, always accessible
 - 🔊 **Audio feedback** — Optional sounds for recording start/stop
+
+### v1.2 Features: Intelligent Text Enhancement
+
+- 🪄 **Processing Modes** — Five levels from raw transcription to professional polish
+- 🧹 **Filler Removal** — Automatically removes "um", "uh", "like", "you know"
+- 🤖 **AI Enhancement** — Optional local or cloud AI for grammar and clarity improvements
+- 📚 **Custom Vocabulary** — Add 200+ custom terms for names, jargon, and technical terms
+- 🎯 **App-Aware Context** — Automatic mode switching based on the active application
+- 🔐 **Privacy First** — Local AI with Ollama, cloud is always opt-in
 
 ## Requirements
 
@@ -141,6 +151,74 @@ The menu bar icon shows the current status:
 
 Click the icon to open the menu with status details and quick access to settings.
 
+## Processing Modes
+
+WhisperType v1.2 introduces five processing modes for different use cases:
+
+| Mode | Description | AI Required |
+|------|-------------|-------------|
+| **Raw** | Exact Whisper output, no modifications | No |
+| **Clean** | Removes filler words (um, uh, like, you know) | No |
+| **Formatted** | Clean + capitalization and punctuation fixes | No |
+| **Polished** | Formatted + grammar and clarity improvements | Yes |
+| **Professional** | Polished + formal tone for business writing | Yes |
+
+**Default mode:** Formatted (recommended for most users)
+
+### Filler Word Removal
+
+WhisperType automatically removes common filler words:
+- Primary fillers: um, uh, er, ah, hmm
+- Contextual fillers: "like", "you know", "sort of", "I mean", "basically"
+- False starts: "I want to— I need to" becomes "I need to"
+
+### AI Enhancement Setup
+
+For Polished and Professional modes, you need AI support:
+
+**Option 1: Local AI with Ollama (Recommended for Privacy)**
+1. Install [Ollama](https://ollama.ai)
+2. Run: `ollama pull llama3.2:3b`
+3. In WhisperType Settings → Processing, select "Local First"
+
+**Option 2: Cloud AI**
+1. Get an API key from [OpenRouter](https://openrouter.ai) or [OpenAI](https://platform.openai.com)
+2. In WhisperType Settings → Processing, add your API key
+3. Select "Cloud First" or "Cloud Only"
+
+## Custom Vocabulary
+
+Add up to 200 custom terms to improve transcription accuracy for:
+- Personal and colleague names
+- Company and product names
+- Technical jargon and acronyms
+- Industry-specific terminology
+
+**Settings → Vocabulary** to manage your custom vocabulary.
+
+Features:
+- Fuzzy matching corrects common misrecognitions
+- Pin important terms for priority
+- Import/export as CSV
+- Terms integrate with both Whisper and AI enhancement
+
+## App-Aware Context
+
+WhisperType automatically adjusts processing mode based on the active application.
+
+### Default Presets
+
+| Category | Apps | Default Mode |
+|----------|------|--------------|
+| **Development** | Terminal, VS Code, Xcode | Raw/Clean |
+| **Email** | Mail, Outlook | Professional |
+| **Messaging** | Slack, Teams, WhatsApp | Formatted |
+| **Browsers** | Safari, Chrome | Formatted |
+| **Documents** | Word, Pages, Notes | Polished |
+| **Spreadsheets** | Excel, Numbers | Raw |
+
+**Settings → App Rules** to customize modes per application.
+
 ## Models
 
 WhisperType uses OpenAI's Whisper models. Choose based on your needs:
@@ -183,6 +261,24 @@ Access settings by clicking the menu bar icon → **Settings**.
 - **Microphone** — Select which microphone to use
 - **Audio Feedback** — Play sounds when recording starts/stops
 - **Input Language** — Specify the language you'll be speaking for improved accuracy (default: Auto-detect)
+
+### Processing Tab (v1.2)
+
+- **Processing Mode** — Select your preferred enhancement level
+- **Filler Removal** — Toggle automatic filler word removal
+- **AI Enhancement Engine** — Configure local (Ollama) or cloud (OpenAI/OpenRouter) AI
+
+### Vocabulary Tab (v1.2)
+
+- Add, edit, and delete custom vocabulary entries
+- Pin important terms for priority
+- Import/export vocabulary as CSV
+
+### App Rules Tab (v1.2)
+
+- Enable/disable app-aware mode switching
+- View and customize modes for specific applications
+- Add rules for any application
 
 ### Models Tab
 

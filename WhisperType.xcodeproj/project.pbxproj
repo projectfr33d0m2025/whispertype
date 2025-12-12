@@ -27,7 +27,6 @@
 		C1200005000000000000001 /* FillerRemover.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1200006000000000000001 /* FillerRemover.swift */; };
 		C1200007000000000000001 /* FormattingRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1200008000000000000001 /* FormattingRules.swift */; };
 		C1200009000000000000001 /* LLMEngineProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1200010000000000000001 /* LLMEngineProtocol.swift */; };
-		C1200011000000000000001 /* StubLLMEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1200012000000000000001 /* StubLLMEngine.swift */; };
 		C1200013000000000000001 /* PostProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1200014000000000000001 /* PostProcessor.swift */; };
 		C1200015000000000000001 /* ProcessingSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1200016000000000000001 /* ProcessingSettingsView.swift */; };
 		D1200001000000000000001 /* LLMProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1200002000000000000001 /* LLMProvider.swift */; };
@@ -132,7 +131,6 @@
 		C1200006000000000000001 /* FillerRemover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FillerRemover.swift; sourceTree = "<group>"; };
 		C1200008000000000000001 /* FormattingRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormattingRules.swift; sourceTree = "<group>"; };
 		C1200010000000000000001 /* LLMEngineProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMEngineProtocol.swift; sourceTree = "<group>"; };
-		C1200012000000000000001 /* StubLLMEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StubLLMEngine.swift; sourceTree = "<group>"; };
 		C1200014000000000000001 /* PostProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostProcessor.swift; sourceTree = "<group>"; };
 		C1200016000000000000001 /* ProcessingSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessingSettingsView.swift; sourceTree = "<group>"; };
 		D1200002000000000000001 /* LLMProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMProvider.swift; sourceTree = "<group>"; };
@@ -361,7 +359,6 @@
 				C1200006000000000000001 /* FillerRemover.swift */,
 				C1200008000000000000001 /* FormattingRules.swift */,
 				C1200010000000000000001 /* LLMEngineProtocol.swift */,
-				C1200012000000000000001 /* StubLLMEngine.swift */,
 				C1200014000000000000001 /* PostProcessor.swift */,
 				D1200002000000000000001 /* LLMProvider.swift */,
 				D1200004000000000000001 /* PromptBuilder.swift */,
@@ -474,7 +471,6 @@
 				C1200005000000000000001 /* FillerRemover.swift in Sources */,
 				C1200007000000000000001 /* FormattingRules.swift in Sources */,
 				C1200009000000000000001 /* LLMEngineProtocol.swift in Sources */,
-				C1200011000000000000001 /* StubLLMEngine.swift in Sources */,
 				C1200013000000000000001 /* PostProcessor.swift in Sources */,
 				C1200015000000000000001 /* ProcessingSettingsView.swift in Sources */,
 				D1200001000000000000001 /* LLMProvider.swift in Sources */,
@@ -633,7 +629,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = NO;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -654,7 +650,7 @@
 					"$(inherited)",
 					"$(SRCROOT)/Libraries/whisper-built/lib",
 				);
-				MARKETING_VERSION = 1.1.0;
+				MARKETING_VERSION = 1.2.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-lc++",
@@ -676,7 +672,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = NO;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -697,7 +693,7 @@
 					"$(inherited)",
 					"$(SRCROOT)/Libraries/whisper-built/lib",
 				);
-				MARKETING_VERSION = 1.1.0;
+				MARKETING_VERSION = 1.2.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-lc++",

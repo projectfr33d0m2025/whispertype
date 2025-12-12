@@ -22,6 +22,11 @@ class AppAwareManager: ObservableObject {
     /// User-defined custom rules
     @Published private(set) var customRules: [AppRule] = []
     
+    /// Count of custom rules (for UI badge)
+    var customRulesCount: Int {
+        customRules.count
+    }
+    
     /// Whether app-awareness is enabled
     @Published var isEnabled: Bool {
         didSet {

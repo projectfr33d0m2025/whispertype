@@ -227,15 +227,11 @@ struct ProcessingSettingsView: View {
             // MARK: - Advanced Navigation
             Section {
                 VStack(alignment: .leading, spacing: 8) {
-                    // Vocabulary - now links to the Vocabulary tab
+                    // Vocabulary - links to the Vocabulary tab
                     VocabularyNavigationLink()
                     
-                    // App Rules - still placeholder for Phase 4
-                    NavigationPlaceholder(
-                        title: "App Rules",
-                        subtitle: "Set different modes per app",
-                        icon: "app.badge"
-                    )
+                    // App Rules - links to the App Rules tab
+                    AppRulesNavigationLink()
                 }
             } header: {
                 Text("Advanced")
@@ -592,43 +588,57 @@ struct VocabularyNavigationLink: View {
         .padding(.vertical, 4)
         .contentShape(Rectangle())
         .onTapGesture {
-            // Open the Vocabulary tab in settings
-            // This is handled by the user clicking the Vocabulary tab directly
-            // For now, we'll just show a hint
             NotificationCenter.default.post(name: .switchToVocabularyTab, object: nil)
         }
     }
 }
 
-// MARK: - Navigation Placeholder
+// MARK: - App Rules Navigation Link
 
-struct NavigationPlaceholder: View {
-    let title: String
-    let subtitle: String
-    let icon: String
+struct AppRulesNavigationLink: View {
+    @ObservedObject var appAwareManager = AppAwareManager.shared
     
     var body: some View {
         HStack(spacing: 12) {
-            Image(systemName: icon)
-                .foregroundColor(.secondary)
+            Image(systemName: "app.badge.checkmark")
+                .foregroundColor(.accentColor)
                 .frame(width: 24)
             
             VStack(alignment: .leading, spacing: 2) {
-                Text(title)
-                    .foregroundColor(.secondary)
-                Text(subtitle)
+                Text("App Rules")
+                Text("Set different modes per app")
                     .font(.caption)
-                    .foregroundColor(.secondary.opacity(0.8))
+                    .foregroundColor(.secondary)
             }
             
             Spacer()
             
-            Text("Coming Soon")
+            // Custom rules count badge
+            if appAwareManager.customRulesCount > 0 {
+                Text("\(appAwareManager.customRulesCount)")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 2)
+                    .background(Capsule().fill(Color.secondary.opacity(0.1)))
+            }
+            
+            // Status indicator
+            if appAwareManager.isEnabled {
+                Circle()
+                    .fill(Color.green)
+                    .frame(width: 6, height: 6)
+            }
+            
+            Image(systemName: "arrow.right")
                 .font(.caption)
-                .foregroundColor(.secondary.opacity(0.6))
+                .foregroundColor(.secondary)
         }
         .padding(.vertical, 4)
-        .opacity(0.6)
+        .contentShape(Rectangle())
+        .onTapGesture {
+            NotificationCenter.default.post(name: .switchToAppRulesTab, object: nil)
+        }
     }
 }
 
