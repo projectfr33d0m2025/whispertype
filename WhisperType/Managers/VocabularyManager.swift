@@ -178,10 +178,13 @@ class VocabularyManager: ObservableObject {
     // MARK: - Prioritization (for Whisper and LLM)
     
     /// Get top vocabulary hints for Whisper initial_prompt (max 20)
-    func getWhisperHints() -> [String] {
-        // Prioritize: pinned first, then by usage
-        let pinned = entries.filter { $0.isPinned }.map { $0.term }
-        let byUsage = entries
+    /// - Parameter context: Optional bundle ID to filter context-specific terms
+    func getWhisperHints(context: String? = nil) -> [String] {
+        // Filter by context, then prioritize: pinned first, then by usage
+        let contextFiltered = entries.filter { $0.isRelevantForContext(context) }
+        
+        let pinned = contextFiltered.filter { $0.isPinned }.map { $0.term }
+        let byUsage = contextFiltered
             .filter { !$0.isPinned }
             .sorted { $0.useCount > $1.useCount }
             .map { $0.term }
@@ -191,10 +194,13 @@ class VocabularyManager: ObservableObject {
     }
     
     /// Get vocabulary for LLM prompt injection (max 50)
-    func getLLMVocabulary() -> [String] {
-        // Prioritize: pinned first, then by usage
-        let pinned = entries.filter { $0.isPinned }.map { $0.term }
-        let byUsage = entries
+    /// - Parameter context: Optional bundle ID to filter context-specific terms
+    func getLLMVocabulary(context: String? = nil) -> [String] {
+        // Filter by context, then prioritize: pinned first, then by usage
+        let contextFiltered = entries.filter { $0.isRelevantForContext(context) }
+        
+        let pinned = contextFiltered.filter { $0.isPinned }.map { $0.term }
+        let byUsage = contextFiltered
             .filter { !$0.isPinned }
             .sorted { $0.useCount > $1.useCount }
             .map { $0.term }
@@ -204,8 +210,23 @@ class VocabularyManager: ObservableObject {
     }
     
     /// Get all entries for post-processing correction
-    func getAllForCorrection() -> [VocabularyEntry] {
-        entries
+    /// - Parameter context: Optional bundle ID to filter context-specific terms
+    func getAllForCorrection(context: String? = nil) -> [VocabularyEntry] {
+        if let context = context {
+            return entries.filter { $0.isRelevantForContext(context) }
+        }
+        return entries
+    }
+    
+    /// Get entries that have specific contexts defined
+    func getContextSpecificEntries() -> [VocabularyEntry] {
+        entries.filter { !$0.contexts.isEmpty }
+    }
+    
+    /// Get all unique contexts across all entries
+    func getAllContexts() -> [String] {
+        let allContexts = entries.flatMap { $0.contexts }
+        return Array(Set(allContexts)).sorted()
     }
     
     // MARK: - Import/Export

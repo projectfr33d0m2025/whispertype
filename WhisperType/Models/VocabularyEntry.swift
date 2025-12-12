@@ -56,6 +56,10 @@ struct VocabularyEntry: Identifiable, Codable, Hashable {
     /// If true, always include in active vocabulary regardless of usage
     var isPinned: Bool
     
+    /// App contexts where this term is relevant (bundle identifiers)
+    /// Empty array means term is relevant in all contexts
+    var contexts: [String]
+    
     /// Number of times this term has been used/matched
     var useCount: Int
     
@@ -74,6 +78,7 @@ struct VocabularyEntry: Identifiable, Codable, Hashable {
         aliases: [String] = [],
         source: VocabularySource = .manual,
         isPinned: Bool = false,
+        contexts: [String] = [],
         useCount: Int = 0,
         createdAt: Date = Date(),
         lastUsed: Date? = nil
@@ -84,6 +89,7 @@ struct VocabularyEntry: Identifiable, Codable, Hashable {
         self.aliases = aliases
         self.source = source
         self.isPinned = isPinned
+        self.contexts = contexts
         self.useCount = useCount
         self.createdAt = createdAt
         self.lastUsed = lastUsed
@@ -99,6 +105,27 @@ struct VocabularyEntry: Identifiable, Codable, Hashable {
     /// Display string for aliases
     var aliasesDisplayString: String {
         aliases.isEmpty ? "None" : aliases.joined(separator: ", ")
+    }
+    
+    /// Display string for contexts
+    var contextsDisplayString: String {
+        contexts.isEmpty ? "All apps" : "\(contexts.count) app(s)"
+    }
+    
+    /// Check if this entry is relevant for a given app context
+    /// - Parameter bundleId: The bundle identifier of the current app (nil means no specific context)
+    /// - Returns: True if the entry should be used in this context
+    func isRelevantForContext(_ bundleId: String?) -> Bool {
+        // If no contexts specified, term is relevant everywhere
+        if contexts.isEmpty {
+            return true
+        }
+        // If no bundle ID provided, include all entries
+        guard let bundleId = bundleId else {
+            return true
+        }
+        // Check if bundle ID is in the contexts list
+        return contexts.contains(bundleId)
     }
     
     /// Formatted date string for createdAt

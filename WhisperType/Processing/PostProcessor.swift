@@ -105,7 +105,7 @@ class PostProcessor {
         }
         
         // Step 2: Vocabulary correction (all modes except raw, before formatting)
-        let vocabulary = VocabularyManager.shared.getAllForCorrection()
+        let vocabulary = VocabularyManager.shared.getAllForCorrection(context: context.appBundleId)
         if !vocabulary.isEmpty {
             let beforeVocab = processedText
             let correctionResult = vocabularyCorrector.correct(processedText, vocabulary: vocabulary)
@@ -145,8 +145,8 @@ class PostProcessor {
         
         // Step 4: LLM enhancement (polished and professional only)
         if mode.requiresLLM {
-            // Inject vocabulary terms into LLM prompt
-            let llmVocabulary = VocabularyManager.shared.getLLMVocabulary()
+            // Inject vocabulary terms into LLM prompt (context-filtered)
+            let llmVocabulary = VocabularyManager.shared.getLLMVocabulary(context: context.appBundleId)
             PromptBuilder.shared.setVocabularyTerms(llmVocabulary)
             
             // Check if LLM is available

@@ -99,6 +99,8 @@ class AppCoordinator: ObservableObject {
     @Published private(set) var lastTranscription: String?
     @Published private(set) var currentProcessingMode: ProcessingMode = .formatted
     @Published private(set) var lastUsedFallback = false
+    @Published private(set) var currentAppContext: AppInfo?
+    @Published private(set) var isUsingAppSpecificMode = false
     
     // MARK: - Managers (lazily initialized)
     
@@ -109,6 +111,7 @@ class AppCoordinator: ObservableObject {
     private(set) var textInjector: TextInjector!
     private(set) var settings: AppSettings!
     private(set) var postProcessor: PostProcessor!
+    private(set) var appAwareManager: AppAwareManager!
     
     // MARK: - Audio Feedback
     
@@ -195,6 +198,7 @@ class AppCoordinator: ObservableObject {
         whisperWrapper = WhisperWrapper.shared
         textInjector = TextInjector.shared
         postProcessor = PostProcessor.shared
+        appAwareManager = AppAwareManager.shared
         
         // Update current processing mode from settings
         currentProcessingMode = settings.processingMode
@@ -418,6 +422,16 @@ class AppCoordinator: ObservableObject {
         
         print("AppCoordinator: 🎤 Starting recording...")
         
+        // Detect current app context for app-aware processing
+        let (detectedApp, effectiveMode) = appAwareManager.detectCurrentAppAndMode(globalDefault: settings.processingMode)
+        currentAppContext = detectedApp
+        currentProcessingMode = effectiveMode
+        isUsingAppSpecificMode = detectedApp != nil && appAwareManager.isEnabled && effectiveMode != settings.processingMode
+        
+        if let app = detectedApp {
+            print("AppCoordinator: Detected app context: \(app.name) (\(app.bundleIdentifier)), mode: \(effectiveMode.displayName)")
+        }
+        
         do {
             // Start recording first - this is the actual async operation
             try await audioRecorder.startRecording()
@@ -426,6 +440,13 @@ class AppCoordinator: ObservableObject {
             isRecording = true
             state = .recording
             playRecordStartSound()
+            
+            // Update overlay with mode info before showing
+            recordingOverlay?.updateModeInfo(
+                modeName: currentProcessingMode.displayName,
+                appName: currentAppContext?.name,
+                isAppSpecific: isUsingAppSpecificMode
+            )
             showRecordingOverlay()
             
             print("AppCoordinator: 🎤 Recording started successfully")
@@ -466,12 +487,23 @@ class AppCoordinator: ObservableObject {
             playSuccessSound()
             hotkeyManager.transcriptionDidComplete()
             
+            // Clear app context after transcription
+            appAwareManager.clearCurrentContext()
+            currentAppContext = nil
+            isUsingAppSpecificMode = false
+            
             print("AppCoordinator: ✅ Workflow complete: \"\(transcription.prefix(50))...\"")
             
         } catch {
             isProcessing = false
             state = .ready
             hotkeyManager.transcriptionDidComplete()
+            
+            // Clear app context on error
+            appAwareManager.clearCurrentContext()
+            currentAppContext = nil
+            isUsingAppSpecificMode = false
+            
             handleError(error, context: "Transcription workflow")
         }
     }
@@ -508,11 +540,14 @@ class AppCoordinator: ObservableObject {
         print("AppCoordinator: Using language hint: \(language ?? "auto-detect")")
         
         // Check if we're in Raw mode - use verbatim transcription to preserve fillers
-        let mode = settings.processingMode
+        let mode = currentProcessingMode
         let useVerbatim = (mode == .raw)
         
-        // Get vocabulary hints for Whisper initial_prompt (top 20 terms by usage)
-        let vocabularyHints = VocabularyManager.shared.getWhisperHints()
+        // Get current app context for vocabulary filtering
+        let appContext = currentAppContext?.bundleIdentifier
+        
+        // Get vocabulary hints for Whisper initial_prompt (top 20 terms by usage, filtered by context)
+        let vocabularyHints = VocabularyManager.shared.getWhisperHints(context: appContext)
         if !vocabularyHints.isEmpty {
             print("AppCoordinator: Using \(vocabularyHints.count) vocabulary hints: \(vocabularyHints.prefix(5).joined(separator: ", "))...")
         }
@@ -533,13 +568,18 @@ class AppCoordinator: ObservableObject {
         }
         
         // Apply post-processing based on current mode
-        currentProcessingMode = mode
         print("AppCoordinator: Applying processing mode: \(mode.displayName)")
+        
+        // Create transcription context with app info
+        let transcriptionContext = TranscriptionContext(
+            appName: currentAppContext?.name,
+            appBundleId: appContext
+        )
         
         let result = await postProcessor.process(
             trimmedTranscription,
             mode: mode,
-            context: .default
+            context: transcriptionContext
         )
         
         // Track if fallback was used

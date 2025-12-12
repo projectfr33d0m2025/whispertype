@@ -13,6 +13,7 @@ struct SettingsContainerView: View {
         case general = "General"
         case processing = "Processing"
         case vocabulary = "Vocabulary"
+        case appRules = "App Rules"
         case models = "Models"
         case hotkey = "Hotkey"
         
@@ -21,6 +22,7 @@ struct SettingsContainerView: View {
             case .general: return "gear"
             case .processing: return "wand.and.stars"
             case .vocabulary: return "textformat.abc"
+            case .appRules: return "app.badge.checkmark"
             case .models: return "cpu"
             case .hotkey: return "keyboard"
             }
@@ -48,6 +50,12 @@ struct SettingsContainerView: View {
                     Label(SettingsTab.vocabulary.rawValue, systemImage: SettingsTab.vocabulary.icon)
                 }
                 .tag(SettingsTab.vocabulary)
+            
+            AppRulesSettingsView()
+                .tabItem {
+                    Label(SettingsTab.appRules.rawValue, systemImage: SettingsTab.appRules.icon)
+                }
+                .tag(SettingsTab.appRules)
             
             ModelsSettingsTabView()
                 .tabItem {

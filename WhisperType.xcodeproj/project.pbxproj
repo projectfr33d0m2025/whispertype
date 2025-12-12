@@ -7,6 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		G1400001000000000000001 /* AppInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = G1400002000000000000001 /* AppInfo.swift */; };
+		G1400003000000000000001 /* AppPreset.swift in Sources */ = {isa = PBXBuildFile; fileRef = G1400004000000000000001 /* AppPreset.swift */; };
+		G1400005000000000000001 /* AppRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = G1400006000000000000001 /* AppRule.swift */; };
+		G1400007000000000000001 /* ContextDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = G1400008000000000000001 /* ContextDetector.swift */; };
+		G1400009000000000000001 /* DefaultAppPresets.swift in Sources */ = {isa = PBXBuildFile; fileRef = G1400010000000000000001 /* DefaultAppPresets.swift */; };
+		G1400011000000000000001 /* AppAwareManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = G1400012000000000000001 /* AppAwareManager.swift */; };
+		G1400013000000000000001 /* AppRulesSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = G1400014000000000000001 /* AppRulesSettingsView.swift */; };
+		G1400015000000000000001 /* AddAppSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = G1400016000000000000001 /* AddAppSheet.swift */; };
 		F1300001000000000000001 /* VocabularyEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1300002000000000000001 /* VocabularyEntry.swift */; };
 		F1300003000000000000001 /* VocabularyStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1300004000000000000001 /* VocabularyStorage.swift */; };
 		F1300005000000000000001 /* VocabularyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1300006000000000000001 /* VocabularyManager.swift */; };
@@ -66,6 +74,14 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		G1400002000000000000001 /* AppInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppInfo.swift; sourceTree = "<group>"; };
+		G1400004000000000000001 /* AppPreset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppPreset.swift; sourceTree = "<group>"; };
+		G1400006000000000000001 /* AppRule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRule.swift; sourceTree = "<group>"; };
+		G1400008000000000000001 /* ContextDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContextDetector.swift; sourceTree = "<group>"; };
+		G1400010000000000000001 /* DefaultAppPresets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultAppPresets.swift; sourceTree = "<group>"; };
+		G1400012000000000000001 /* AppAwareManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppAwareManager.swift; sourceTree = "<group>"; };
+		G1400014000000000000001 /* AppRulesSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRulesSettingsView.swift; sourceTree = "<group>"; };
+		G1400016000000000000001 /* AddAppSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddAppSheet.swift; sourceTree = "<group>"; };
 		F1300002000000000000001 /* VocabularyEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VocabularyEntry.swift; sourceTree = "<group>"; };
 		F1300004000000000000001 /* VocabularyStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VocabularyStorage.swift; sourceTree = "<group>"; };
 		F1300006000000000000001 /* VocabularyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VocabularyManager.swift; sourceTree = "<group>"; };
@@ -219,6 +235,9 @@
 		A1000018000000000000001 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				G1400002000000000000001 /* AppInfo.swift */,
+				G1400004000000000000001 /* AppPreset.swift */,
+				G1400006000000000000001 /* AppRule.swift */,
 				A1000055000000000000001 /* AppSettings.swift */,
 				B1300002000000000000001 /* SupportedLanguage.swift */,
 				F1300002000000000000001 /* VocabularyEntry.swift */,
@@ -231,6 +250,7 @@
 		A1000019000000000000001 /* Managers */ = {
 			isa = PBXGroup;
 			children = (
+				G1400012000000000000001 /* AppAwareManager.swift */,
 				7B73EFC92EDD989E0062E68C /* AudioRecorder.swift */,
 				A1000094000000000000001 /* HotkeyManager.swift */,
 				D1200014000000000000001 /* KeychainManager.swift */,
@@ -290,6 +310,8 @@
 		A1000025000000000000001 /* Settings */ = {
 			isa = PBXGroup;
 			children = (
+				G1400016000000000000001 /* AddAppSheet.swift */,
+				G1400014000000000000001 /* AppRulesSettingsView.swift */,
 				A8000002000000000000001 /* SettingsContainerView.swift */,
 				A8000004000000000000001 /* GeneralSettingsView.swift */,
 				C1200016000000000000001 /* ProcessingSettingsView.swift */,
@@ -332,6 +354,8 @@
 		C1200017000000000000001 /* Processing */ = {
 			isa = PBXGroup;
 			children = (
+				G1400008000000000000001 /* ContextDetector.swift */,
+				G1400010000000000000001 /* DefaultAppPresets.swift */,
 				C1200002000000000000001 /* ProcessingMode.swift */,
 				C1200004000000000000001 /* LLMPreference.swift */,
 				C1200006000000000000001 /* FillerRemover.swift */,
@@ -468,6 +492,14 @@
 				F1300009000000000000001 /* VocabularySettingsView.swift in Sources */,
 				F1300011000000000000001 /* VocabularyEntryRow.swift in Sources */,
 				F1300013000000000000001 /* VocabularyEntryEditorView.swift in Sources */,
+				G1400001000000000000001 /* AppInfo.swift in Sources */,
+				G1400003000000000000001 /* AppPreset.swift in Sources */,
+				G1400005000000000000001 /* AppRule.swift in Sources */,
+				G1400007000000000000001 /* ContextDetector.swift in Sources */,
+				G1400009000000000000001 /* DefaultAppPresets.swift in Sources */,
+				G1400011000000000000001 /* AppAwareManager.swift in Sources */,
+				G1400013000000000000001 /* AppRulesSettingsView.swift in Sources */,
+				G1400015000000000000001 /* AddAppSheet.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -38,8 +38,12 @@ struct VocabularyEntryEditorView: View {
     @State private var phonetic: String = ""
     @State private var aliasesText: String = ""
     @State private var isPinned: Bool = false
+    @State private var selectedContexts: Set<String> = []
+    @State private var showContextPicker: Bool = false
     
     @State private var validationError: String?
+    
+    @ObservedObject private var appAwareManager = AppAwareManager.shared
     
     // For edit mode
     private var existingEntry: VocabularyEntry? {
@@ -104,6 +108,29 @@ struct VocabularyEntryEditorView: View {
                         .foregroundColor(.secondary)
                 }
                 
+                // App Contexts field
+                Section {
+                    HStack {
+                        if selectedContexts.isEmpty {
+                            Text("All apps")
+                                .foregroundColor(.secondary)
+                        } else {
+                            Text(contextDisplayText)
+                                .lineLimit(2)
+                        }
+                        Spacer()
+                        Button("Select Apps...") {
+                            showContextPicker = true
+                        }
+                    }
+                } header: {
+                    Text("App Contexts")
+                } footer: {
+                    Text("Limit this term to specific apps, or leave empty for all apps")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                
                 // Pin toggle
                 Section {
                     Toggle("Pin this entry", isOn: $isPinned)
@@ -148,10 +175,23 @@ struct VocabularyEntryEditorView: View {
             }
             .padding()
         }
-        .frame(width: 400, height: 450)
+        .frame(width: 400, height: 520)
         .onAppear {
             loadExistingEntry()
         }
+        .sheet(isPresented: $showContextPicker) {
+            AppContextPickerView(selectedContexts: $selectedContexts)
+        }
+    }
+    
+    // MARK: - Computed Properties
+    
+    private var contextDisplayText: String {
+        let entries = appAwareManager.getAllAppEntries()
+        let names = selectedContexts.compactMap { bundleId in
+            entries.first { $0.bundleIdentifier == bundleId }?.displayName ?? bundleId
+        }
+        return names.sorted().joined(separator: ", ")
     }
     
     // MARK: - Helper Methods
@@ -163,6 +203,7 @@ struct VocabularyEntryEditorView: View {
         phonetic = entry.phonetic ?? ""
         aliasesText = entry.aliases.joined(separator: ", ")
         isPinned = entry.isPinned
+        selectedContexts = Set(entry.contexts)
     }
     
     private func parseAliases() -> [String] {
@@ -206,6 +247,7 @@ struct VocabularyEntryEditorView: View {
         let trimmedTerm = term.trimmingCharacters(in: .whitespacesAndNewlines)
         let trimmedPhonetic = phonetic.trimmingCharacters(in: .whitespacesAndNewlines)
         let aliases = parseAliases()
+        let contexts = Array(selectedContexts)
         
         let entry: VocabularyEntry
         
@@ -218,6 +260,7 @@ struct VocabularyEntryEditorView: View {
                 aliases: aliases,
                 source: existing.source,
                 isPinned: isPinned,
+                contexts: contexts,
                 useCount: existing.useCount,
                 createdAt: existing.createdAt,
                 lastUsed: existing.lastUsed
@@ -229,12 +272,104 @@ struct VocabularyEntryEditorView: View {
                 phonetic: trimmedPhonetic.isEmpty ? nil : trimmedPhonetic,
                 aliases: aliases,
                 source: .manual,
-                isPinned: isPinned
+                isPinned: isPinned,
+                contexts: contexts
             )
         }
         
         onSave(entry)
         dismiss()
+    }
+}
+
+// MARK: - App Context Picker View
+
+struct AppContextPickerView: View {
+    @Binding var selectedContexts: Set<String>
+    @Environment(\.dismiss) private var dismiss
+    @ObservedObject private var appAwareManager = AppAwareManager.shared
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            // Header
+            HStack {
+                Text("Select Apps")
+                    .font(.headline)
+                Spacer()
+                Button("Done") {
+                    dismiss()
+                }
+                .keyboardShortcut(.return)
+            }
+            .padding()
+            
+            Divider()
+            
+            // Clear all option
+            HStack {
+                Text("Clear all (use in all apps)")
+                    .foregroundColor(.secondary)
+                Spacer()
+                if !selectedContexts.isEmpty {
+                    Button("Clear") {
+                        selectedContexts.removeAll()
+                    }
+                    .buttonStyle(.link)
+                }
+            }
+            .padding(.horizontal)
+            .padding(.vertical, 8)
+            
+            Divider()
+            
+            // App list
+            List {
+                ForEach(appAwareManager.getAppEntriesByCategory(), id: \.category) { group in
+                    Section(header: Text(group.category.displayName)) {
+                        ForEach(group.entries) { entry in
+                            AppContextRow(
+                                entry: entry,
+                                isSelected: selectedContexts.contains(entry.bundleIdentifier)
+                            ) {
+                                if selectedContexts.contains(entry.bundleIdentifier) {
+                                    selectedContexts.remove(entry.bundleIdentifier)
+                                } else {
+                                    selectedContexts.insert(entry.bundleIdentifier)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        .frame(width: 350, height: 400)
+    }
+}
+
+// MARK: - App Context Row
+
+struct AppContextRow: View {
+    let entry: AppAwareManager.AppEntry
+    let isSelected: Bool
+    let onToggle: () -> Void
+    
+    var body: some View {
+        HStack {
+            Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                .foregroundColor(isSelected ? .accentColor : .secondary)
+            
+            Text(entry.displayName)
+            
+            Spacer()
+            
+            Text(entry.currentMode.displayName)
+                .font(.caption)
+                .foregroundColor(.secondary)
+        }
+        .contentShape(Rectangle())
+        .onTapGesture {
+            onToggle()
+        }
     }
 }
 
@@ -253,7 +388,8 @@ struct VocabularyEntryEditorView: View {
             term: "Eng Leong",
             phonetic: "eng lee-ong",
             aliases: ["England", "English long"],
-            isPinned: true
+            isPinned: true,
+            contexts: ["com.apple.Terminal", "com.microsoft.VSCode"]
         )),
         onSave: { _ in }
     )

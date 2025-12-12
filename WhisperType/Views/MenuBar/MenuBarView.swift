@@ -13,6 +13,7 @@ struct MenuBarView: View {
     @ObservedObject var whisperWrapper = WhisperWrapper.shared
     @ObservedObject var settings = AppSettings.shared
     @ObservedObject var llmEngine = LLMEngine.shared
+    @ObservedObject var appAwareManager = AppAwareManager.shared
     @Environment(\.openWindow) private var openWindow
     @Environment(\.dismiss) private var dismiss
     
@@ -391,17 +392,41 @@ struct MenuBarView: View {
     
     private var processingModeRow: some View {
         HStack {
-            Image(systemName: settings.processingMode.icon)
+            Image(systemName: effectiveProcessingMode.icon)
                 .foregroundColor(.accentColor)
                 .frame(width: 20)
             
-            Text(settings.processingMode.displayName)
-                .font(.system(.body, design: .default))
+            VStack(alignment: .leading, spacing: 1) {
+                HStack(spacing: 4) {
+                    Text(effectiveProcessingMode.displayName)
+                        .font(.system(.body, design: .default))
+                    
+                    if appAwareManager.isEnabled && !appAwareManager.currentApp.isUnknown {
+                        Text("(\(appAwareManager.currentApp.name))")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                }
+                
+                if appAwareManager.isEnabled {
+                    Text("App-aware")
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                }
+            }
             
             Spacer()
             
             // Mode submenu
             Menu {
+                // App-aware toggle
+                Toggle(isOn: $appAwareManager.isEnabled) {
+                    Label("Use App-Aware Mode", systemImage: "app.badge.checkmark")
+                }
+                
+                Divider()
+                
+                // Mode selection
                 ForEach(ProcessingMode.allCases) { mode in
                     Button(action: {
                         settings.processingMode = mode
@@ -411,6 +436,9 @@ struct MenuBarView: View {
                                 Image(systemName: "checkmark")
                             }
                             Label(mode.displayName, systemImage: mode.icon)
+                            if mode.requiresLLM {
+                                Text("(AI)")
+                            }
                         }
                     }
                     .disabled(mode.requiresLLM && !llmEngine.currentStatus.isAvailable)
@@ -426,6 +454,14 @@ struct MenuBarView: View {
         .padding(8)
         .background(Color.secondary.opacity(0.1))
         .cornerRadius(8)
+    }
+    
+    /// Get the effective processing mode (considering app-aware settings)
+    private var effectiveProcessingMode: ProcessingMode {
+        if appAwareManager.isEnabled && !appAwareManager.currentApp.isUnknown {
+            return appAwareManager.getModeForApp(appAwareManager.currentApp.bundleIdentifier)
+        }
+        return settings.processingMode
     }
     
     private var aiEngineRow: some View {

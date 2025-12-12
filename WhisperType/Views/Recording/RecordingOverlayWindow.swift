@@ -16,6 +16,9 @@ import Combine
 class RecordingOverlayState: ObservableObject {
     @Published var audioLevel: Float = 0.0
     @Published var isActive: Bool = true
+    @Published var modeName: String = ""
+    @Published var appName: String? = nil
+    @Published var isAppSpecificMode: Bool = false
 }
 
 // MARK: - Recording Overlay Window
@@ -83,6 +86,13 @@ class RecordingOverlayWindow {
     /// Update the audio level for waveform visualization
     func updateAudioLevel(_ level: Float) {
         state.audioLevel = level
+    }
+    
+    /// Update the mode info displayed on the overlay
+    func updateModeInfo(modeName: String, appName: String?, isAppSpecific: Bool) {
+        state.modeName = modeName
+        state.appName = appName
+        state.isAppSpecificMode = isAppSpecific
     }
     
     // MARK: - Show/Hide
