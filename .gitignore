@@ -100,3 +100,4 @@ WhisperType/Resources/*.bin
 Libraries/whisper-built/
 Libraries/whisper.cpp/build*/
 build.log
+*.swp
