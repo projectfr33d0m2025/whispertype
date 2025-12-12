@@ -53,7 +53,10 @@ class FormattingRules {
         // Step 5: Normalize ellipsis
         result = normalizeEllipsis(result)
         
-        // Step 6: Final whitespace cleanup
+        // Step 6: Add ending punctuation if missing
+        result = addEndingPunctuation(result)
+        
+        // Step 7: Final whitespace cleanup
         result = result.trimmingCharacters(in: .whitespacesAndNewlines)
         
         return result
@@ -201,6 +204,23 @@ class FormattingRules {
         result = result.replacingOccurrences(of: "…", with: "...")
         
         return result
+    }
+    
+    /// Add ending punctuation if the text doesn't end with one
+    func addEndingPunctuation(_ text: String) -> String {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return text }
+        
+        // Check if already ends with punctuation
+        if let lastChar = trimmed.last {
+            let endingPunctuation = CharacterSet(charactersIn: ".!?")
+            if lastChar.unicodeScalars.allSatisfy({ endingPunctuation.contains($0) }) {
+                return text
+            }
+        }
+        
+        // Add a period at the end
+        return trimmed + "."
     }
     
     // MARK: - Utility Methods

@@ -83,10 +83,12 @@ class FillerRemover {
             options: [.caseInsensitive]
         )
         
-        // "like" as filler: "like" when followed by comma or at start of clause
-        // But NOT in comparisons: "looks like", "feels like", "just like"
+        // "like" as filler: Match "like" with surrounding commas or at sentence boundaries
+        // Pattern 1: ", like," -> remove entirely
+        // Pattern 2: "like," at start of sentence -> remove
+        // Preserve: "looks like", "feels like", "I like", "would like"
         likeFillerRegex = try? NSRegularExpression(
-            pattern: "(?<!(looks|feels|sounds|seems|just|much|more|be|is|was|were|am|are|being|been|something|anything|nothing)\\s)\\blike\\b(?!\\s+(that|this|it|he|she|they|we|I|a|an|the|to|when|if|how|what))\\s*[,]?\\s*",
+            pattern: "(?:,\\s*like\\s*,|^like\\s*,|\\s+like\\s*,)\\s*",
             options: [.caseInsensitive]
         )
     }
