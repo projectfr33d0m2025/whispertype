@@ -507,10 +507,15 @@ class AppCoordinator: ObservableObject {
         let language = settings.whisperLanguageCode
         print("AppCoordinator: Using language hint: \(language ?? "auto-detect")")
         
+        // Check if we're in Raw mode - use verbatim transcription to preserve fillers
+        let mode = settings.processingMode
+        let useVerbatim = (mode == .raw)
+        
         // Transcribe using Whisper
         let rawTranscription = try await whisperWrapper.transcribe(
             samples: samples,
-            language: language
+            language: language,
+            verbatimMode: useVerbatim
         )
         
         // Validate raw transcription
@@ -521,7 +526,6 @@ class AppCoordinator: ObservableObject {
         }
         
         // Apply post-processing based on current mode
-        let mode = settings.processingMode
         currentProcessingMode = mode
         print("AppCoordinator: Applying processing mode: \(mode.displayName)")
         

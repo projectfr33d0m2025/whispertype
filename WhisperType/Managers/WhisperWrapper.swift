@@ -91,11 +91,13 @@ actor WhisperContext {
     ///   - samples: Float32 audio samples at 16kHz mono
     ///   - language: Language code (e.g., "en", nil for auto-detect)
     ///   - vocabulary: Optional vocabulary words for initial prompt
+    ///   - verbatimMode: If true, attempts to preserve filler words and speech patterns
     /// - Returns: Array of transcription segments
     func transcribe(
         samples: [Float],
         language: String? = "en",
-        vocabulary: [String] = []
+        vocabulary: [String] = [],
+        verbatimMode: Bool = false
     ) throws -> [TranscriptionSegment] {
         guard let ctx = context else {
             throw WhisperError.contextNotInitialized
@@ -107,13 +109,25 @@ actor WhisperContext {
         
         // Calculate optimal thread count
         let threadCount = Self.optimalThreadCount()
-        print("WhisperContext: Transcribing \(samples.count) samples with \(threadCount) threads")
+        print("WhisperContext: Transcribing \(samples.count) samples with \(threadCount) threads, verbatim: \(verbatimMode)")
 
         // Configure transcription parameters
         var params = whisper_full_default_params(WHISPER_SAMPLING_GREEDY)
         
         // Build initial prompt from vocabulary words
-        let initialPrompt = vocabulary.isEmpty ? nil : vocabulary.joined(separator: ", ")
+        // For verbatim mode, add a prompt that encourages preserving speech patterns
+        var promptParts: [String] = []
+        
+        if verbatimMode {
+            // This prompt tells Whisper to preserve filler words
+            promptParts.append("Transcribe exactly as spoken, including um, uh, like, you know, and other filler words.")
+        }
+        
+        if !vocabulary.isEmpty {
+            promptParts.append(vocabulary.joined(separator: ", "))
+        }
+        
+        let initialPrompt = promptParts.isEmpty ? nil : promptParts.joined(separator: " ")
         
         // Set common parameters
         params.print_realtime = false
@@ -326,11 +340,13 @@ class WhisperWrapper: ObservableObject {
     ///   - samples: Float32 audio samples at 16kHz mono
     ///   - language: Language code (nil for auto-detect, default: "en")
     ///   - vocabulary: Optional vocabulary words to improve recognition
+    ///   - verbatimMode: If true, attempts to preserve filler words (for Raw mode)
     /// - Returns: Transcribed text
     func transcribe(
         samples: [Float],
         language: String? = "en",
-        vocabulary: [String] = []
+        vocabulary: [String] = [],
+        verbatimMode: Bool = false
     ) async throws -> String {
         guard let context = whisperContext else {
             throw WhisperError.contextNotInitialized
@@ -353,7 +369,8 @@ class WhisperWrapper: ObservableObject {
             let segments = try await context.transcribe(
                 samples: samples,
                 language: language,
-                vocabulary: vocabulary
+                vocabulary: vocabulary,
+                verbatimMode: verbatimMode
             )
             
             let fullText = await context.getFullTranscription(segments: segments)
