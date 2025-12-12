@@ -224,15 +224,13 @@ struct ProcessingSettingsView: View {
                 }
             }
             
-            // MARK: - Navigation Placeholders
+            // MARK: - Advanced Navigation
             Section {
                 VStack(alignment: .leading, spacing: 8) {
-                    NavigationPlaceholder(
-                        title: "Custom Vocabulary",
-                        subtitle: "Add names, terms, and jargon",
-                        icon: "textformat.abc"
-                    )
+                    // Vocabulary - now links to the Vocabulary tab
+                    VocabularyNavigationLink()
                     
+                    // App Rules - still placeholder for Phase 4
                     NavigationPlaceholder(
                         title: "App Rules",
                         subtitle: "Set different modes per app",
@@ -555,6 +553,49 @@ struct LLMStatusBadge: View {
             return "Processing"
         case .connecting:
             return "Connecting"
+        }
+    }
+}
+
+// MARK: - Vocabulary Navigation Link
+
+struct VocabularyNavigationLink: View {
+    @ObservedObject var vocabularyManager = VocabularyManager.shared
+    
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "textformat.abc")
+                .foregroundColor(.accentColor)
+                .frame(width: 24)
+            
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Custom Vocabulary")
+                Text("Add names, terms, and jargon")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            
+            Spacer()
+            
+            // Entry count badge
+            Text("\(vocabularyManager.entryCount)")
+                .font(.caption)
+                .foregroundColor(.secondary)
+                .padding(.horizontal, 6)
+                .padding(.vertical, 2)
+                .background(Capsule().fill(Color.secondary.opacity(0.1)))
+            
+            Image(systemName: "arrow.right")
+                .font(.caption)
+                .foregroundColor(.secondary)
+        }
+        .padding(.vertical, 4)
+        .contentShape(Rectangle())
+        .onTapGesture {
+            // Open the Vocabulary tab in settings
+            // This is handled by the user clicking the Vocabulary tab directly
+            // For now, we'll just show a hint
+            NotificationCenter.default.post(name: .switchToVocabularyTab, object: nil)
         }
     }
 }

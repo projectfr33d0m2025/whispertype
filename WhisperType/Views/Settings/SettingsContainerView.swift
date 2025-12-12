@@ -12,6 +12,7 @@ struct SettingsContainerView: View {
     private enum SettingsTab: String, CaseIterable {
         case general = "General"
         case processing = "Processing"
+        case vocabulary = "Vocabulary"
         case models = "Models"
         case hotkey = "Hotkey"
         
@@ -19,6 +20,7 @@ struct SettingsContainerView: View {
             switch self {
             case .general: return "gear"
             case .processing: return "wand.and.stars"
+            case .vocabulary: return "textformat.abc"
             case .models: return "cpu"
             case .hotkey: return "keyboard"
             }
@@ -41,6 +43,12 @@ struct SettingsContainerView: View {
                 }
                 .tag(SettingsTab.processing)
             
+            VocabularySettingsView()
+                .tabItem {
+                    Label(SettingsTab.vocabulary.rawValue, systemImage: SettingsTab.vocabulary.icon)
+                }
+                .tag(SettingsTab.vocabulary)
+            
             ModelsSettingsTabView()
                 .tabItem {
                     Label(SettingsTab.models.rawValue, systemImage: SettingsTab.models.icon)
@@ -53,7 +61,7 @@ struct SettingsContainerView: View {
                 }
                 .tag(SettingsTab.hotkey)
         }
-        .frame(width: 550, height: 500)
+        .frame(width: 550, height: 520)
     }
 }
 

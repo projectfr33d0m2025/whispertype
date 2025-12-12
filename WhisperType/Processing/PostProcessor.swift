@@ -3,7 +3,7 @@
 //  WhisperType
 //
 //  Orchestrates the text processing pipeline.
-//  Chains FillerRemover, FormattingRules, and LLM enhancement based on mode.
+//  Chains FillerRemover, FormattingRules, VocabularyCorrector, and LLM enhancement based on mode.
 //
 
 import Foundation
@@ -20,6 +20,7 @@ class PostProcessor {
     
     private let fillerRemover: FillerRemover
     private let formattingRules: FormattingRules
+    private let vocabularyCorrector: VocabularyCorrector
     private var llmEngine: LLMEngineProtocol
     
     // MARK: - Settings Reference
@@ -31,10 +32,12 @@ class PostProcessor {
     init(
         fillerRemover: FillerRemover = .shared,
         formattingRules: FormattingRules = .shared,
+        vocabularyCorrector: VocabularyCorrector = .shared,
         llmEngine: LLMEngineProtocol = LLMEngine.shared
     ) {
         self.fillerRemover = fillerRemover
         self.formattingRules = formattingRules
+        self.vocabularyCorrector = vocabularyCorrector
         self.llmEngine = llmEngine
         
         print("PostProcessor: Initialized with LLM engine: \(type(of: llmEngine))")
@@ -56,6 +59,7 @@ class PostProcessor {
     ///   - mode: Processing mode to apply
     ///   - context: Additional context for LLM processing
     /// - Returns: ProcessingResult with processed text and metadata
+    @MainActor
     func process(
         _ text: String,
         mode: ProcessingMode,
@@ -83,6 +87,7 @@ class PostProcessor {
         var usedFallback = false
         var wasRateLimited = false
         var provider: String? = nil
+        var vocabularyCorrections: [Correction] = []
         
         // Step 1: Filler removal (all modes except raw)
         if mode.removesFiller && settings.fillerRemovalEnabled {
@@ -99,7 +104,31 @@ class PostProcessor {
             print("PostProcessor: Filler removal skipped (mode: \(mode.removesFiller), enabled: \(settings.fillerRemovalEnabled))")
         }
         
-        // Step 2: Formatting rules (formatted and above)
+        // Step 2: Vocabulary correction (all modes except raw, before formatting)
+        let vocabulary = VocabularyManager.shared.getAllForCorrection()
+        if !vocabulary.isEmpty {
+            let beforeVocab = processedText
+            let correctionResult = vocabularyCorrector.correct(processedText, vocabulary: vocabulary)
+            processedText = correctionResult.text
+            vocabularyCorrections = correctionResult.corrections
+            
+            if correctionResult.hadCorrections {
+                print("PostProcessor: Vocabulary correction made \(correctionResult.correctionCount) corrections:")
+                print("  Before: \"\(beforeVocab)\"")
+                print("  After:  \"\(processedText)\"")
+                for correction in correctionResult.corrections {
+                    print("    - '\(correction.original)' → '\(correction.corrected)' (\(correction.matchType.description))")
+                    // Increment usage count for matched terms
+                    VocabularyManager.shared.incrementUsage(correction.term)
+                }
+            } else {
+                print("PostProcessor: Vocabulary correction - no matches found")
+            }
+        } else {
+            print("PostProcessor: Vocabulary correction skipped (no vocabulary entries)")
+        }
+        
+        // Step 3: Formatting rules (formatted and above)
         if mode.appliesFormatting {
             let beforeFormat = processedText
             processedText = formattingRules.apply(processedText)
@@ -114,8 +143,12 @@ class PostProcessor {
             print("PostProcessor: Formatting rules skipped (mode doesn't apply formatting)")
         }
         
-        // Step 3: LLM enhancement (polished and professional only)
+        // Step 4: LLM enhancement (polished and professional only)
         if mode.requiresLLM {
+            // Inject vocabulary terms into LLM prompt
+            let llmVocabulary = VocabularyManager.shared.getLLMVocabulary()
+            PromptBuilder.shared.setVocabularyTerms(llmVocabulary)
+            
             // Check if LLM is available
             let llmStatus = await llmEngine.status
             
@@ -160,7 +193,8 @@ class PostProcessor {
             usedFallback: usedFallback,
             processingTime: processingTime,
             provider: provider,
-            wasRateLimited: wasRateLimited
+            wasRateLimited: wasRateLimited,
+            vocabularyCorrections: vocabularyCorrections
         )
     }
     

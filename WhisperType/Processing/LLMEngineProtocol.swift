@@ -155,13 +155,17 @@ struct ProcessingResult {
     /// Whether rate limiting caused the fallback
     let wasRateLimited: Bool
     
+    /// Vocabulary corrections that were applied
+    let vocabularyCorrections: [Correction]
+    
     init(
         text: String,
         modeUsed: ProcessingMode,
         usedFallback: Bool,
         processingTime: TimeInterval,
         provider: String?,
-        wasRateLimited: Bool = false
+        wasRateLimited: Bool = false,
+        vocabularyCorrections: [Correction] = []
     ) {
         self.text = text
         self.modeUsed = modeUsed
@@ -169,6 +173,7 @@ struct ProcessingResult {
         self.processingTime = processingTime
         self.provider = provider
         self.wasRateLimited = wasRateLimited
+        self.vocabularyCorrections = vocabularyCorrections
     }
 }
 

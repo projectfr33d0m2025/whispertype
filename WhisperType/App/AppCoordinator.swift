@@ -511,10 +511,17 @@ class AppCoordinator: ObservableObject {
         let mode = settings.processingMode
         let useVerbatim = (mode == .raw)
         
+        // Get vocabulary hints for Whisper initial_prompt (top 20 terms by usage)
+        let vocabularyHints = VocabularyManager.shared.getWhisperHints()
+        if !vocabularyHints.isEmpty {
+            print("AppCoordinator: Using \(vocabularyHints.count) vocabulary hints: \(vocabularyHints.prefix(5).joined(separator: ", "))...")
+        }
+        
         // Transcribe using Whisper
         let rawTranscription = try await whisperWrapper.transcribe(
             samples: samples,
             language: language,
+            vocabulary: vocabularyHints,
             verbatimMode: useVerbatim
         )
         
@@ -537,6 +544,11 @@ class AppCoordinator: ObservableObject {
         
         // Track if fallback was used
         lastUsedFallback = result.usedFallback
+        
+        // Log vocabulary corrections if any
+        if !result.vocabularyCorrections.isEmpty {
+            print("AppCoordinator: Vocabulary corrections applied: \(result.vocabularyCorrections.count)")
+        }
         
         // Show floating toast notification if fallback was used
         if result.usedFallback {
