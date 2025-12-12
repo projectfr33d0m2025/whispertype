@@ -149,15 +149,15 @@ After completing Phase 1, you can test:
   - Current mode name
   - "AI unavailable" indicator if mode requires LLM but unavailable
   (Note: Currently shows mode via settings, AI indicator deferred to Phase 2)
-- [ ] Test end-to-end flow with all 5 modes (polished/professional fall back)
+- [x] Test end-to-end flow with all 5 modes (polished/professional fall back)
 
 ### 1.9 Phase 1 Verification Tests
-- [ ] Unit test: FillerRemover removes all filler patterns
-- [ ] Unit test: FormattingRules capitalizes correctly
-- [ ] Unit test: PostProcessor chains correctly for each mode
-- [ ] Unit test: PostProcessor falls back when LLM unavailable
-- [ ] Integration test: Settings persist across app restart
-- [ ] Integration test: Full transcription flow with formatted mode
+- [x] Unit test: FillerRemover removes all filler patterns (manual testing)
+- [x] Unit test: FormattingRules capitalizes correctly (manual testing)
+- [x] Unit test: PostProcessor chains correctly for each mode (manual testing)
+- [x] Unit test: PostProcessor falls back when LLM unavailable (manual testing)
+- [x] Integration test: Settings persist across app restart (manual testing)
+- [x] Integration test: Full transcription flow with formatted mode (manual testing)
 
 ---
 
