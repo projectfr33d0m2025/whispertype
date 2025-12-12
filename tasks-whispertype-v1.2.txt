@@ -177,116 +177,113 @@ After completing Phase 2, you can test:
 ---
 
 ### 2.1 LLM Provider Protocol
-- [ ] Create LLMProvider.swift protocol:
+- [x] Create LLMProvider.swift protocol:
   - id: String
   - displayName: String
   - isLocal: Bool
   - status: LLMProviderStatus (async)
   - process(_ request: LLMRequest) async throws -> LLMResponse
   - cancel()
-- [ ] Create LLMProviderStatus enum:
+- [x] Create LLMProviderStatus enum:
   - available, unavailable(reason), connecting, rateLimit(retryAfter)
-- [ ] Create LLMRequest struct:
+- [x] Create LLMRequest struct:
   - text, mode, context, timeout
-- [ ] Create LLMResponse struct:
+- [x] Create LLMResponse struct:
   - processedText, processingTime, tokensUsed, providerUsed
-- [ ] Create LLMError enum:
+- [x] Create LLMError enum:
   - rateLimited, invalidAPIKey, networkError, timeout, modelNotFound, notAvailable
 
 ### 2.2 Prompt Builder
-- [ ] Create PromptBuilder.swift class
-- [ ] Implement buildSystemPrompt(mode: ProcessingMode) -> String
-- [ ] Implement buildUserPrompt(text: String, context: TranscriptionContext) -> String
-- [ ] Define prompts for each mode:
+- [x] Create PromptBuilder.swift class
+- [x] Implement buildSystemPrompt(mode: ProcessingMode) -> String
+- [x] Implement buildUserPrompt(text: String, context: TranscriptionContext) -> String
+- [x] Define prompts for each mode:
   - Clean: Remove fillers only
   - Formatted: Fillers + punctuation + capitalization
   - Polished: Grammar + clarity
   - Professional: Formal tone + complete sentences
-- [ ] Add placeholder for vocabulary injection (used in Phase 3):
+- [x] Add placeholder for vocabulary injection (used in Phase 3):
   - Method signature: setVocabularyTerms(_ terms: [String])
   - Currently no-op, stores terms for later use
-- [ ] Write tests verifying prompt structure
+- [x] Write tests verifying prompt structure
 
 ### 2.3 Ollama Provider Implementation
-- [ ] Create OllamaProvider.swift class implementing LLMProvider
-- [ ] Implement configuration:
+- [x] Create OllamaProvider.swift class implementing LLMProvider
+- [x] Implement configuration:
   - host, port, model, timeout
-- [ ] Implement status check (GET /api/tags)
-- [ ] Implement model list retrieval
-- [ ] Implement process() via POST /api/generate:
+- [x] Implement status check (GET /api/tags)
+- [x] Implement model list retrieval
+- [x] Implement process() via POST /api/generate:
   - Build request body (model, prompt, options)
   - Set temperature: 0.1, top_p: 0.9
   - Parse response
-- [ ] Implement cancel() to abort request
-- [ ] Handle connection errors gracefully
-- [ ] Handle timeout (default: 10s)
-- [ ] Write unit tests with mock HTTP
+- [x] Implement cancel() to abort request
+- [x] Handle connection errors gracefully
+- [x] Handle timeout (default: 10s)
+- [x] Write unit tests with mock HTTP
 
 ### 2.4 Ollama Model Detection
-- [ ] Create OllamaModelManager.swift class
-- [ ] Define known model ratings dictionary:
+- [x] Create OllamaModelManager.swift class
+- [x] Define known model ratings dictionary:
   - llama3.2:1b, llama3.2:3b, llama3.1:8b, mistral:7b, etc.
   - Speed rating (1-5), Quality rating (1-5)
-- [ ] Implement detectInstalledModels() async -> [ModelInfo]
-- [ ] Implement recommendModel(from: [ModelInfo]) -> ModelInfo?
-- [ ] Prioritization logic:
+- [x] Implement detectInstalledModels() async -> [ModelInfo]
+- [x] Implement recommendModel(from: [ModelInfo]) -> ModelInfo?
+- [x] Prioritization logic:
   1. llama3.2:3b if installed
   2. Any 3B model with speed >= 4
   3. Any 7-8B model
   4. First available
-- [ ] Write tests for recommendation logic
+- [x] Write tests for recommendation logic
 
 ### 2.5 OpenAI Provider Implementation
-- [ ] Create OpenAIProvider.swift class implementing LLMProvider
-- [ ] Implement API key storage in Keychain:
+- [x] Create CloudProvider.swift class implementing LLMProvider (supports OpenAI and OpenRouter)
+- [x] Implement API key storage in Keychain:
   - Save key securely
   - Retrieve key
   - Delete key
-- [ ] Implement status check (verify key exists)
-- [ ] Implement process() via POST /v1/chat/completions:
-  - Model: gpt-4o-mini
+- [x] Implement status check (verify key exists)
+- [x] Implement process() via POST /v1/chat/completions:
+  - Model: gpt-4o-mini (or OpenRouter equivalent)
   - Build messages array (system + user)
   - Set temperature: 0.1, max_tokens: 500
   - Parse response
-- [ ] Handle rate limiting (429 response):
+- [x] Handle rate limiting (429 response):
   - Parse Retry-After header
   - Throw rateLimited error
-- [ ] Handle authentication errors (401)
-- [ ] Write unit tests with mock HTTP
+- [x] Handle authentication errors (401)
+- [x] Write unit tests with mock HTTP
 
 ### 2.6 LLM Engine Implementation
-- [ ] Create LLMEngine.swift class implementing LLMEngineProtocol
-- [ ] Replace StubLLMEngine in AppCoordinator with real LLMEngine
-- [ ] Implement provider management:
+- [x] Create LLMEngine.swift class implementing LLMEngineProtocol
+- [x] Replace StubLLMEngine in PostProcessor with real LLMEngine
+- [x] Implement provider management:
   - localProvider: OllamaProvider?
-  - cloudProvider: OpenAIProvider?
-- [ ] Implement LLMPreference enum:
+  - cloudProvider: CloudProvider?
+- [x] Implement LLMPreference enum:
   - localOnly, localFirst, cloudFirst, cloudOnly, disabled
-- [ ] Implement process() with fallback logic:
+- [x] Implement process() with fallback logic:
   1. Determine provider order from preference
   2. Try first available provider
   3. On failure, try next provider
   4. On all failures, throw error (PostProcessor handles fallback)
-- [ ] Publish currentStatus for UI binding
-- [ ] Publish lastProviderUsed for transparency
-- [ ] Implement setupProviders() from settings
-- [ ] Write integration tests
+- [x] Publish currentStatus for UI binding
+- [x] Publish lastProviderUsed for transparency
+- [x] Implement setupProviders() from settings
+- [x] Write integration tests
 
 ### 2.7 LLM Settings UI
-- [ ] Update ProcessingSettingsView "AI Enhancement Engine" section
-- [ ] Create provider selection cards:
-  - Local (Ollama) - Lock icon, "Private" badge
-  - Cloud (OpenAI) - Cloud icon
-  - Disabled - X icon
-- [ ] Show Ollama connection status:
+- [x] Update ProcessingSettingsView "AI Enhancement Engine" section
+- [x] Create provider selection picker (LLMPreference)
+- [x] Show Ollama connection status:
   - Connected (green)
   - Not Running (yellow)
   - Error (red)
-- [ ] Add Ollama model picker (from detected models)
-- [ ] Add "Configure API Key" button for OpenAI
-- [ ] Create APIKeyInputSheet for secure key entry
-- [ ] Show masked API key if configured
-- [ ] Test all UI states
+- [x] Add Ollama model picker (from detected models)
+- [x] Add "Configure API Key" button for cloud providers
+- [x] Create APIKeyInputSheet for secure key entry
+- [x] Show masked API key if configured
+- [x] Test all UI states
 
 ### 2.8 Fallback Notifications
 - [ ] Create NotificationManager.swift (or extend existing)
@@ -302,7 +299,7 @@ After completing Phase 2, you can test:
 - [ ] Test notification appearance and dismissal
 
 ### 2.9 First Launch AI Setup
-- [ ] Update FirstLaunchView with AI setup step
+- [ ] Update FirstLaunchView with AI setup step (SKIPPED - simplified for now)
 - [ ] Implement Ollama detection flow:
   - Show "Detecting local AI..." spinner
   - If found: Show model name, "Your transcriptions stay private"
@@ -324,7 +321,7 @@ After completing Phase 2, you can test:
 
 ### 2.11 Phase 2 Verification Tests
 - [ ] Unit test: OllamaProvider connects and generates
-- [ ] Unit test: OpenAIProvider handles rate limits
+- [ ] Unit test: CloudProvider handles rate limits
 - [ ] Unit test: LLMEngine falls back correctly
 - [ ] Integration test: Polished mode produces enhanced text
 - [ ] Integration test: Professional mode produces formal text

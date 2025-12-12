@@ -15,6 +15,13 @@
 		C1200011000000000000001 /* StubLLMEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1200012000000000000001 /* StubLLMEngine.swift */; };
 		C1200013000000000000001 /* PostProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1200014000000000000001 /* PostProcessor.swift */; };
 		C1200015000000000000001 /* ProcessingSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1200016000000000000001 /* ProcessingSettingsView.swift */; };
+		D1200001000000000000001 /* LLMProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1200002000000000000001 /* LLMProvider.swift */; };
+		D1200003000000000000001 /* PromptBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1200004000000000000001 /* PromptBuilder.swift */; };
+		D1200005000000000000001 /* OllamaProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1200006000000000000001 /* OllamaProvider.swift */; };
+		D1200007000000000000001 /* OllamaModelManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1200008000000000000001 /* OllamaModelManager.swift */; };
+		D1200009000000000000001 /* CloudProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1200010000000000000001 /* CloudProvider.swift */; };
+		D1200011000000000000001 /* LLMEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1200012000000000000001 /* LLMEngine.swift */; };
+		D1200013000000000000001 /* KeychainManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1200014000000000000001 /* KeychainManager.swift */; };
 		B1200001000000000000001 /* WaveformView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1200002000000000000001 /* WaveformView.swift */; };
 		B1200004000000000000001 /* RecordingOverlayWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1200005000000000000001 /* RecordingOverlayWindow.swift */; };
 		B1200006000000000000001 /* RecordingOverlayContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1200007000000000000001 /* RecordingOverlayContentView.swift */; };
@@ -96,6 +103,13 @@
 		C1200012000000000000001 /* StubLLMEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StubLLMEngine.swift; sourceTree = "<group>"; };
 		C1200014000000000000001 /* PostProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostProcessor.swift; sourceTree = "<group>"; };
 		C1200016000000000000001 /* ProcessingSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessingSettingsView.swift; sourceTree = "<group>"; };
+		D1200002000000000000001 /* LLMProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMProvider.swift; sourceTree = "<group>"; };
+		D1200004000000000000001 /* PromptBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptBuilder.swift; sourceTree = "<group>"; };
+		D1200006000000000000001 /* OllamaProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OllamaProvider.swift; sourceTree = "<group>"; };
+		D1200008000000000000001 /* OllamaModelManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OllamaModelManager.swift; sourceTree = "<group>"; };
+		D1200010000000000000001 /* CloudProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudProvider.swift; sourceTree = "<group>"; };
+		D1200012000000000000001 /* LLMEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMEngine.swift; sourceTree = "<group>"; };
+		D1200014000000000000001 /* KeychainManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -202,6 +216,7 @@
 			children = (
 				7B73EFC92EDD989E0062E68C /* AudioRecorder.swift */,
 				A1000094000000000000001 /* HotkeyManager.swift */,
+				D1200014000000000000001 /* KeychainManager.swift */,
 				7B73EFC12EDD944D0062E68C /* ModelManager.swift */,
 				A1000092000000000000001 /* TextInjector.swift */,
 				A1000071000000000000001 /* WhisperWrapper.swift */,
@@ -301,6 +316,12 @@
 				C1200010000000000000001 /* LLMEngineProtocol.swift */,
 				C1200012000000000000001 /* StubLLMEngine.swift */,
 				C1200014000000000000001 /* PostProcessor.swift */,
+				D1200002000000000000001 /* LLMProvider.swift */,
+				D1200004000000000000001 /* PromptBuilder.swift */,
+				D1200006000000000000001 /* OllamaProvider.swift */,
+				D1200008000000000000001 /* OllamaModelManager.swift */,
+				D1200010000000000000001 /* CloudProvider.swift */,
+				D1200012000000000000001 /* LLMEngine.swift */,
 			);
 			path = Processing;
 			sourceTree = "<group>";
@@ -408,6 +429,13 @@
 				C1200011000000000000001 /* StubLLMEngine.swift in Sources */,
 				C1200013000000000000001 /* PostProcessor.swift in Sources */,
 				C1200015000000000000001 /* ProcessingSettingsView.swift in Sources */,
+				D1200001000000000000001 /* LLMProvider.swift in Sources */,
+				D1200003000000000000001 /* PromptBuilder.swift in Sources */,
+				D1200005000000000000001 /* OllamaProvider.swift in Sources */,
+				D1200007000000000000001 /* OllamaModelManager.swift in Sources */,
+				D1200009000000000000001 /* CloudProvider.swift in Sources */,
+				D1200011000000000000001 /* LLMEngine.swift in Sources */,
+				D1200013000000000000001 /* KeychainManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

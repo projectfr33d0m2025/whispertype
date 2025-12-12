@@ -94,6 +94,10 @@ enum Constants {
         static let ollamaModel = "ollamaModel"
         static let ollamaHost = "ollamaHost"
         static let ollamaPort = "ollamaPort"
+        
+        // v1.2 Cloud Provider Settings
+        static let cloudProviderType = "cloudProviderType"
+        static let cloudModel = "cloudModel"
     }
 
     // MARK: - Default Values
@@ -124,6 +128,10 @@ enum Constants {
         static let ollamaModel = "llama3.2:3b"
         static let ollamaHost = "localhost"
         static let ollamaPort = 11434
+        
+        // v1.2 Cloud Provider Defaults
+        static let cloudProviderType: CloudProviderType = .openRouter
+        static let cloudModel = "openai/gpt-4o-mini"
     }
 
     // MARK: - Audio Settings

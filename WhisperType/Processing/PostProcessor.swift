@@ -31,7 +31,7 @@ class PostProcessor {
     init(
         fillerRemover: FillerRemover = .shared,
         formattingRules: FormattingRules = .shared,
-        llmEngine: LLMEngineProtocol = StubLLMEngine.shared
+        llmEngine: LLMEngineProtocol = LLMEngine.shared
     ) {
         self.fillerRemover = fillerRemover
         self.formattingRules = formattingRules

@@ -37,6 +37,11 @@ class AppSettings: ObservableObject {
     private var _ollamaModel: String = "llama3.2:3b"
     private var _ollamaHost: String = "localhost"
     private var _ollamaPort: Int = 11434
+    
+    // MARK: - v1.2 Cloud Provider Settings
+    
+    private var _cloudProviderType: CloudProviderType = .openRouter
+    private var _cloudModel: String = "openai/gpt-4o-mini"
 
     // MARK: - Public Computed Properties
 
@@ -213,6 +218,28 @@ class AppSettings: ObservableObject {
     var ollamaURL: URL {
         URL(string: "http://\(_ollamaHost):\(_ollamaPort)")!
     }
+    
+    // MARK: - v1.2 Cloud Provider Settings (Public)
+    
+    var cloudProviderType: CloudProviderType {
+        get { _cloudProviderType }
+        set {
+            objectWillChange.send()
+            _cloudProviderType = newValue
+            UserDefaults.standard.set(newValue.rawValue, forKey: Constants.UserDefaultsKeys.cloudProviderType)
+            print("AppSettings: Cloud provider type changed to \(newValue.rawValue)")
+        }
+    }
+    
+    var cloudModel: String {
+        get { _cloudModel }
+        set {
+            objectWillChange.send()
+            _cloudModel = newValue
+            UserDefaults.standard.set(newValue, forKey: Constants.UserDefaultsKeys.cloudModel)
+            print("AppSettings: Cloud model changed to \(newValue)")
+        }
+    }
 
     // MARK: - Initialization
 
@@ -286,6 +313,17 @@ class AppSettings: ObservableObject {
         
         let savedPort = defaults.integer(forKey: Constants.UserDefaultsKeys.ollamaPort)
         self._ollamaPort = savedPort > 0 ? savedPort : Constants.Defaults.ollamaPort
+        
+        // Load v1.2 Cloud Provider Settings
+        if let providerString = defaults.string(forKey: Constants.UserDefaultsKeys.cloudProviderType),
+           let provider = CloudProviderType(rawValue: providerString) {
+            self._cloudProviderType = provider
+        } else {
+            self._cloudProviderType = Constants.Defaults.cloudProviderType
+        }
+        
+        self._cloudModel = defaults.string(forKey: Constants.UserDefaultsKeys.cloudModel)
+            ?? Constants.Defaults.cloudModel
 
         print("AppSettings: Initialized with active model: \(_activeModelId), processing mode: \(_processingMode.rawValue)")
     }
@@ -311,6 +349,8 @@ class AppSettings: ObservableObject {
         ollamaModel = Constants.Defaults.ollamaModel
         ollamaHost = Constants.Defaults.ollamaHost
         ollamaPort = Constants.Defaults.ollamaPort
+        cloudProviderType = Constants.Defaults.cloudProviderType
+        cloudModel = Constants.Defaults.cloudModel
 
         print("AppSettings: Reset to defaults")
     }

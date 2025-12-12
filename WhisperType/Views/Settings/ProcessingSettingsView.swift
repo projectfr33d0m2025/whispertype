@@ -10,7 +10,13 @@ import SwiftUI
 
 struct ProcessingSettingsView: View {
     @ObservedObject var settings = AppSettings.shared
-    @State private var llmStatus: LLMEngineStatus = .unavailable(reason: "Checking...")
+    @ObservedObject var llmEngine = LLMEngine.shared
+    @ObservedObject var ollamaModelManager = OllamaModelManager.shared
+    
+    @State private var ollamaStatus: LLMProviderStatus = .connecting
+    @State private var cloudStatus: LLMProviderStatus = .connecting
+    @State private var showAPIKeySheet = false
+    @State private var isRefreshingOllama = false
     
     var body: some View {
         Form {
@@ -29,7 +35,7 @@ struct ProcessingSettingsView: View {
                             ProcessingModeCard(
                                 mode: mode,
                                 isSelected: settings.processingMode == mode,
-                                llmAvailable: llmStatus.isAvailable
+                                llmAvailable: llmEngine.currentStatus.isAvailable
                             ) {
                                 settings.processingMode = mode
                             }
@@ -61,33 +67,160 @@ struct ProcessingSettingsView: View {
                         Text("AI Enhancement Engine")
                             .font(.headline)
                         Spacer()
-                        LLMStatusBadge(status: llmStatus)
+                        LLMStatusBadge(status: llmEngine.currentStatus)
                     }
                     
-                    Text("AI features will be available in a future update.")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
+                    // Provider Preference
+                    Picker("Provider Preference", selection: $settings.llmPreference) {
+                        ForEach(LLMPreference.allCases) { pref in
+                            Label(pref.displayName, systemImage: pref.icon)
+                                .tag(pref)
+                        }
+                    }
+                    .onChange(of: settings.llmPreference) { _ in
+                        llmEngine.reconfigure()
+                    }
                     
-                    // Placeholder for Phase 2 configuration
-                    GroupBox {
-                        VStack(alignment: .leading, spacing: 8) {
+                    Text(settings.llmPreference.description)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+            }
+            
+            // MARK: - Local AI (Ollama) Configuration
+            if settings.llmPreference.usesLocal {
+                Section {
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack {
                             Label("Local AI (Ollama)", systemImage: "lock.shield")
-                                .foregroundColor(.secondary)
-                            Text("Run AI models locally for complete privacy.")
+                                .font(.headline)
+                            Spacer()
+                            ProviderStatusIndicator(status: ollamaStatus)
+                        }
+                        
+                        // Connection status
+                        if case .unavailable(let reason) = ollamaStatus {
+                            HStack {
+                                Image(systemName: "exclamationmark.triangle.fill")
+                                    .foregroundColor(.orange)
+                                Text(reason)
+                                    .font(.caption)
+                                    .foregroundColor(.orange)
+                            }
+                            .padding(8)
+                            .background(Color.orange.opacity(0.1))
+                            .cornerRadius(6)
+                        }
+                        
+                        // Model picker
+                        if ollamaModelManager.hasModels {
+                            Picker("Model", selection: $settings.ollamaModel) {
+                                ForEach(ollamaModelManager.installedModels) { model in
+                                    Text(model.name).tag(model.name)
+                                }
+                            }
+                            .onChange(of: settings.ollamaModel) { _ in
+                                llmEngine.reconfigure()
+                            }
+                        } else {
+                            HStack {
+                                Text("Model:")
+                                TextField("Model name", text: $settings.ollamaModel)
+                                    .textFieldStyle(.roundedBorder)
+                                    .frame(maxWidth: 200)
+                            }
+                        }
+                        
+                        // Refresh button
+                        HStack {
+                            Button(action: refreshOllamaStatus) {
+                                Label(
+                                    isRefreshingOllama ? "Checking..." : "Refresh Status",
+                                    systemImage: "arrow.clockwise"
+                                )
+                            }
+                            .disabled(isRefreshingOllama)
+                            
+                            Spacer()
+                            
+                            Link("Install Ollama", destination: URL(string: "https://ollama.ai")!)
                                 .font(.caption)
-                                .foregroundColor(.secondary)
+                        }
+                    }
+                }
+            }
+            
+            // MARK: - Cloud AI Configuration
+            if settings.llmPreference.usesCloud {
+                Section {
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack {
+                            Label("Cloud AI", systemImage: "cloud")
+                                .font(.headline)
+                            Spacer()
+                            ProviderStatusIndicator(status: cloudStatus)
+                        }
+                        
+                        // Provider selection
+                        Picker("Provider", selection: $settings.cloudProviderType) {
+                            ForEach(CloudProviderType.allCases) { provider in
+                                Text(provider.displayName).tag(provider)
+                            }
+                        }
+                        .onChange(of: settings.cloudProviderType) { newValue in
+                            // Update model to default for selected provider
+                            settings.cloudModel = newValue.defaultModel
+                            llmEngine.reconfigure()
+                            Task { await updateCloudStatus() }
+                        }
+                        
+                        // Model input
+                        HStack {
+                            Text("Model:")
+                            TextField("Model name", text: $settings.cloudModel)
+                                .textFieldStyle(.roundedBorder)
+                                .frame(maxWidth: 200)
+                        }
+                        
+                        // API Key configuration
+                        HStack {
+                            if hasCloudAPIKey {
+                                HStack(spacing: 4) {
+                                    Image(systemName: "checkmark.circle.fill")
+                                        .foregroundColor(.green)
+                                    Text("API Key: \(maskedAPIKey)")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
+                            } else {
+                                HStack(spacing: 4) {
+                                    Image(systemName: "exclamationmark.triangle.fill")
+                                        .foregroundColor(.orange)
+                                    Text("API key not configured")
+                                        .font(.caption)
+                                        .foregroundColor(.orange)
+                                }
+                            }
                             
-                            Divider()
+                            Spacer()
                             
-                            Label("Cloud AI (OpenAI)", systemImage: "cloud")
+                            Button(hasCloudAPIKey ? "Change API Key" : "Add API Key") {
+                                showAPIKeySheet = true
+                            }
+                        }
+                        
+                        // Privacy notice
+                        HStack(alignment: .top, spacing: 6) {
+                            Image(systemName: "info.circle")
                                 .foregroundColor(.secondary)
-                            Text("Faster processing with cloud-based models.")
+                            Text("Cloud AI sends your transcribed text (not audio) to external servers for processing.")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }
-                        .padding(.vertical, 4)
+                        .padding(8)
+                        .background(Color.secondary.opacity(0.1))
+                        .cornerRadius(6)
                     }
-                    .opacity(0.6)
                 }
             }
             
@@ -112,14 +245,188 @@ struct ProcessingSettingsView: View {
         }
         .formStyle(.grouped)
         .task {
-            await updateLLMStatus()
+            await loadInitialStatus()
+        }
+        .sheet(isPresented: $showAPIKeySheet) {
+            APIKeyInputSheet(
+                providerType: settings.cloudProviderType,
+                onSave: { key in
+                    saveAPIKey(key)
+                }
+            )
         }
     }
     
-    private func updateLLMStatus() async {
-        llmStatus = await PostProcessor.shared.llmStatus
+    // MARK: - Helper Methods
+    
+    private func loadInitialStatus() async {
+        ollamaStatus = await llmEngine.getOllamaStatus()
+        cloudStatus = await llmEngine.getCloudStatus()
+        await ollamaModelManager.detectInstalledModels()
+    }
+    
+    private func refreshOllamaStatus() {
+        isRefreshingOllama = true
+        Task {
+            ollamaStatus = await llmEngine.refreshOllamaStatus()
+            await ollamaModelManager.detectInstalledModels()
+            llmEngine.reconfigure()
+            await MainActor.run {
+                isRefreshingOllama = false
+            }
+        }
+    }
+    
+    private func updateCloudStatus() async {
+        cloudStatus = await llmEngine.getCloudStatus()
+    }
+    
+    private var hasCloudAPIKey: Bool {
+        switch settings.cloudProviderType {
+        case .openAI:
+            return KeychainManager.shared.hasOpenAIKey
+        case .openRouter:
+            return KeychainManager.shared.hasOpenRouterKey
+        }
+    }
+    
+    private var maskedAPIKey: String {
+        switch settings.cloudProviderType {
+        case .openAI:
+            return KeychainManager.shared.getMaskedAPIKey(for: CloudProviderType.openAI.keychainAccount) ?? "****"
+        case .openRouter:
+            return KeychainManager.shared.getMaskedAPIKey(for: CloudProviderType.openRouter.keychainAccount) ?? "****"
+        }
+    }
+    
+    private func saveAPIKey(_ key: String) {
+        switch settings.cloudProviderType {
+        case .openAI:
+            KeychainManager.shared.saveOpenAIKey(key)
+        case .openRouter:
+            KeychainManager.shared.saveOpenRouterKey(key)
+        }
+        llmEngine.reconfigure()
+        Task { await updateCloudStatus() }
     }
 }
+
+
+// MARK: - Provider Status Indicator
+
+struct ProviderStatusIndicator: View {
+    let status: LLMProviderStatus
+    
+    var body: some View {
+        HStack(spacing: 4) {
+            Circle()
+                .fill(statusColor)
+                .frame(width: 8, height: 8)
+            
+            Text(status.displayText)
+                .font(.caption)
+                .foregroundColor(.secondary)
+        }
+    }
+    
+    private var statusColor: Color {
+        switch status {
+        case .available:
+            return .green
+        case .unavailable:
+            return .red
+        case .connecting:
+            return .orange
+        case .rateLimited:
+            return .yellow
+        }
+    }
+}
+
+// MARK: - API Key Input Sheet
+
+struct APIKeyInputSheet: View {
+    let providerType: CloudProviderType
+    let onSave: (String) -> Void
+    
+    @Environment(\.dismiss) private var dismiss
+    @State private var apiKey = ""
+    @State private var isValidating = false
+    @State private var validationError: String?
+    
+    var body: some View {
+        VStack(spacing: 20) {
+            // Header
+            VStack(spacing: 8) {
+                Image(systemName: providerType.icon)
+                    .font(.largeTitle)
+                    .foregroundColor(.accentColor)
+                
+                Text("\(providerType.displayName) API Key")
+                    .font(.headline)
+                
+                Text(providerType.description)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+            }
+            
+            // API Key input
+            VStack(alignment: .leading, spacing: 8) {
+                SecureField("Enter API Key", text: $apiKey)
+                    .textFieldStyle(.roundedBorder)
+                
+                if let error = validationError {
+                    Text(error)
+                        .font(.caption)
+                        .foregroundColor(.red)
+                }
+                
+                // Help link
+                if providerType == .openRouter {
+                    Link("Get an OpenRouter API key →", destination: URL(string: "https://openrouter.ai/keys")!)
+                        .font(.caption)
+                } else {
+                    Link("Get an OpenAI API key →", destination: URL(string: "https://platform.openai.com/api-keys")!)
+                        .font(.caption)
+                }
+            }
+            
+            // Buttons
+            HStack {
+                Button("Cancel") {
+                    dismiss()
+                }
+                .keyboardShortcut(.escape)
+                
+                Spacer()
+                
+                Button("Save") {
+                    saveKey()
+                }
+                .keyboardShortcut(.return)
+                .disabled(apiKey.isEmpty || isValidating)
+            }
+        }
+        .padding(24)
+        .frame(width: 400)
+    }
+    
+    private func saveKey() {
+        // Basic validation
+        let trimmedKey = apiKey.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        guard !trimmedKey.isEmpty else {
+            validationError = "API key cannot be empty"
+            return
+        }
+        
+        // Save the key
+        onSave(trimmedKey)
+        dismiss()
+    }
+}
+
 
 // MARK: - Processing Mode Card
 
@@ -288,5 +595,5 @@ struct NavigationPlaceholder: View {
 
 #Preview {
     ProcessingSettingsView()
-        .frame(width: 500, height: 700)
+        .frame(width: 500, height: 800)
 }
