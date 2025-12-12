@@ -87,7 +87,7 @@ class PostProcessor {
         var usedFallback = false
         var wasRateLimited = false
         var provider: String? = nil
-        var vocabularyCorrections: [Correction] = []
+        var vocabularyCorrections: [VocabularyCorrection] = []
         
         // Step 1: Filler removal (all modes except raw)
         if mode.removesFiller && settings.fillerRemovalEnabled {

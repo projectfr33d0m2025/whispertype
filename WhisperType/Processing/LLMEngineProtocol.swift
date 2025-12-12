@@ -156,7 +156,7 @@ struct ProcessingResult {
     let wasRateLimited: Bool
     
     /// Vocabulary corrections that were applied
-    let vocabularyCorrections: [Correction]
+    let vocabularyCorrections: [VocabularyCorrection]
     
     init(
         text: String,
@@ -165,7 +165,7 @@ struct ProcessingResult {
         processingTime: TimeInterval,
         provider: String?,
         wasRateLimited: Bool = false,
-        vocabularyCorrections: [Correction] = []
+        vocabularyCorrections: [VocabularyCorrection] = []
     ) {
         self.text = text
         self.modeUsed = modeUsed

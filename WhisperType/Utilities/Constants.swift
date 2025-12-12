@@ -11,9 +11,6 @@ import AppKit
 // MARK: - Notification Names
 
 extension Notification.Name {
-    /// Posted when the active Whisper model changes
-    static let activeModelChanged = Notification.Name("activeModelChanged")
-    
     /// Posted to switch to the Vocabulary tab in settings
     static let switchToVocabularyTab = Notification.Name("switchToVocabularyTab")
 }

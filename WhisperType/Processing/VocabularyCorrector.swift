@@ -40,7 +40,7 @@ class VocabularyCorrector {
         }
         
         var correctedText = text
-        var corrections: [Correction] = []
+        var corrections: [VocabularyCorrection] = []
         
         // Build lookup dictionary for faster matching
         let lookup = buildLookup(from: vocabulary)
@@ -57,7 +57,7 @@ class VocabularyCorrector {
             if let match = findExactMatch(token.text, in: lookup) {
                 if token.text != match.term {
                     let replacement = preserveCase(original: token.text, replacement: match.term)
-                    let correction = Correction(
+                    let correction = VocabularyCorrection(
                         original: token.text,
                         corrected: replacement,
                         term: match.term,
@@ -74,7 +74,7 @@ class VocabularyCorrector {
             // Try fuzzy match
             else if let match = findFuzzyMatch(token.text, in: lookup, vocabulary: vocabulary) {
                 let replacement = preserveCase(original: token.text, replacement: match.term)
-                let correction = Correction(
+                let correction = VocabularyCorrection(
                     original: token.text,
                     corrected: replacement,
                     term: match.term,
@@ -262,27 +262,27 @@ class VocabularyCorrector {
 
 struct CorrectionResult {
     let text: String
-    let corrections: [Correction]
+    let corrections: [VocabularyCorrection]
     
     var hadCorrections: Bool { !corrections.isEmpty }
     var correctionCount: Int { corrections.count }
 }
 
-struct Correction {
+struct VocabularyCorrection {
     let original: String
     let corrected: String
     let term: String
-    let matchType: MatchType
+    let matchType: VocabularyCorrectionMatchType
+}
+
+enum VocabularyCorrectionMatchType {
+    case exact
+    case fuzzy(distance: Int)
     
-    enum MatchType {
-        case exact
-        case fuzzy(distance: Int)
-        
-        var description: String {
-            switch self {
-            case .exact: return "exact"
-            case .fuzzy(let distance): return "fuzzy (distance: \(distance))"
-            }
+    var description: String {
+        switch self {
+        case .exact: return "exact"
+        case .fuzzy(let distance): return "fuzzy (distance: \(distance))"
         }
     }
 }
