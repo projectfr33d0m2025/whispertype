@@ -7,6 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F1300001000000000000001 /* VocabularyEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1300002000000000000001 /* VocabularyEntry.swift */; };
+		F1300003000000000000001 /* VocabularyStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1300004000000000000001 /* VocabularyStorage.swift */; };
+		F1300005000000000000001 /* VocabularyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1300006000000000000001 /* VocabularyManager.swift */; };
+		F1300007000000000000001 /* VocabularyCorrector.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1300008000000000000001 /* VocabularyCorrector.swift */; };
+		F1300009000000000000001 /* VocabularySettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1300010000000000000001 /* VocabularySettingsView.swift */; };
+		F1300011000000000000001 /* VocabularyEntryRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1300012000000000000001 /* VocabularyEntryRow.swift */; };
+		F1300013000000000000001 /* VocabularyEntryEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1300014000000000000001 /* VocabularyEntryEditorView.swift */; };
 		C1200001000000000000001 /* ProcessingMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1200002000000000000001 /* ProcessingMode.swift */; };
 		C1200003000000000000001 /* LLMPreference.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1200004000000000000001 /* LLMPreference.swift */; };
 		C1200005000000000000001 /* FillerRemover.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1200006000000000000001 /* FillerRemover.swift */; };
@@ -59,6 +66,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		F1300002000000000000001 /* VocabularyEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VocabularyEntry.swift; sourceTree = "<group>"; };
+		F1300004000000000000001 /* VocabularyStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VocabularyStorage.swift; sourceTree = "<group>"; };
+		F1300006000000000000001 /* VocabularyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VocabularyManager.swift; sourceTree = "<group>"; };
+		F1300008000000000000001 /* VocabularyCorrector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VocabularyCorrector.swift; sourceTree = "<group>"; };
+		F1300010000000000000001 /* VocabularySettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VocabularySettingsView.swift; sourceTree = "<group>"; };
+		F1300012000000000000001 /* VocabularyEntryRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VocabularyEntryRow.swift; sourceTree = "<group>"; };
+		F1300014000000000000001 /* VocabularyEntryEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VocabularyEntryEditorView.swift; sourceTree = "<group>"; };
 		B1200002000000000000001 /* WaveformView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaveformView.swift; sourceTree = "<group>"; };
 		B1200005000000000000001 /* RecordingOverlayWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingOverlayWindow.swift; sourceTree = "<group>"; };
 		B1200007000000000000001 /* RecordingOverlayContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingOverlayContentView.swift; sourceTree = "<group>"; };
@@ -207,6 +221,7 @@
 			children = (
 				A1000055000000000000001 /* AppSettings.swift */,
 				B1300002000000000000001 /* SupportedLanguage.swift */,
+				F1300002000000000000001 /* VocabularyEntry.swift */,
 				A1000057000000000000001 /* WhisperModel.swift */,
 				A1000059000000000000001 /* TranscriptionResult.swift */,
 			);
@@ -221,6 +236,8 @@
 				D1200014000000000000001 /* KeychainManager.swift */,
 				7B73EFC12EDD944D0062E68C /* ModelManager.swift */,
 				A1000092000000000000001 /* TextInjector.swift */,
+				F1300006000000000000001 /* VocabularyManager.swift */,
+				F1300004000000000000001 /* VocabularyStorage.swift */,
 				A1000071000000000000001 /* WhisperWrapper.swift */,
 			);
 			path = Managers;
@@ -278,6 +295,9 @@
 				C1200016000000000000001 /* ProcessingSettingsView.swift */,
 				A8000006000000000000001 /* HotkeySettingsView.swift */,
 				7B73EFC52EDD947C0062E68C /* ModelSettingsView.swift */,
+				F1300010000000000000001 /* VocabularySettingsView.swift */,
+				F1300012000000000000001 /* VocabularyEntryRow.swift */,
+				F1300014000000000000001 /* VocabularyEntryEditorView.swift */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
@@ -325,6 +345,7 @@
 				D1200008000000000000001 /* OllamaModelManager.swift */,
 				D1200010000000000000001 /* CloudProvider.swift */,
 				D1200012000000000000001 /* LLMEngine.swift */,
+				F1300008000000000000001 /* VocabularyCorrector.swift */,
 			);
 			path = Processing;
 			sourceTree = "<group>";
@@ -440,6 +461,13 @@
 				D1200011000000000000001 /* LLMEngine.swift in Sources */,
 				D1200013000000000000001 /* KeychainManager.swift in Sources */,
 				E1200001000000000000001 /* ToastNotificationWindow.swift in Sources */,
+				F1300001000000000000001 /* VocabularyEntry.swift in Sources */,
+				F1300003000000000000001 /* VocabularyStorage.swift in Sources */,
+				F1300005000000000000001 /* VocabularyManager.swift in Sources */,
+				F1300007000000000000001 /* VocabularyCorrector.swift in Sources */,
+				F1300009000000000000001 /* VocabularySettingsView.swift in Sources */,
+				F1300011000000000000001 /* VocabularyEntryRow.swift in Sources */,
+				F1300013000000000000001 /* VocabularyEntryEditorView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
