@@ -1,7 +1,7 @@
 # WhisperType
 
 <p align="center">
-  <img src="WhisperType/Resources/Assets.xcassets/AppIcon.appiconset/icon_128x128.png" alt="WhisperType Logo" width="128" height="128">
+  <img src="docs/screenshots/whispertype-logo.png" alt="WhisperType Logo" width="128" height="128">
 </p>
 
 <p align="center">
