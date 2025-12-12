@@ -25,6 +25,7 @@
 		B1200001000000000000001 /* WaveformView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1200002000000000000001 /* WaveformView.swift */; };
 		B1200004000000000000001 /* RecordingOverlayWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1200005000000000000001 /* RecordingOverlayWindow.swift */; };
 		B1200006000000000000001 /* RecordingOverlayContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1200007000000000000001 /* RecordingOverlayContentView.swift */; };
+		E1200001000000000000001 /* ToastNotificationWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1200002000000000000001 /* ToastNotificationWindow.swift */; };
 		7B73EFC22EDD944D0062E68C /* ModelManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B73EFC12EDD944D0062E68C /* ModelManager.swift */; };
 		7B73EFC42EDD946C0062E68C /* ModelRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B73EFC32EDD946C0062E68C /* ModelRowView.swift */; };
 		7B73EFC62EDD947C0062E68C /* ModelSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B73EFC52EDD947C0062E68C /* ModelSettingsView.swift */; };
@@ -61,6 +62,7 @@
 		B1200002000000000000001 /* WaveformView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaveformView.swift; sourceTree = "<group>"; };
 		B1200005000000000000001 /* RecordingOverlayWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingOverlayWindow.swift; sourceTree = "<group>"; };
 		B1200007000000000000001 /* RecordingOverlayContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingOverlayContentView.swift; sourceTree = "<group>"; };
+		E1200002000000000000001 /* ToastNotificationWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastNotificationWindow.swift; sourceTree = "<group>"; };
 		7B73EFC12EDD944D0062E68C /* ModelManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelManager.swift; sourceTree = "<group>"; };
 		7B73EFC32EDD946C0062E68C /* ModelRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelRowView.swift; sourceTree = "<group>"; };
 		7B73EFC52EDD947C0062E68C /* ModelSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelSettingsView.swift; sourceTree = "<group>"; };
@@ -284,6 +286,7 @@
 			isa = PBXGroup;
 			children = (
 				7B73EFC32EDD946C0062E68C /* ModelRowView.swift */,
+				E1200002000000000000001 /* ToastNotificationWindow.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -436,6 +439,7 @@
 				D1200009000000000000001 /* CloudProvider.swift in Sources */,
 				D1200011000000000000001 /* LLMEngine.swift in Sources */,
 				D1200013000000000000001 /* KeychainManager.swift in Sources */,
+				E1200001000000000000001 /* ToastNotificationWindow.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

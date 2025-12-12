@@ -538,17 +538,17 @@ class AppCoordinator: ObservableObject {
         // Track if fallback was used
         lastUsedFallback = result.usedFallback
         
-        // Show notification if fallback was used (includes rate limit scenarios)
+        // Show floating toast notification if fallback was used
         if result.usedFallback {
             if result.wasRateLimited {
-                showNotification(
-                    "Rate limited. Switched to \(result.modeUsed.displayName) mode.",
+                ToastNotificationWindow.shared.show(
+                    message: "Rate limited. Switched to \(result.modeUsed.displayName) mode.",
                     type: .warning,
                     duration: 4.0
                 )
             } else {
-                showNotification(
-                    "AI enhancement unavailable. Using \(result.modeUsed.displayName) mode.",
+                ToastNotificationWindow.shared.show(
+                    message: "AI enhancement unavailable. Using \(result.modeUsed.displayName) mode.",
                     type: .warning,
                     duration: 3.0
                 )

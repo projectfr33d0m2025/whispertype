@@ -286,16 +286,20 @@ After completing Phase 2, you can test:
 - [x] Test all UI states
 
 ### 2.8 Fallback Notifications
-- [x] Extend NotificationMessage in AppCoordinator
+- [x] Create ToastNotificationWindow.swift for floating toast overlay
+- [x] Implement floating toast that appears at top center of screen
+- [x] Toast auto-dismisses after duration (3-4 seconds)
+- [x] Toast has slide-in/fade-out animation
+- [x] Toast supports dismiss button
 - [x] Implement fallback notification in transcribeAudio():
   - "AI enhancement unavailable. Using [mode] mode."
-  - Yellow/amber styling (warning type)
+  - Orange/warning styling
   - Auto-dismiss after 3 seconds
 - [x] Implement rate limit notification:
   - "Rate limited. Switched to [mode] mode."
   - Auto-dismiss after 4 seconds
 - [x] Track wasRateLimited in ProcessingResult
-- [x] Integrate notifications with PostProcessor result
+- [x] Integrate floating toast with PostProcessor result
 
 ### 2.9 First Launch AI Setup
 - [ ] Update FirstLaunchView with AI setup step (SKIPPED - simplified for now)
