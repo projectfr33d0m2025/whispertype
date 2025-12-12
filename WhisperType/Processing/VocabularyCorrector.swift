@@ -258,31 +258,13 @@ class VocabularyCorrector {
     }
 }
 
-// MARK: - Result Types
+// MARK: - Correction Result
 
+/// Result of vocabulary correction containing corrected text and list of corrections made
 struct CorrectionResult {
     let text: String
     let corrections: [VocabularyCorrection]
     
     var hadCorrections: Bool { !corrections.isEmpty }
     var correctionCount: Int { corrections.count }
-}
-
-struct VocabularyCorrection {
-    let original: String
-    let corrected: String
-    let term: String
-    let matchType: VocabularyCorrectionMatchType
-}
-
-enum VocabularyCorrectionMatchType {
-    case exact
-    case fuzzy(distance: Int)
-    
-    var description: String {
-        switch self {
-        case .exact: return "exact"
-        case .fuzzy(let distance): return "fuzzy (distance: \(distance))"
-        }
-    }
 }

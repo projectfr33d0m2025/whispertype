@@ -133,6 +133,39 @@ struct TranscriptionContext {
     static let `default` = TranscriptionContext()
 }
 
+// MARK: - Vocabulary Correction
+
+/// A correction made by the vocabulary system
+struct VocabularyCorrection {
+    /// The original word that was corrected
+    let original: String
+    
+    /// The corrected word
+    let corrected: String
+    
+    /// The vocabulary term that triggered the correction
+    let term: String
+    
+    /// How the match was found
+    let matchType: VocabularyCorrectionMatchType
+}
+
+/// How a vocabulary correction was matched
+enum VocabularyCorrectionMatchType {
+    /// Exact match (case-insensitive)
+    case exact
+    
+    /// Fuzzy match with Levenshtein distance
+    case fuzzy(distance: Int)
+    
+    var description: String {
+        switch self {
+        case .exact: return "exact"
+        case .fuzzy(let distance): return "fuzzy (distance: \(distance))"
+        }
+    }
+}
+
 // MARK: - Processing Result
 
 /// Result of LLM processing
