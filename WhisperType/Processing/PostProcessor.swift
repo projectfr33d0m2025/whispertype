@@ -67,6 +67,7 @@ class PostProcessor {
         
         // Handle raw mode - no processing
         if mode == .raw {
+            print("PostProcessor: Raw mode - returning unchanged text")
             return ProcessingResult(
                 text: text,
                 modeUsed: .raw,
@@ -84,14 +85,32 @@ class PostProcessor {
         
         // Step 1: Filler removal (all modes except raw)
         if mode.removesFiller && settings.fillerRemovalEnabled {
+            let beforeFiller = processedText
             processedText = fillerRemover.remove(processedText)
-            print("PostProcessor: Filler removal complete")
+            if beforeFiller != processedText {
+                print("PostProcessor: Filler removal changed text:")
+                print("  Before: \"\(beforeFiller)\"")
+                print("  After:  \"\(processedText)\"")
+            } else {
+                print("PostProcessor: Filler removal - no fillers found")
+            }
+        } else {
+            print("PostProcessor: Filler removal skipped (mode: \(mode.removesFiller), enabled: \(settings.fillerRemovalEnabled))")
         }
         
         // Step 2: Formatting rules (formatted and above)
         if mode.appliesFormatting {
+            let beforeFormat = processedText
             processedText = formattingRules.apply(processedText)
-            print("PostProcessor: Formatting rules applied")
+            if beforeFormat != processedText {
+                print("PostProcessor: Formatting rules changed text:")
+                print("  Before: \"\(beforeFormat)\"")
+                print("  After:  \"\(processedText)\"")
+            } else {
+                print("PostProcessor: Formatting rules - no changes needed")
+            }
+        } else {
+            print("PostProcessor: Formatting rules skipped (mode doesn't apply formatting)")
         }
         
         // Step 3: LLM enhancement (polished and professional only)

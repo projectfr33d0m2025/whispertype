@@ -192,10 +192,8 @@ class FillerRemover {
         // Trim leading/trailing whitespace
         result = result.trimmingCharacters(in: .whitespacesAndNewlines)
         
-        // Ensure sentence starts with capital letter after cleanup
-        if let firstChar = result.first, firstChar.isLetter && firstChar.isLowercase {
-            result = result.prefix(1).uppercased() + result.dropFirst()
-        }
+        // NOTE: Do NOT capitalize here - that's FormattingRules' job
+        // This keeps Clean mode distinct from Formatted mode
         
         return result
     }
