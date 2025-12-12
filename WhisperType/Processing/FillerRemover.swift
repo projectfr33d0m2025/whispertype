@@ -83,13 +83,13 @@ class FillerRemover {
             options: [.caseInsensitive]
         )
         
-        // "like" as filler: Match "like" with surrounding commas or at sentence boundaries
-        // Pattern 1: ", like," -> replace with single comma and space
-        // Pattern 2: "like," at start of sentence -> remove
+        // "like" as filler: Match "like" in common filler positions
+        // Pattern 1: ", like," -> filler in middle of sentence  
+        // Pattern 2: "So like" -> filler after sentence starter
+        // Pattern 3: "And like", "But like" -> filler after conjunctions
         // Preserve: "looks like", "feels like", "I like", "would like"
-        // The replacement template will add appropriate spacing
         likeFillerRegex = try? NSRegularExpression(
-            pattern: ",\\s*like\\s*,\\s*|^like\\s*,\\s*|\\s+like\\s*,\\s*",
+            pattern: ",\\s*like\\s*,|\\b(so|and|but|or|well)\\s+like\\s+",
             options: [.caseInsensitive]
         )
     }
@@ -162,12 +162,13 @@ class FillerRemover {
         guard let regex = likeFillerRegex else { return text }
         
         let range = NSRange(text.startIndex..., in: text)
-        // Replace with single space to maintain word separation
+        // Replace with captured group (word before "like") + space, or just space
+        // $1 captures "so", "and", "but", etc. if present
         return regex.stringByReplacingMatches(
             in: text,
             options: [],
             range: range,
-            withTemplate: " "
+            withTemplate: "$1 "
         )
     }
     
