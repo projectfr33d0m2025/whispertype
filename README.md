@@ -127,6 +127,10 @@ When you first launch WhisperType:
 5. **Release** the hotkey
 6. Your speech is transcribed and inserted at the cursor
 
+<p align="center">
+  <img src="docs/screenshots/screenshot-recording-overlay.png" alt="Recording Overlay" width="280">
+</p>
+
 ### Recording Modes
 
 WhisperType supports two recording modes:
@@ -151,6 +155,10 @@ The menu bar icon shows the current status:
 
 Click the icon to open the menu with status details and quick access to settings.
 
+<p align="center">
+  <img src="docs/screenshots/screenshot-menubar.png" alt="Menu Bar" width="320">
+</p>
+
 ## Processing Modes
 
 WhisperType v1.2 introduces five processing modes for different use cases:
@@ -164,6 +172,10 @@ WhisperType v1.2 introduces five processing modes for different use cases:
 | **Professional** | Polished + formal tone for business writing | Yes |
 
 **Default mode:** Formatted (recommended for most users)
+
+<p align="center">
+  <img src="docs/screenshots/screenshot-processing-settings.png" alt="Processing Settings" width="550">
+</p>
 
 ### Filler Word Removal
 
@@ -186,6 +198,10 @@ For Polished and Professional modes, you need AI support:
 2. In WhisperType Settings → Processing, add your API key
 3. Select "Cloud First" or "Cloud Only"
 
+<p align="center">
+  <img src="docs/screenshots/screenshot-ai-config.png" alt="AI Configuration" width="550">
+</p>
+
 ## Custom Vocabulary
 
 Add up to 200 custom terms to improve transcription accuracy for:
@@ -201,6 +217,10 @@ Features:
 - Pin important terms for priority
 - Import/export as CSV
 - Terms integrate with both Whisper and AI enhancement
+
+<p align="center">
+  <img src="docs/screenshots/screenshot-vocabulary.png" alt="Vocabulary Settings" width="550">
+</p>
 
 ## App-Aware Context
 
@@ -218,6 +238,10 @@ WhisperType automatically adjusts processing mode based on the active applicatio
 | **Spreadsheets** | Excel, Numbers | Raw |
 
 **Settings → App Rules** to customize modes per application.
+
+<p align="center">
+  <img src="docs/screenshots/screenshot-apprules.png" alt="App Rules Settings" width="550">
+</p>
 
 ## Models
 

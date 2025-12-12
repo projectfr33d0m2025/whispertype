@@ -680,7 +680,7 @@ Phase 5 is integration and release work. All previous phases must be complete.
   - Add Vocabulary documentation
   - Add App-Aware documentation
   - Add LLM setup guide
-- [ ] Add screenshots of new UI (see screenshot list below)
+- [x] Add screenshots of new UI (see screenshot list below)
 - [x] Update troubleshooting section
 - [x] Review and update FAQ
 
