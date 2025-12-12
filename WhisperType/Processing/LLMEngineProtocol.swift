@@ -151,6 +151,25 @@ struct ProcessingResult {
     
     /// Which provider was used (if any)
     let provider: String?
+    
+    /// Whether rate limiting caused the fallback
+    let wasRateLimited: Bool
+    
+    init(
+        text: String,
+        modeUsed: ProcessingMode,
+        usedFallback: Bool,
+        processingTime: TimeInterval,
+        provider: String?,
+        wasRateLimited: Bool = false
+    ) {
+        self.text = text
+        self.modeUsed = modeUsed
+        self.usedFallback = usedFallback
+        self.processingTime = processingTime
+        self.provider = provider
+        self.wasRateLimited = wasRateLimited
+    }
 }
 
 // MARK: - LLM Engine Protocol

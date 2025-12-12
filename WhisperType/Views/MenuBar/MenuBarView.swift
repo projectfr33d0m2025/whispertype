@@ -12,6 +12,7 @@ struct MenuBarView: View {
     @ObservedObject var modelManager = ModelManager.shared
     @ObservedObject var whisperWrapper = WhisperWrapper.shared
     @ObservedObject var settings = AppSettings.shared
+    @ObservedObject var llmEngine = LLMEngine.shared
     @Environment(\.openWindow) private var openWindow
     @Environment(\.dismiss) private var dismiss
     
@@ -39,6 +40,12 @@ struct MenuBarView: View {
             
             // Model Section
             modelSection
+            
+            Divider()
+                .padding(.vertical, 8)
+            
+            // Processing Mode & AI Engine Section
+            processingSection
             
             Divider()
                 .padding(.vertical, 8)
@@ -363,6 +370,141 @@ struct MenuBarView: View {
             }
         }
         .help("Speed: \(model.speedRating)/5")
+    }
+    
+    // MARK: - Processing Section
+    
+    private var processingSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("PROCESSING")
+                .font(.caption)
+                .fontWeight(.semibold)
+                .foregroundColor(.secondary)
+            
+            // Processing Mode Row
+            processingModeRow
+            
+            // AI Engine Row
+            aiEngineRow
+        }
+    }
+    
+    private var processingModeRow: some View {
+        HStack {
+            Image(systemName: settings.processingMode.icon)
+                .foregroundColor(.accentColor)
+                .frame(width: 20)
+            
+            Text(settings.processingMode.displayName)
+                .font(.system(.body, design: .default))
+            
+            Spacer()
+            
+            // Mode submenu
+            Menu {
+                ForEach(ProcessingMode.allCases) { mode in
+                    Button(action: {
+                        settings.processingMode = mode
+                    }) {
+                        HStack {
+                            if settings.processingMode == mode {
+                                Image(systemName: "checkmark")
+                            }
+                            Label(mode.displayName, systemImage: mode.icon)
+                        }
+                    }
+                    .disabled(mode.requiresLLM && !llmEngine.currentStatus.isAvailable)
+                }
+            } label: {
+                Image(systemName: "chevron.up.chevron.down")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            .menuStyle(.borderlessButton)
+            .frame(width: 20)
+        }
+        .padding(8)
+        .background(Color.secondary.opacity(0.1))
+        .cornerRadius(8)
+    }
+    
+    private var aiEngineRow: some View {
+        HStack {
+            Image(systemName: aiEngineIcon)
+                .foregroundColor(aiEngineStatusColor)
+                .frame(width: 20)
+            
+            VStack(alignment: .leading, spacing: 1) {
+                Text(aiEngineTitle)
+                    .font(.system(.body, design: .default))
+                
+                Text(aiEngineSubtitle)
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
+            
+            Spacer()
+            
+            // Status indicator dot
+            Circle()
+                .fill(aiEngineStatusColor)
+                .frame(width: 8, height: 8)
+        }
+        .padding(8)
+        .background(Color.secondary.opacity(0.1))
+        .cornerRadius(8)
+    }
+    
+    private var aiEngineIcon: String {
+        switch settings.llmPreference {
+        case .disabled:
+            return "xmark.circle"
+        case .localOnly, .localFirst:
+            return "lock.shield"
+        case .cloudFirst, .cloudOnly:
+            return "cloud"
+        }
+    }
+    
+    private var aiEngineTitle: String {
+        switch llmEngine.currentStatus {
+        case .available(let provider):
+            return provider
+        case .unavailable:
+            return settings.llmPreference == .disabled ? "Disabled" : "Not Available"
+        case .connecting:
+            return "Connecting..."
+        case .processing:
+            return "Processing..."
+        }
+    }
+    
+    private var aiEngineSubtitle: String {
+        switch settings.llmPreference {
+        case .disabled:
+            return "AI enhancement off"
+        case .localOnly:
+            return "Local only (private)"
+        case .localFirst:
+            return "Local preferred"
+        case .cloudFirst:
+            return "Cloud preferred"
+        case .cloudOnly:
+            return "Cloud only"
+        }
+    }
+    
+    private var aiEngineStatusColor: Color {
+        switch llmEngine.currentStatus {
+        case .available:
+            return .green
+        case .unavailable:
+            return settings.llmPreference == .disabled ? .secondary : .red
+        case .connecting:
+            return .orange
+        case .processing:
+            return .yellow
+        }
     }
     
     // MARK: - Actions Section

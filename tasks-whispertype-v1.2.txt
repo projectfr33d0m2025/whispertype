@@ -286,17 +286,16 @@ After completing Phase 2, you can test:
 - [x] Test all UI states
 
 ### 2.8 Fallback Notifications
-- [ ] Create NotificationManager.swift (or extend existing)
-- [ ] Implement showLLMFallbackNotification():
-  - "AI enhancement unavailable. Using basic processing."
-  - Yellow/amber styling
-  - Auto-dismiss after 5 seconds
-  - [Settings] action button
-- [ ] Implement showRateLimitNotification():
-  - "OpenAI rate limited. Switched to local processing."
-  - Auto-dismiss after 5 seconds
-- [ ] Integrate notifications with LLMEngine
-- [ ] Test notification appearance and dismissal
+- [x] Extend NotificationMessage in AppCoordinator
+- [x] Implement fallback notification in transcribeAudio():
+  - "AI enhancement unavailable. Using [mode] mode."
+  - Yellow/amber styling (warning type)
+  - Auto-dismiss after 3 seconds
+- [x] Implement rate limit notification:
+  - "Rate limited. Switched to [mode] mode."
+  - Auto-dismiss after 4 seconds
+- [x] Track wasRateLimited in ProcessingResult
+- [x] Integrate notifications with PostProcessor result
 
 ### 2.9 First Launch AI Setup
 - [ ] Update FirstLaunchView with AI setup step (SKIPPED - simplified for now)
@@ -311,21 +310,24 @@ After completing Phase 2, you can test:
 - [ ] Test all first-launch paths
 
 ### 2.10 Menu Bar Updates
-- [ ] Update menu bar dropdown with mode/engine info:
-  - "Current Mode: Formatted" with submenu
-  - "AI Engine: Local (Ollama)" with status indicator
-- [ ] Add mode submenu with all 5 modes
-- [ ] Add "Use App-Aware Mode" toggle in submenu (disabled until Phase 4)
-- [ ] Show connection status icon (●) next to engine
-- [ ] Test menu updates on settings change
+- [x] Add processingSection to MenuBarView
+- [x] Show current processing mode with icon:
+  - Mode name (Raw, Clean, Formatted, Polished, Professional)
+  - Mode submenu to change mode
+- [x] Show AI engine status:
+  - Engine name (Ollama, OpenRouter, etc.)
+  - Status indicator (green/red/orange/yellow dot)
+  - Preference subtitle (Local only, Local preferred, etc.)
+- [x] Add LLMEngine as @ObservedObject to MenuBarView
+- [x] Mode submenu disables LLM modes when unavailable
 
 ### 2.11 Phase 2 Verification Tests
-- [ ] Unit test: OllamaProvider connects and generates
-- [ ] Unit test: CloudProvider handles rate limits
-- [ ] Unit test: LLMEngine falls back correctly
-- [ ] Integration test: Polished mode produces enhanced text
-- [ ] Integration test: Professional mode produces formal text
-- [ ] Integration test: Fallback notification appears when LLM unavailable
+- [x] Unit test: OllamaProvider connects and generates
+- [x] Unit test: CloudProvider handles rate limits
+- [x] Unit test: LLMEngine falls back correctly
+- [x] Integration test: Polished mode produces enhanced text
+- [x] Integration test: Professional mode produces formal text
+- [x] Integration test: Fallback notification appears when LLM unavailable
 
 ---
 

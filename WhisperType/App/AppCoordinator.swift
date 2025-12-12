@@ -538,16 +538,24 @@ class AppCoordinator: ObservableObject {
         // Track if fallback was used
         lastUsedFallback = result.usedFallback
         
-        // Show notification if fallback was used
+        // Show notification if fallback was used (includes rate limit scenarios)
         if result.usedFallback {
-            showNotification(
-                "AI enhancement unavailable. Using \(result.modeUsed.displayName) mode.",
-                type: .warning,
-                duration: 3.0
-            )
+            if result.wasRateLimited {
+                showNotification(
+                    "Rate limited. Switched to \(result.modeUsed.displayName) mode.",
+                    type: .warning,
+                    duration: 4.0
+                )
+            } else {
+                showNotification(
+                    "AI enhancement unavailable. Using \(result.modeUsed.displayName) mode.",
+                    type: .warning,
+                    duration: 3.0
+                )
+            }
         }
         
-        print("AppCoordinator: Processing complete. Mode used: \(result.modeUsed.displayName), Fallback: \(result.usedFallback)")
+        print("AppCoordinator: Processing complete. Mode used: \(result.modeUsed.displayName), Fallback: \(result.usedFallback), RateLimited: \(result.wasRateLimited)")
         
         return result.text
     }

@@ -81,6 +81,7 @@ class PostProcessor {
         var processedText = text
         var actualMode = mode
         var usedFallback = false
+        var wasRateLimited = false
         var provider: String? = nil
         
         // Step 1: Filler removal (all modes except raw)
@@ -125,8 +126,19 @@ class PostProcessor {
                         provider = providerName
                     }
                     print("PostProcessor: LLM enhancement complete")
-                } catch {
+                } catch let error as LLMError {
                     // LLM failed, fall back to formatted mode
+                    print("PostProcessor: LLM enhancement failed (\(error.localizedDescription ?? "Unknown")), using fallback")
+                    actualMode = mode.fallbackMode
+                    usedFallback = true
+                    
+                    // Check if it was rate limited
+                    if case .rateLimited = error {
+                        wasRateLimited = true
+                        print("PostProcessor: Rate limited, falling back")
+                    }
+                } catch {
+                    // Other error, fall back
                     print("PostProcessor: LLM enhancement failed (\(error.localizedDescription)), using fallback")
                     actualMode = mode.fallbackMode
                     usedFallback = true
@@ -147,7 +159,8 @@ class PostProcessor {
             modeUsed: actualMode,
             usedFallback: usedFallback,
             processingTime: processingTime,
-            provider: provider
+            provider: provider,
+            wasRateLimited: wasRateLimited
         )
     }
     

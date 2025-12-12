@@ -210,9 +210,12 @@ final class LLMEngine: LLMEngineProtocol, ObservableObject {
                 case .cancelled:
                     throw error
                 case .invalidAPIKey:
+                    print("LLMEngine: Invalid API key for \(provider.displayName)")
                     // Skip to next provider
                     continue
-                case .rateLimited:
+                case .rateLimited(let retryAfter):
+                    print("LLMEngine: Rate limited by \(provider.displayName). Retry after: \(retryAfter ?? 0)s")
+                    // Notify user about rate limiting (will be caught by PostProcessor)
                     // Skip to next provider
                     continue
                 default:
