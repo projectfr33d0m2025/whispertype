@@ -7,6 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C1200001000000000000001 /* ProcessingMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1200002000000000000001 /* ProcessingMode.swift */; };
+		C1200003000000000000001 /* LLMPreference.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1200004000000000000001 /* LLMPreference.swift */; };
+		C1200005000000000000001 /* FillerRemover.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1200006000000000000001 /* FillerRemover.swift */; };
+		C1200007000000000000001 /* FormattingRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1200008000000000000001 /* FormattingRules.swift */; };
+		C1200009000000000000001 /* LLMEngineProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1200010000000000000001 /* LLMEngineProtocol.swift */; };
+		C1200011000000000000001 /* StubLLMEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1200012000000000000001 /* StubLLMEngine.swift */; };
+		C1200013000000000000001 /* PostProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1200014000000000000001 /* PostProcessor.swift */; };
+		C1200015000000000000001 /* ProcessingSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1200016000000000000001 /* ProcessingSettingsView.swift */; };
 		B1200001000000000000001 /* WaveformView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1200002000000000000001 /* WaveformView.swift */; };
 		B1200004000000000000001 /* RecordingOverlayWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1200005000000000000001 /* RecordingOverlayWindow.swift */; };
 		B1200006000000000000001 /* RecordingOverlayContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1200007000000000000001 /* RecordingOverlayContentView.swift */; };
@@ -80,6 +88,14 @@
 		A1000092000000000000001 /* TextInjector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextInjector.swift; sourceTree = "<group>"; };
 		A1000094000000000000001 /* HotkeyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotkeyManager.swift; sourceTree = "<group>"; };
 		A1000100000000000000001 /* WhisperType.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = WhisperType.xcconfig; sourceTree = "<group>"; };
+		C1200002000000000000001 /* ProcessingMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessingMode.swift; sourceTree = "<group>"; };
+		C1200004000000000000001 /* LLMPreference.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMPreference.swift; sourceTree = "<group>"; };
+		C1200006000000000000001 /* FillerRemover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FillerRemover.swift; sourceTree = "<group>"; };
+		C1200008000000000000001 /* FormattingRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormattingRules.swift; sourceTree = "<group>"; };
+		C1200010000000000000001 /* LLMEngineProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMEngineProtocol.swift; sourceTree = "<group>"; };
+		C1200012000000000000001 /* StubLLMEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StubLLMEngine.swift; sourceTree = "<group>"; };
+		C1200014000000000000001 /* PostProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostProcessor.swift; sourceTree = "<group>"; };
+		C1200016000000000000001 /* ProcessingSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessingSettingsView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -118,6 +134,7 @@
 				A1000017000000000000001 /* App */,
 				A1000018000000000000001 /* Models */,
 				A1000019000000000000001 /* Managers */,
+				C1200017000000000000001 /* Processing */,
 				A1000020000000000000001 /* Views */,
 				A1000021000000000000001 /* Utilities */,
 				A1000022000000000000001 /* Bridging */,
@@ -241,6 +258,7 @@
 			children = (
 				A8000002000000000000001 /* SettingsContainerView.swift */,
 				A8000004000000000000001 /* GeneralSettingsView.swift */,
+				C1200016000000000000001 /* ProcessingSettingsView.swift */,
 				A8000006000000000000001 /* HotkeySettingsView.swift */,
 				7B73EFC52EDD947C0062E68C /* ModelSettingsView.swift */,
 			);
@@ -271,6 +289,20 @@
 				A1000100000000000000001 /* WhisperType.xcconfig */,
 			);
 			path = Config;
+			sourceTree = "<group>";
+		};
+		C1200017000000000000001 /* Processing */ = {
+			isa = PBXGroup;
+			children = (
+				C1200002000000000000001 /* ProcessingMode.swift */,
+				C1200004000000000000001 /* LLMPreference.swift */,
+				C1200006000000000000001 /* FillerRemover.swift */,
+				C1200008000000000000001 /* FormattingRules.swift */,
+				C1200010000000000000001 /* LLMEngineProtocol.swift */,
+				C1200012000000000000001 /* StubLLMEngine.swift */,
+				C1200014000000000000001 /* PostProcessor.swift */,
+			);
+			path = Processing;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -368,6 +400,14 @@
 				B1200001000000000000001 /* WaveformView.swift in Sources */,
 				B1200004000000000000001 /* RecordingOverlayWindow.swift in Sources */,
 				B1200006000000000000001 /* RecordingOverlayContentView.swift in Sources */,
+				C1200001000000000000001 /* ProcessingMode.swift in Sources */,
+				C1200003000000000000001 /* LLMPreference.swift in Sources */,
+				C1200005000000000000001 /* FillerRemover.swift in Sources */,
+				C1200007000000000000001 /* FormattingRules.swift in Sources */,
+				C1200009000000000000001 /* LLMEngineProtocol.swift in Sources */,
+				C1200011000000000000001 /* StubLLMEngine.swift in Sources */,
+				C1200013000000000000001 /* PostProcessor.swift in Sources */,
+				C1200015000000000000001 /* ProcessingSettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

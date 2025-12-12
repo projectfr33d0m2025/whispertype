@@ -28,6 +28,15 @@ class AppSettings: ObservableObject {
     private var _playAudioFeedback: Bool = false
     private var _hotkeyMode: HotkeyMode = .hold
     private var _languageHint: String = ""
+    
+    // MARK: - v1.2 Processing Settings
+    
+    private var _processingMode: ProcessingMode = .formatted
+    private var _fillerRemovalEnabled: Bool = true
+    private var _llmPreference: LLMPreference = .localFirst
+    private var _ollamaModel: String = "llama3.2:3b"
+    private var _ollamaHost: String = "localhost"
+    private var _ollamaPort: Int = 11434
 
     // MARK: - Public Computed Properties
 
@@ -137,6 +146,73 @@ class AppSettings: ObservableObject {
         let language = SupportedLanguage(fromStored: _languageHint)
         return language.whisperCode
     }
+    
+    // MARK: - v1.2 Processing Settings (Public)
+    
+    var processingMode: ProcessingMode {
+        get { _processingMode }
+        set {
+            objectWillChange.send()
+            _processingMode = newValue
+            UserDefaults.standard.set(newValue.rawValue, forKey: Constants.UserDefaultsKeys.processingMode)
+            print("AppSettings: Processing mode changed to \(newValue.rawValue)")
+        }
+    }
+    
+    var fillerRemovalEnabled: Bool {
+        get { _fillerRemovalEnabled }
+        set {
+            objectWillChange.send()
+            _fillerRemovalEnabled = newValue
+            UserDefaults.standard.set(newValue, forKey: Constants.UserDefaultsKeys.fillerRemovalEnabled)
+            print("AppSettings: Filler removal enabled changed to \(newValue)")
+        }
+    }
+    
+    var llmPreference: LLMPreference {
+        get { _llmPreference }
+        set {
+            objectWillChange.send()
+            _llmPreference = newValue
+            UserDefaults.standard.set(newValue.rawValue, forKey: Constants.UserDefaultsKeys.llmPreference)
+            print("AppSettings: LLM preference changed to \(newValue.rawValue)")
+        }
+    }
+    
+    var ollamaModel: String {
+        get { _ollamaModel }
+        set {
+            objectWillChange.send()
+            _ollamaModel = newValue
+            UserDefaults.standard.set(newValue, forKey: Constants.UserDefaultsKeys.ollamaModel)
+            print("AppSettings: Ollama model changed to \(newValue)")
+        }
+    }
+    
+    var ollamaHost: String {
+        get { _ollamaHost }
+        set {
+            objectWillChange.send()
+            _ollamaHost = newValue
+            UserDefaults.standard.set(newValue, forKey: Constants.UserDefaultsKeys.ollamaHost)
+            print("AppSettings: Ollama host changed to \(newValue)")
+        }
+    }
+    
+    var ollamaPort: Int {
+        get { _ollamaPort }
+        set {
+            objectWillChange.send()
+            _ollamaPort = newValue
+            UserDefaults.standard.set(newValue, forKey: Constants.UserDefaultsKeys.ollamaPort)
+            print("AppSettings: Ollama port changed to \(newValue)")
+        }
+    }
+    
+    /// Computed property for the full Ollama URL
+    var ollamaURL: URL {
+        URL(string: "http://\(_ollamaHost):\(_ollamaPort)")!
+    }
 
     // MARK: - Initialization
 
@@ -183,8 +259,35 @@ class AppSettings: ObservableObject {
 
         self._languageHint = defaults.string(forKey: Constants.UserDefaultsKeys.languageHint)
             ?? Constants.Defaults.languageHint
+        
+        // Load v1.2 Processing Settings
+        if let modeString = defaults.string(forKey: Constants.UserDefaultsKeys.processingMode),
+           let mode = ProcessingMode(rawValue: modeString) {
+            self._processingMode = mode
+        } else {
+            self._processingMode = Constants.Defaults.processingMode
+        }
+        
+        self._fillerRemovalEnabled = defaults.object(forKey: Constants.UserDefaultsKeys.fillerRemovalEnabled) as? Bool
+            ?? Constants.Defaults.fillerRemovalEnabled
+        
+        if let prefString = defaults.string(forKey: Constants.UserDefaultsKeys.llmPreference),
+           let pref = LLMPreference(rawValue: prefString) {
+            self._llmPreference = pref
+        } else {
+            self._llmPreference = Constants.Defaults.llmPreference
+        }
+        
+        self._ollamaModel = defaults.string(forKey: Constants.UserDefaultsKeys.ollamaModel)
+            ?? Constants.Defaults.ollamaModel
+        
+        self._ollamaHost = defaults.string(forKey: Constants.UserDefaultsKeys.ollamaHost)
+            ?? Constants.Defaults.ollamaHost
+        
+        let savedPort = defaults.integer(forKey: Constants.UserDefaultsKeys.ollamaPort)
+        self._ollamaPort = savedPort > 0 ? savedPort : Constants.Defaults.ollamaPort
 
-        print("AppSettings: Initialized with active model: \(_activeModelId)")
+        print("AppSettings: Initialized with active model: \(_activeModelId), processing mode: \(_processingMode.rawValue)")
     }
 
     // MARK: - Reset
@@ -200,6 +303,14 @@ class AppSettings: ObservableObject {
         playAudioFeedback = Constants.Defaults.playAudioFeedback
         hotkeyMode = .hold
         languageHint = Constants.Defaults.languageHint
+        
+        // v1.2 Processing Settings
+        processingMode = Constants.Defaults.processingMode
+        fillerRemovalEnabled = Constants.Defaults.fillerRemovalEnabled
+        llmPreference = Constants.Defaults.llmPreference
+        ollamaModel = Constants.Defaults.ollamaModel
+        ollamaHost = Constants.Defaults.ollamaHost
+        ollamaPort = Constants.Defaults.ollamaPort
 
         print("AppSettings: Reset to defaults")
     }

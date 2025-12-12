@@ -42,106 +42,106 @@ After completing Phase 1, you can test:
 ---
 
 ### 1.1 Processing Mode Foundation
-- [ ] Create ProcessingMode.swift enum with 5 modes:
+- [x] Create ProcessingMode.swift enum with 5 modes:
   - raw, clean, formatted, polished, professional
-- [ ] Add computed properties:
+- [x] Add computed properties:
   - displayName: String
   - description: String
   - icon: String (emoji)
   - requiresLLM: Bool
-- [ ] Add Codable conformance for persistence
-- [ ] Add CaseIterable for UI enumeration
+- [x] Add Codable conformance for persistence
+- [x] Add CaseIterable for UI enumeration
 - [ ] Write unit tests for ProcessingMode
 
 ### 1.2 Settings Model Updates
-- [ ] Add processingMode: ProcessingMode to AppSettings (default: .formatted)
-- [ ] Add fillerRemovalEnabled: Bool (default: true)
-- [ ] Add llmPreference: LLMPreference enum (default: .localFirst)
-- [ ] Add ollamaModel: String (default: "llama3.2:3b")
-- [ ] Add ollamaHost: String (default: "localhost")
-- [ ] Add ollamaPort: Int (default: 11434)
-- [ ] Add UserDefaults persistence for all new settings
+- [x] Add processingMode: ProcessingMode to AppSettings (default: .formatted)
+- [x] Add fillerRemovalEnabled: Bool (default: true)
+- [x] Add llmPreference: LLMPreference enum (default: .localFirst)
+- [x] Add ollamaModel: String (default: "llama3.2:3b")
+- [x] Add ollamaHost: String (default: "localhost")
+- [x] Add ollamaPort: Int (default: 11434)
+- [x] Add UserDefaults persistence for all new settings
 - [ ] Write unit tests for settings persistence
 
 ### 1.3 Filler Removal Implementation
-- [ ] Create FillerRemover.swift class
-- [ ] Define primary filler patterns (regex):
+- [x] Create FillerRemover.swift class
+- [x] Define primary filler patterns (regex):
   - um, umm, uh, uhh, uhm, er, erm, ah, ahh, hmm, hm
-- [ ] Define contextual filler patterns:
+- [x] Define contextual filler patterns:
   - "like" (when filler, not comparison)
   - "you know" (standalone/sentence-end)
   - "sort of", "kind of", "I mean", "basically"
-- [ ] Implement false start detection:
+- [x] Implement false start detection:
   - Pattern: "X— Y" where X and Y start similarly
-- [ ] Implement remove(_ text: String) -> String
-- [ ] Handle edge cases:
+- [x] Implement remove(_ text: String) -> String
+- [x] Handle edge cases:
   - Preserve "um" in words like "umbrella"
   - Preserve "like" in comparisons
 - [ ] Write comprehensive unit tests (20+ test cases)
 
 ### 1.4 Basic Formatting Rules
-- [ ] Create FormattingRules.swift class
-- [ ] Implement capitalizeFirstLetter()
-- [ ] Implement capitalizeAfterPunctuation()
-- [ ] Implement capitalizeI() - standalone "i" → "I"
-- [ ] Implement normalizeWhitespace()
-- [ ] Implement normalizeEllipsis() - "..." consistency
-- [ ] Implement apply(_ text: String) -> String
+- [x] Create FormattingRules.swift class
+- [x] Implement capitalizeFirstLetter()
+- [x] Implement capitalizeAfterPunctuation()
+- [x] Implement capitalizeI() - standalone "i" → "I"
+- [x] Implement normalizeWhitespace()
+- [x] Implement normalizeEllipsis() - "..." consistency
+- [x] Implement apply(_ text: String) -> String
 - [ ] Write unit tests for formatting rules
 
 ### 1.5 LLM Engine Protocol (Stub for Phase 2)
-- [ ] Create LLMEngineProtocol.swift:
+- [x] Create LLMEngineProtocol.swift:
   ```swift
   protocol LLMEngineProtocol {
       var status: LLMEngineStatus { get async }
       func process(_ text: String, mode: ProcessingMode, context: TranscriptionContext) async throws -> String
   }
   ```
-- [ ] Create LLMEngineStatus enum:
+- [x] Create LLMEngineStatus enum:
   - available(provider: String)
   - unavailable(reason: String)
   - processing
-- [ ] Create StubLLMEngine.swift:
+- [x] Create StubLLMEngine.swift:
   - Always returns `.unavailable(reason: "AI enhancement not configured")`
   - process() throws LLMError.notAvailable
 - [ ] Write tests for stub behavior
 
 ### 1.6 Post-Processor Orchestration
-- [ ] Create PostProcessor.swift class
-- [ ] Inject LLMEngineProtocol via initializer (dependency injection)
-- [ ] Define processing chain based on mode:
+- [x] Create PostProcessor.swift class
+- [x] Inject LLMEngineProtocol via initializer (dependency injection)
+- [x] Define processing chain based on mode:
   - raw: pass-through
   - clean: FillerRemover only
   - formatted: FillerRemover + FormattingRules
   - polished: FillerRemover + FormattingRules + LLM (if available)
   - professional: FillerRemover + FormattingRules + LLM (if available)
-- [ ] Implement process(_ text: String, mode: ProcessingMode, context: TranscriptionContext) async -> String
-- [ ] **Fallback logic**: If LLM unavailable for polished/professional, use formatted processing
-- [ ] Return tuple: (processedText: String, actualModeUsed: ProcessingMode)
-- [ ] Add timing/performance logging
+- [x] Implement process(_ text: String, mode: ProcessingMode, context: TranscriptionContext) async -> String
+- [x] **Fallback logic**: If LLM unavailable for polished/professional, use formatted processing
+- [x] Return tuple: (processedText: String, actualModeUsed: ProcessingMode)
+- [x] Add timing/performance logging
 - [ ] Write integration tests with StubLLMEngine
 
 ### 1.7 Processing Settings UI
-- [ ] Create ProcessingSettingsView.swift (SwiftUI)
-- [ ] Add Processing tab to SettingsView
-- [ ] Implement mode selection with visual cards:
+- [x] Create ProcessingSettingsView.swift (SwiftUI)
+- [x] Add Processing tab to SettingsView
+- [x] Implement mode selection with visual cards:
   - Icon, name, description for each mode
   - "Recommended" badge on Formatted
   - "AI Required" badge on Polished/Professional
   - **"AI Not Configured" warning** when LLM unavailable and AI mode selected
-- [ ] Add filler removal toggle with description
-- [ ] Add "AI Enhancement Engine" section:
+- [x] Add filler removal toggle with description
+- [x] Add "AI Enhancement Engine" section:
   - Show current status (Stub shows "Not Configured")
   - Placeholder text: "Configure in Phase 2"
-- [ ] Add navigation to Vocabulary (placeholder, disabled)
-- [ ] Add navigation to App Rules (placeholder, disabled)
-- [ ] Bind all controls to AppSettings
+- [x] Add navigation to Vocabulary (placeholder, disabled)
+- [x] Add navigation to App Rules (placeholder, disabled)
+- [x] Bind all controls to AppSettings
 - [ ] Test settings persistence and UI state
 
 ### 1.8 Integration with Transcription Flow
-- [ ] Update AppCoordinator to read processingMode from settings
-- [ ] Inject PostProcessor with StubLLMEngine into transcription pipeline
-- [ ] Update transcription flow:
+- [x] Update AppCoordinator to read processingMode from settings
+- [x] Inject PostProcessor with StubLLMEngine into transcription pipeline
+- [x] Update transcription flow:
   1. Whisper transcribes audio
   2. PostProcessor processes based on mode
   3. TextInjector inserts processed text

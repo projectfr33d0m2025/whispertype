@@ -86,6 +86,14 @@ enum Constants {
         static let playAudioFeedback = "playAudioFeedback"
         static let hotkeyMode = "hotkeyMode" // "hold" or "toggle"
         static let languageHint = "languageHint" // Language code for transcription
+        
+        // v1.2 Processing Settings
+        static let processingMode = "processingMode"
+        static let fillerRemovalEnabled = "fillerRemovalEnabled"
+        static let llmPreference = "llmPreference"
+        static let ollamaModel = "ollamaModel"
+        static let ollamaHost = "ollamaHost"
+        static let ollamaPort = "ollamaPort"
     }
 
     // MARK: - Default Values
@@ -108,6 +116,14 @@ enum Constants {
         
         // Language hint (default to English)
         static let languageHint = "en"
+        
+        // v1.2 Processing Defaults
+        static let processingMode: ProcessingMode = .formatted
+        static let fillerRemovalEnabled = true
+        static let llmPreference: LLMPreference = .localFirst
+        static let ollamaModel = "llama3.2:3b"
+        static let ollamaHost = "localhost"
+        static let ollamaPort = 11434
     }
 
     // MARK: - Audio Settings

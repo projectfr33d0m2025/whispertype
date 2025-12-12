@@ -97,6 +97,8 @@ class AppCoordinator: ObservableObject {
     @Published private(set) var isProcessing = false
     @Published private(set) var notification: NotificationMessage?
     @Published private(set) var lastTranscription: String?
+    @Published private(set) var currentProcessingMode: ProcessingMode = .formatted
+    @Published private(set) var lastUsedFallback = false
     
     // MARK: - Managers (lazily initialized)
     
@@ -106,6 +108,7 @@ class AppCoordinator: ObservableObject {
     private(set) var whisperWrapper: WhisperWrapper!
     private(set) var textInjector: TextInjector!
     private(set) var settings: AppSettings!
+    private(set) var postProcessor: PostProcessor!
     
     // MARK: - Audio Feedback
     
@@ -191,6 +194,10 @@ class AppCoordinator: ObservableObject {
         audioRecorder = AudioRecorder.shared
         whisperWrapper = WhisperWrapper.shared
         textInjector = TextInjector.shared
+        postProcessor = PostProcessor.shared
+        
+        // Update current processing mode from settings
+        currentProcessingMode = settings.processingMode
         
         print("AppCoordinator: Managers initialized")
     }
@@ -501,19 +508,44 @@ class AppCoordinator: ObservableObject {
         print("AppCoordinator: Using language hint: \(language ?? "auto-detect")")
         
         // Transcribe using Whisper
-        let transcription = try await whisperWrapper.transcribe(
+        let rawTranscription = try await whisperWrapper.transcribe(
             samples: samples,
             language: language
         )
         
-        // Validate transcription
-        let trimmedTranscription = transcription.trimmingCharacters(in: .whitespacesAndNewlines)
+        // Validate raw transcription
+        let trimmedTranscription = rawTranscription.trimmingCharacters(in: .whitespacesAndNewlines)
         
         guard !trimmedTranscription.isEmpty else {
             throw TranscriptionError.emptyResult
         }
         
-        return trimmedTranscription
+        // Apply post-processing based on current mode
+        let mode = settings.processingMode
+        currentProcessingMode = mode
+        print("AppCoordinator: Applying processing mode: \(mode.displayName)")
+        
+        let result = await postProcessor.process(
+            trimmedTranscription,
+            mode: mode,
+            context: .default
+        )
+        
+        // Track if fallback was used
+        lastUsedFallback = result.usedFallback
+        
+        // Show notification if fallback was used
+        if result.usedFallback {
+            showNotification(
+                "AI enhancement unavailable. Using \(result.modeUsed.displayName) mode.",
+                type: .warning,
+                duration: 3.0
+            )
+        }
+        
+        print("AppCoordinator: Processing complete. Mode used: \(result.modeUsed.displayName), Fallback: \(result.usedFallback)")
+        
+        return result.text
     }
     
     // MARK: - Text Injection
