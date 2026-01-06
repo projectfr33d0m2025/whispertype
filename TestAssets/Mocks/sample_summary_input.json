@@ -1,0 +1,17 @@
+{
+  "meeting_id": "test-summary-input-001",
+  "template": "standard_meeting_notes",
+  "transcript_text": "Michael: Good morning Sarah. Thanks for meeting with me today to discuss the Q1 budget allocation.\n\nSarah: Good morning Michael. Of course. I've reviewed the preliminary numbers and have some thoughts to share.\n\nMichael: Great. Let's start with the marketing budget. We're proposing fifty thousand dollars for digital advertising. That's a twenty percent increase from last quarter.\n\nSarah: I think that's reasonable given our growth targets. However, I'd suggest we allocate at least fifteen thousand specifically for social media campaigns. The ROI on our Instagram ads has been exceptional.\n\nMichael: Agreed. Now, regarding the product development budget. The engineering team is requesting additional headcount. They want to hire two senior developers.\n\nSarah: Two positions might stretch our budget. What if we start with one senior developer and one mid-level? That would save us approximately forty thousand annually while still adding capacity.\n\nMichael: That's a good compromise. I'll discuss it with the CTO. Can you prepare the final summary by Friday?\n\nSarah: Absolutely. I'll have the complete breakdown ready for your review by Thursday afternoon.",
+  "speakers": [
+    "Michael",
+    "Sarah"
+  ],
+  "duration_seconds": 120,
+  "variables_to_extract": [
+    "summary",
+    "key_points",
+    "action_items",
+    "decisions",
+    "follow_ups"
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "audio_file": "single_speaker.wav",
+  "duration_seconds": 60.0,
+  "speakers": [
+    "SPEAKER_A"
+  ],
+  "segments": [
+    {
+      "speaker": "SPEAKER_A",
+      "start": 0.0,
+      "end": 60.0,
+      "text": "Welcome to this product update presentation. Today I'll be walking you through the key features we've shipped in the last quarter and our roadmap for the upcoming months."
+    }
+  ]
+}

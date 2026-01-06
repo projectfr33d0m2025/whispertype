@@ -1,0 +1,44 @@
+# Two Speakers Script (120 seconds / 2 minutes)
+# Voices: Use TWO distinct voices
+#   - SPEAKER_A: Male voice (e.g., "Adam")
+#   - SPEAKER_B: Female voice (e.g., "Rachel")
+# Purpose: Test speaker diarization with 2 speakers
+
+---
+[SPEAKER_A | 0:00 - 0:08]
+Good morning, Sarah. Thanks for meeting with me today to discuss the Q1 budget allocation.
+
+[SPEAKER_B | 0:08 - 0:15]
+Good morning, Michael. Of course. I've reviewed the preliminary numbers and have some thoughts to share.
+
+[SPEAKER_A | 0:15 - 0:28]
+Great. Let's start with the marketing budget. We're proposing fifty thousand dollars for digital advertising. That's a twenty percent increase from last quarter.
+
+[SPEAKER_B | 0:28 - 0:42]
+I think that's reasonable given our growth targets. However, I'd suggest we allocate at least fifteen thousand specifically for social media campaigns. The ROI on our Instagram ads has been exceptional.
+
+[SPEAKER_A | 0:42 - 0:55]
+Agreed. Now, regarding the product development budget. The engineering team is requesting additional headcount. They want to hire two senior developers.
+
+[SPEAKER_B | 0:55 - 1:10]
+Two positions might stretch our budget. What if we start with one senior developer and one mid-level? That would save us approximately forty thousand annually while still adding capacity.
+
+[SPEAKER_A | 1:10 - 1:22]
+That's a good compromise. I'll discuss it with the CTO. What about the customer success team? They've asked for a new CRM system.
+
+[SPEAKER_B | 1:22 - 1:38]
+The CRM request is valid. Our current system is outdated. I've gotten quotes from three vendors. Salesforce is the most expensive at thirty thousand, but HubSpot offers similar features for eighteen thousand.
+
+[SPEAKER_A | 1:38 - 1:50]
+Let's go with HubSpot then. That frees up budget for the training program we discussed. Can you prepare a final summary by Friday?
+
+[SPEAKER_B | 1:50 - 2:00]
+Absolutely. I'll have the complete breakdown ready for your review by Thursday afternoon, and we can finalize it before the board meeting.
+
+---
+# METADATA
+# Total Duration: ~120 seconds (2 minutes)
+# Speaker A segments: 5 (total ~50 seconds)
+# Speaker B segments: 5 (total ~70 seconds)
+# Word Count: ~320 words
+# Topics: Budget, Marketing, Hiring, CRM

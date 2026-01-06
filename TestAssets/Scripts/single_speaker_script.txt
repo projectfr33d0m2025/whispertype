@@ -1,0 +1,24 @@
+# Single Speaker Script (60 seconds)
+# Voice: Use ONE consistent voice (e.g., "Adam")
+# Purpose: Test basic transcription without speaker changes
+
+---
+[SPEAKER_A | 0:00 - 1:00]
+
+Welcome to this product update presentation. Today I'll be walking you through the key features we've shipped in the last quarter and our roadmap for the upcoming months.
+
+First, let's talk about performance improvements. We've reduced the application startup time by forty percent. Users were previously waiting an average of eight seconds, and now the app launches in under five seconds. This was achieved through lazy loading of non-critical modules and optimizing our database queries.
+
+Second, we've introduced a new collaboration feature. Teams can now work together in real-time on shared documents. Changes sync instantly across all connected devices. We've also added presence indicators so you can see who else is viewing or editing a document.
+
+Third, our mobile app received a major redesign. The new interface follows modern design principles with improved accessibility. We've increased touch targets, added better contrast ratios, and implemented full voice-over support for visually impaired users.
+
+Looking ahead to next quarter, we're planning to launch three major initiatives. The first is an AI-powered assistant that will help users complete tasks more efficiently. The second is expanded integration with third-party services. And the third is a new analytics dashboard for team administrators.
+
+Thank you for your attention. I'm happy to answer any questions.
+
+---
+# METADATA
+# Total Duration: ~60 seconds
+# Word Count: ~230 words
+# Speaking Rate: Normal pace (~230 WPM with pauses)

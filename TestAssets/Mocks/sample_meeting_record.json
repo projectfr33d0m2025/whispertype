@@ -1,0 +1,88 @@
+{
+  "id": "meeting-uuid-12345",
+  "title": "Q1 Budget Planning Meeting",
+  "created_at": "2026-01-06T14:06:47.970283",
+  "updated_at": "2026-01-06T14:06:47.970283",
+  "duration_seconds": 300,
+  "audio_source": "both",
+  "status": "completed",
+  "speakers": [
+    {
+      "id": "SPEAKER_A",
+      "name": "Michael",
+      "speaking_time": 120.0,
+      "color": "#4A90D9"
+    },
+    {
+      "id": "SPEAKER_B",
+      "name": "Sarah",
+      "speaking_time": 180.0,
+      "color": "#D94A4A"
+    }
+  ],
+  "summary": {
+    "template": "standard_meeting_notes",
+    "generated_at": "2026-01-06T14:06:47.970283",
+    "content": {
+      "overview": "Budget planning meeting between Michael and Sarah to discuss Q1 allocations for marketing and product development.",
+      "key_points": [
+        "Marketing budget set at $50,000 with $15,000 allocated to social media",
+        "Product team requesting two new developers",
+        "Compromise reached: one senior developer and one mid-level",
+        "Follow-up summary due by Friday"
+      ],
+      "action_items": [
+        {
+          "assignee": "Michael",
+          "task": "Discuss hiring compromise with CTO",
+          "due": null,
+          "completed": false
+        },
+        {
+          "assignee": "Sarah",
+          "task": "Prepare final budget summary",
+          "due": "Friday",
+          "completed": false
+        }
+      ],
+      "decisions": [
+        "$50,000 allocated to marketing",
+        "$15,000 specifically for social media campaigns",
+        "Hire one senior developer and one mid-level developer"
+      ]
+    }
+  },
+  "transcript": {
+    "segments": [
+      {
+        "speaker": "SPEAKER_A",
+        "text": "Good morning Sarah. Thanks for meeting with me today.",
+        "start_time": 0.0,
+        "end_time": 4.0
+      },
+      {
+        "speaker": "SPEAKER_B",
+        "text": "Good morning Michael. Happy to discuss the budget.",
+        "start_time": 4.0,
+        "end_time": 7.5
+      }
+    ],
+    "word_count": 450,
+    "confidence": 0.92
+  },
+  "files": {
+    "audio_chunks": [
+      "chunk_001.wav",
+      "chunk_002.wav",
+      "chunk_003.wav"
+    ],
+    "transcript_json": "transcript.json",
+    "summary_md": "summary.md"
+  },
+  "metadata": {
+    "whisper_model": "medium.en",
+    "diarization_mode": "pyannote",
+    "llm_model": "llama2",
+    "processing_time_seconds": 45.2
+  }
+}

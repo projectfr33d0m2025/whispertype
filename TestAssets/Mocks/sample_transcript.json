@@ -1,0 +1,53 @@
+{
+  "meeting_id": "test-transcript-001",
+  "duration_seconds": 180,
+  "created_at": "2026-01-06T14:06:47.970267",
+  "segments": [
+    {
+      "text": "Good morning everyone. Let's get started with today's meeting.",
+      "start_time": 0.0,
+      "end_time": 4.5
+    },
+    {
+      "text": "First item on the agenda is the Q1 budget review.",
+      "start_time": 4.5,
+      "end_time": 8.2
+    },
+    {
+      "text": "We've allocated fifty thousand dollars for marketing.",
+      "start_time": 8.2,
+      "end_time": 12.0
+    },
+    {
+      "text": "The engineering team has requested two new hires.",
+      "start_time": 12.0,
+      "end_time": 15.5
+    },
+    {
+      "text": "We need to discuss the product roadmap for next quarter.",
+      "start_time": 15.5,
+      "end_time": 19.8
+    },
+    {
+      "text": "Sarah will prepare the marketing plan by Friday.",
+      "start_time": 19.8,
+      "end_time": 23.5
+    },
+    {
+      "text": "John, please send the updated timeline to everyone.",
+      "start_time": 23.5,
+      "end_time": 27.2
+    },
+    {
+      "text": "Let's schedule a follow-up meeting for next week.",
+      "start_time": 27.2,
+      "end_time": 31.0
+    },
+    {
+      "text": "Thank you all for your time. Meeting adjourned.",
+      "start_time": 31.0,
+      "end_time": 35.0
+    }
+  ],
+  "full_text": "Good morning everyone. Let's get started with today's meeting. First item on the agenda is the Q1 budget review. We've allocated fifty thousand dollars for marketing. The engineering team has requested two new hires. We need to discuss the product roadmap for next quarter. Sarah will prepare the marketing plan by Friday. John, please send the updated timeline to everyone. Let's schedule a follow-up meeting for next week. Thank you all for your time. Meeting adjourned."
+}

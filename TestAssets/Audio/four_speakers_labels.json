@@ -1,0 +1,132 @@
+{
+  "audio_file": "four_speakers_300s.wav",
+  "duration_seconds": 208.4,
+  "speakers": [
+    "SPEAKER_A",
+    "SPEAKER_B",
+    "SPEAKER_C",
+    "SPEAKER_D"
+  ],
+  "segments": [
+    {
+      "speaker": "SPEAKER_A",
+      "start": 0.1,
+      "end": 9.5,
+      "text": "Alright, everyone, let's get started with our weekly sprint planning meeting. We have a lot to cover today, so let's dive right in. Lisa, can you start with the product update?"
+    },
+    {
+      "speaker": "SPEAKER_D",
+      "start": 9.72,
+      "end": 26.08,
+      "text": "Sure. Thanks, Alex. So based on customer feedback from last week, we're prioritizing the notification system redesign. Users have been complaining about missing important alerts. I've written up the requirements, and I think we can ship this in two sprints."
+    },
+    {
+      "speaker": "SPEAKER_C",
+      "start": 26.08,
+      "end": 38.66,
+      "text": "I've looked at the technical requirements. The back-end changes are straightforward, but we'll need to update the push notification service. That integration hasn't been touched in over a year, so there might be some surprises."
+    },
+    {
+      "speaker": "SPEAKER_B",
+      "start": 38.88,
+      "end": 55.6,
+      "text": "From a design perspective, I've already started on the mock-ups. I'm thinking we go with a notification center approach, similar to what iOS does. Users can see all their notifications in one place and manage their preferences easily."
+    },
+    {
+      "speaker": "SPEAKER_A",
+      "start": 55.6,
+      "end": 59.72,
+      "text": "That sounds good, Emma. How long do you estimate for the design work?"
+    },
+    {
+      "speaker": "SPEAKER_B",
+      "start": 59.72,
+      "end": 68.19,
+      "text": "I should have the high-fidelity mock-ups ready by Wednesday. Then I'll need a day to prepare the specs for handoff to development."
+    },
+    {
+      "speaker": "SPEAKER_C",
+      "start": 68.19,
+      "end": 80.48,
+      "text": "That works for me. Once I have the designs, I can start on the front-end implementation. I'm estimating about five days for the UI work, assuming no major changes to the designs."
+    },
+    {
+      "speaker": "SPEAKER_D",
+      "start": 80.48,
+      "end": 93.78,
+      "text": "Perfect. Now, there's one more thing. The CEO wants us to add analytics tracking to the notifications. She wants to know which notifications users are engaging with and which ones they're ignoring."
+    },
+    {
+      "speaker": "SPEAKER_A",
+      "start": 93.78,
+      "end": 100.16,
+      "text": "That's a reasonable request. Marcus, can you add the analytics events to your implementation estimate?"
+    },
+    {
+      "speaker": "SPEAKER_C",
+      "start": 100.16,
+      "end": 109.34,
+      "text": "Yeah, that should add about a day. I'll use our existing analytics framework. We just need to define the event names and properties with the data team."
+    },
+    {
+      "speaker": "SPEAKER_B",
+      "start": 109.34,
+      "end": 119.94,
+      "text": "Should I include any visual feedback for the analytics, like showing users which notifications are most popular? That could be a nice engagement feature."
+    },
+    {
+      "speaker": "SPEAKER_D",
+      "start": 119.94,
+      "end": 131.54,
+      "text": "Let's keep that out of scope for now, but add it to the backlog. I like the idea, but we need to ship the core functionality first. We can always iterate in future sprints."
+    },
+    {
+      "speaker": "SPEAKER_A",
+      "start": 131.54,
+      "end": 141.3,
+      "text": "Good call, Lisa. Okay, let's talk about blockers. Marcus, you mentioned the push notification service might have issues. What's your plan there?"
+    },
+    {
+      "speaker": "SPEAKER_C",
+      "start": 141.3,
+      "end": 156.079,
+      "text": "I'll spend the first day of the sprint doing a technical spike. I'll review the current implementation, check for any deprecated APIs, and document what needs to be updated. If it's a bigger job than expected, I'll flag it immediately."
+    },
+    {
+      "speaker": "SPEAKER_D",
+      "start": 156.08,
+      "end": 164.94,
+      "text": "That's smart. Better to know early than to discover problems mid-sprint. Emma, do you have any dependencies on other teams?"
+    },
+    {
+      "speaker": "SPEAKER_B",
+      "start": 164.94,
+      "end": 177.96,
+      "text": "Just one. I need the updated brand guidelines from the marketing team. They said they'd have them by Monday. If that's delayed, I can start with our current design system and update later."
+    },
+    {
+      "speaker": "SPEAKER_A",
+      "start": 177.96,
+      "end": 186.42,
+      "text": "Alright, I'll follow up with marketing to make sure we get those guidelines on time. Any other concerns before we assign story points?"
+    },
+    {
+      "speaker": "SPEAKER_C",
+      "start": 186.42,
+      "end": 193.78,
+      "text": "One thing: Should we plan for a bug fix day? We still have a few issues from the last release that need attention."
+    },
+    {
+      "speaker": "SPEAKER_D",
+      "start": 193.78,
+      "end": 203.84,
+      "text": "Good point. Let's allocate Friday for bug fixes and tech debt. That gives us four days for the notification work and keeps our quality high."
+    },
+    {
+      "speaker": "SPEAKER_A",
+      "start": 203.84,
+      "end": 208.4,
+      "text": "Perfect. Let's start the point estimation. Emma, you're up first."
+    }
+  ]
+}

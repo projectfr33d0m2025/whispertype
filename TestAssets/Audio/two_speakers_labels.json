@@ -1,0 +1,76 @@
+{
+  "audio_file": "two_speakers_120s.wav",
+  "duration_seconds": 106.5,
+  "speakers": [
+    "SPEAKER_A",
+    "SPEAKER_B"
+  ],
+  "segments": [
+    {
+      "speaker": "SPEAKER_A",
+      "start": 0.119,
+      "end": 7.139,
+      "text": "Good morning, Sarah. Thanks for meeting with me today to discuss the Q One budget allocation."
+    },
+    {
+      "speaker": "SPEAKER_B",
+      "start": 7.139,
+      "end": 10.559,
+      "text": "Good morning, Michael. Of course!"
+    },
+    {
+      "speaker": "SPEAKER_B",
+      "start": 10.559,
+      "end": 15.42,
+      "text": "I've reviewed the preliminary numbers and have some thoughts to share."
+    },
+    {
+      "speaker": "SPEAKER_A",
+      "start": 15.42,
+      "end": 25.42,
+      "text": "Great. Let's start with the marketing budget. We're proposing fifty thousand dollars for digital advertising. That's a twenty percent increase from last quarter."
+    },
+    {
+      "speaker": "SPEAKER_B",
+      "start": 25.42,
+      "end": 40.759,
+      "text": "I think that's reasonable, given our growth targets. However, I'd suggest we allocate at least fifteen thousand specifically for social media campaigns. The ROI on our Instagram ads has been exceptional."
+    },
+    {
+      "speaker": "SPEAKER_A",
+      "start": 40.759,
+      "end": 50.939,
+      "text": "Agreed. Now, regarding the product development budget, the engineering team is requesting additional headcount. They want to hire two senior developers."
+    },
+    {
+      "speaker": "SPEAKER_B",
+      "start": 50.939,
+      "end": 64.099,
+      "text": "Two positions might stretch our budget. What if we start with one senior developer and one mid-level? That would save us approximately forty thousand annually while still adding capacity."
+    },
+    {
+      "speaker": "SPEAKER_A",
+      "start": 64.099,
+      "end": 73.54,
+      "text": "That's a good compromise. I'll discuss it with the CTO. What about the customer success team? They've asked for a new CRM system."
+    },
+    {
+      "speaker": "SPEAKER_B",
+      "start": 73.54,
+      "end": 89.659,
+      "text": "The CRM request is valid. Our current system is outdated. [sighs] I've gotten quotes from three vendors. Salesforce is the most expensive at thirty thousand, but HubSpot offers similar features for eighteen thousand."
+    },
+    {
+      "speaker": "SPEAKER_A",
+      "start": 89.659,
+      "end": 98.04,
+      "text": "Let's go with HubSpot then. That frees up budget for the training program we discussed. Can you prepare a final summary by Friday?"
+    },
+    {
+      "speaker": "SPEAKER_B",
+      "start": 98.04,
+      "end": 106.5,
+      "text": "Absolutely. I'll have the complete breakdown ready for your review by Thursday afternoon, and we can finalize it before the board meeting."
+    }
+  ]
+}

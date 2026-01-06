@@ -1,0 +1,71 @@
+{
+  "audio_file": "two_speakers_120s.wav",
+  "duration_seconds": 120.0,
+  "num_speakers": 2,
+  "speakers": [
+    "SPEAKER_A",
+    "SPEAKER_B"
+  ],
+  "segments": [
+    {
+      "speaker": "SPEAKER_A",
+      "start": 0.0,
+      "end": 8.0
+    },
+    {
+      "speaker": "SPEAKER_B",
+      "start": 8.0,
+      "end": 15.0
+    },
+    {
+      "speaker": "SPEAKER_A",
+      "start": 15.0,
+      "end": 28.0
+    },
+    {
+      "speaker": "SPEAKER_B",
+      "start": 28.0,
+      "end": 42.0
+    },
+    {
+      "speaker": "SPEAKER_A",
+      "start": 42.0,
+      "end": 55.0
+    },
+    {
+      "speaker": "SPEAKER_B",
+      "start": 55.0,
+      "end": 70.0
+    },
+    {
+      "speaker": "SPEAKER_A",
+      "start": 70.0,
+      "end": 82.0
+    },
+    {
+      "speaker": "SPEAKER_B",
+      "start": 82.0,
+      "end": 98.0
+    },
+    {
+      "speaker": "SPEAKER_A",
+      "start": 98.0,
+      "end": 110.0
+    },
+    {
+      "speaker": "SPEAKER_B",
+      "start": 110.0,
+      "end": 120.0
+    }
+  ],
+  "speaker_stats": {
+    "SPEAKER_A": {
+      "total_time": 50.0,
+      "num_segments": 5
+    },
+    "SPEAKER_B": {
+      "total_time": 70.0,
+      "num_segments": 5
+    }
+  }
+}

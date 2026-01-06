@@ -1,0 +1,22 @@
+# Known Text Script (30 seconds)
+# Voice: Use ONE clear voice (e.g., "Adam")
+# Purpose: Test transcription accuracy (Word Error Rate calculation)
+# IMPORTANT: The text below is the EXACT expected transcription output
+
+---
+[SPEAKER_A | 0:00 - 0:30]
+
+The quick brown fox jumps over the lazy dog. Pack my box with five dozen liquor jugs. How vexingly quick daft zebras jump. The five boxing wizards jump quickly. Sphinx of black quartz, judge my vow. Two driven jocks help fax my big quiz. The jay, pig, fox, zebra and my wolves quack. Crazy Frederick bought many very exquisite opal jewels.
+
+---
+# METADATA
+# Total Duration: ~30 seconds
+# Word Count: 71 words
+# Speaking Rate: Slow and clear (~140 WPM)
+# Contains: Pangrams (sentences using all letters A-Z)
+# Purpose: WER testing - these sentences test all phonemes
+
+# EXPECTED TRANSCRIPTION (copy this to known_text_30s_expected.txt):
+# ---
+# The quick brown fox jumps over the lazy dog. Pack my box with five dozen liquor jugs. How vexingly quick daft zebras jump. The five boxing wizards jump quickly. Sphinx of black quartz, judge my vow. Two driven jocks help fax my big quiz. The jay, pig, fox, zebra and my wolves quack. Crazy Frederick bought many very exquisite opal jewels.
+# ---

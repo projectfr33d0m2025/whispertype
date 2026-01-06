@@ -101,21 +101,46 @@ This document breaks down the v1.3.0 Meeting Transcription feature into developm
 
 **Test Artifacts (REQUIRED for all phases):**
 
+> **📁 Setup Scripts Available:** `TestAssets/Scripts/`
+> 
+> Run `./setup_test_assets.sh --auto` to generate all auto-generatable files.
+> For ElevenLabs audio: `export ELEVENLABS_API_KEY="..." && ./setup_test_assets.sh --elevenlabs`
+
 - [ ] **1.1.5** Create `TestAssets/` directory structure
-- [ ] **1.1.6** Create/source audio test files:
+- [ ] **1.1.6** Run setup script for auto-generated files:
+  ```bash
+  cd TestAssets/Scripts
+  ./setup_test_assets.sh --auto
+  ```
+  This generates:
+  - `silence_30s.wav` - ffmpeg generated
+  - `tone_1khz_30s.wav` - ffmpeg generated  
+  - `low_volume_30s.wav` - ffmpeg generated
+  - `clipping_30s.wav` - ffmpeg generated
+  - `known_text_30s.wav` - macOS TTS (or ElevenLabs)
+  - All mock JSON files
+
+- [ ] **1.1.7** Generate ElevenLabs audio files (recommended):
+  ```bash
+  # Set your API key
+  export ELEVENLABS_API_KEY="your-key-from-elevenlabs.io"
+  
+  # Generate all speaker audio files
+  ./setup_test_assets.sh --elevenlabs
+  ```
+  This generates (with automatic ground truth labels):
   ```
   TestAssets/Audio/
-  ├── silence_30s.wav                    # Generated: 30s silence
-  ├── tone_1khz_30s.wav                  # Generated: 1kHz sine wave
-  ├── single_speaker_60s.wav             # Source: LibriSpeech sample
-  ├── two_speakers_120s.wav              # Source: LibriSpeech concatenated
-  ├── two_speakers_120s_labels.json      # Ground truth speaker segments
-  ├── four_speakers_300s.wav             # Source: VoxConverse sample  
-  ├── four_speakers_300s_labels.json     # Ground truth speaker segments
-  ├── known_text_30s.wav                 # "The quick brown fox..." for WER test
+  ├── single_speaker_60s.wav             # 1 voice (Adam)
+  ├── two_speakers_120s.wav              # 2 voices (Adam, Rachel)
+  ├── two_speakers_120s_labels.json      # Auto-generated from script
+  ├── four_speakers_300s.wav             # 4 voices (Adam, Rachel, Clyde, Domi)
+  ├── four_speakers_300s_labels.json     # Auto-generated from script
+  ├── known_text_30s.wav                 # For WER testing
   └── known_text_30s_expected.txt        # Expected transcription
   ```
-- [ ] **1.1.7** Create mock data files:
+
+- [ ] **1.1.8** Verify mock data files exist:
   ```
   TestAssets/Mocks/
   ├── sample_transcript.json             # Transcript without speakers
@@ -125,21 +150,28 @@ This document breaks down the v1.3.0 Meeting Transcription feature into developm
   ├── sample_summary_input.json          # Input for summarization
   └── sample_summary_expected.md         # Expected summary structure
   ```
-- [ ] **1.1.8** Create ground truth label schema:
+
+- [ ] **1.1.9** Ground truth labels (auto-generated from scripts):
   ```json
-  // two_speakers_120s_labels.json
+  // two_speakers_120s_labels.json (auto-generated)
   {
     "audio_file": "two_speakers_120s.wav",
     "duration_seconds": 120,
     "speakers": ["SPEAKER_A", "SPEAKER_B"],
     "segments": [
-      {"speaker": "SPEAKER_A", "start": 0.0, "end": 15.5},
-      {"speaker": "SPEAKER_B", "start": 15.5, "end": 32.1},
+      {"speaker": "SPEAKER_A", "start": 0.0, "end": 8.0, "text": "Good morning..."},
+      {"speaker": "SPEAKER_B", "start": 8.0, "end": 15.0, "text": "Good morning..."},
       ...
     ]
   }
   ```
-- [ ] **1.1.9** Document test artifact sources and licenses
+
+- [ ] **1.1.10** Document test artifact sources:
+  | File | Source | License |
+  |------|--------|---------|
+  | silence/tone WAVs | ffmpeg generated | N/A |
+  | Speaker audio | ElevenLabs TTS | ElevenLabs ToS |
+  | Mock JSON | Generated scripts | N/A |
 
 ### 1.2 Audio Stream Bus
 
@@ -1779,21 +1811,51 @@ Also, remind everyone that the office will be closed next Thursday for the holid
 
 ## Appendix A: Test Artifact Specifications
 
+### Quick Setup
+
+```bash
+cd TestAssets/Scripts
+
+# Auto-generate everything possible (no API key needed)
+./setup_test_assets.sh --auto
+
+# Generate ElevenLabs audio (recommended for diarization tests)
+export ELEVENLABS_API_KEY="your-key"
+./setup_test_assets.sh --elevenlabs
+```
+
 ### Audio Test Files
 
-| File | Duration | Content | Source |
-|------|----------|---------|--------|
-| `silence_30s.wav` | 30s | Digital silence | Generate with ffmpeg |
-| `tone_1khz_30s.wav` | 30s | 1kHz sine wave | Generate with ffmpeg |
-| `single_speaker_60s.wav` | 60s | One person speaking | LibriSpeech |
-| `two_speakers_120s.wav` | 120s | Two people alternating | LibriSpeech concat |
-| `four_speakers_300s.wav` | 300s | Four people meeting | VoxConverse |
-| `known_text_30s.wav` | 30s | "The quick brown fox..." | TTS or recording |
-| `noisy_background.wav` | 30s | Speech + noise | Mix existing |
-| `low_volume.wav` | 30s | Quiet speech | Process existing |
-| `clipping.wav` | 30s | Distorted speech | Process existing |
+| File | Duration | Source | Generation Method |
+|------|----------|--------|-------------------|
+| `silence_30s.wav` | 30s | Auto | `ffmpeg -f lavfi -i anullsrc` |
+| `tone_1khz_30s.wav` | 30s | Auto | `ffmpeg -f lavfi -i sine` |
+| `low_volume_30s.wav` | 30s | Auto | `ffmpeg` with volume filter |
+| `clipping_30s.wav` | 30s | Auto | `ffmpeg` with overdrive |
+| `known_text_30s.wav` | 30s | Auto/ElevenLabs | macOS `say` or ElevenLabs |
+| `single_speaker_60s.wav` | 60s | **ElevenLabs** | 1 voice (Adam) |
+| `two_speakers_120s.wav` | 120s | **ElevenLabs** | 2 voices (Adam, Rachel) |
+| `four_speakers_300s.wav` | 300s | **ElevenLabs** | 4 voices (Adam, Rachel, Clyde, Domi) |
 
-### Ground Truth JSON Format
+### ElevenLabs Voice Mapping
+
+| Speaker | Voice Name | Voice ID | Character |
+|---------|------------|----------|-----------|
+| SPEAKER_A | Adam | pNInz6obpgDQGcFmaJgB | Male (PM) |
+| SPEAKER_B | Rachel | 21m00Tcm4TlvDq8ikWAM | Female (Designer) |
+| SPEAKER_C | Clyde | 2EiwWnXFnvU5JabPnv8n | Male (Developer) |
+| SPEAKER_D | Domi | AZnzlk1XvdvUeBnXmlld | Female (Product) |
+
+### Script Files (in `TestAssets/Scripts/`)
+
+| Script | Output Audio | Output Labels | Content |
+|--------|--------------|---------------|---------|
+| `single_speaker_script.txt` | `single_speaker_60s.wav` | N/A | Product update monologue |
+| `two_speakers_script.txt` | `two_speakers_120s.wav` | `*_labels.json` | Budget planning dialogue |
+| `four_speakers_script.txt` | `four_speakers_300s.wav` | `*_labels.json` | Sprint planning meeting |
+| `known_text_script.txt` | `known_text_30s.wav` | `*_expected.txt` | Pangrams for WER testing |
+
+### Ground Truth JSON Format (Auto-Generated)
 
 ```json
 {
@@ -1801,30 +1863,37 @@ Also, remind everyone that the office will be closed next Thursday for the holid
   "duration_seconds": 120.0,
   "speakers": ["SPEAKER_A", "SPEAKER_B"],
   "segments": [
-    {"speaker": "SPEAKER_A", "start": 0.0, "end": 15.5},
-    {"speaker": "SPEAKER_B", "start": 15.5, "end": 32.1},
-    {"speaker": "SPEAKER_A", "start": 32.5, "end": 48.0}
+    {"speaker": "SPEAKER_A", "start": 0.0, "end": 8.0, "text": "Good morning Sarah..."},
+    {"speaker": "SPEAKER_B", "start": 8.0, "end": 15.0, "text": "Good morning Michael..."},
+    {"speaker": "SPEAKER_A", "start": 15.0, "end": 28.0, "text": "Let's start with..."}
   ]
 }
 ```
 
-### Mock Transcript Format
+> **Note:** Ground truth labels are automatically generated from the script files using `generate_ground_truth.py`. Since you write the script, timestamps are exact.
 
-```json
-{
-  "meeting_id": "test-001",
-  "duration_seconds": 300,
-  "segments": [
-    {
-      "speaker": "SPEAKER_A",
-      "text": "Let's discuss the Q1 budget allocation.",
-      "start_time": 0.0,
-      "end_time": 3.5
-    }
-  ],
-  "expected_keywords": ["budget", "Q1", "allocation", "marketing"]
-}
-```
+### Mock Data Files (Auto-Generated)
+
+Run `python3 generate_mock_data.py` to create:
+
+| File | Purpose |
+|------|---------|
+| `sample_transcript.json` | Transcript without speaker labels |
+| `sample_transcript_speakers.json` | Transcript with speakers + expected keywords |
+| `sample_diarization.json` | Speaker segments only (no text) |
+| `sample_meeting_record.json` | Complete meeting record (DB format) |
+| `sample_summary_input.json` | Input for LLM summarization |
+| `sample_summary_expected.md` | Expected summary output |
+
+### Manual Alternative (No ElevenLabs)
+
+If you prefer not to use ElevenLabs API:
+
+1. Open each `*_script.txt` in `TestAssets/Scripts/`
+2. Copy text for each speaker segment
+3. Generate audio in ElevenLabs web UI (https://elevenlabs.io)
+4. Download and save to `TestAssets/Audio/`
+5. Run: `python3 generate_ground_truth.py <script> <output.json>`
 
 ---
 

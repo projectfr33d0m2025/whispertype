@@ -1,0 +1,84 @@
+{
+  "meeting_id": "test-transcript-speakers-001",
+  "duration_seconds": 300,
+  "created_at": "2026-01-06T14:06:47.970278",
+  "speakers": [
+    "SPEAKER_A",
+    "SPEAKER_B"
+  ],
+  "speaker_names": {
+    "SPEAKER_A": "Michael",
+    "SPEAKER_B": "Sarah"
+  },
+  "segments": [
+    {
+      "speaker": "SPEAKER_A",
+      "text": "Good morning Sarah. Thanks for meeting with me today.",
+      "start_time": 0.0,
+      "end_time": 4.0
+    },
+    {
+      "speaker": "SPEAKER_B",
+      "text": "Good morning Michael. Happy to discuss the budget.",
+      "start_time": 4.0,
+      "end_time": 7.5
+    },
+    {
+      "speaker": "SPEAKER_A",
+      "text": "Let's start with the marketing allocation. We're proposing fifty thousand dollars.",
+      "start_time": 7.5,
+      "end_time": 13.0
+    },
+    {
+      "speaker": "SPEAKER_B",
+      "text": "That seems reasonable. I'd suggest allocating fifteen thousand for social media specifically.",
+      "start_time": 13.0,
+      "end_time": 19.0
+    },
+    {
+      "speaker": "SPEAKER_A",
+      "text": "Agreed. Now regarding product development, the team wants two senior developers.",
+      "start_time": 19.0,
+      "end_time": 25.0
+    },
+    {
+      "speaker": "SPEAKER_B",
+      "text": "What if we start with one senior and one mid-level? That would save forty thousand annually.",
+      "start_time": 25.0,
+      "end_time": 32.0
+    },
+    {
+      "speaker": "SPEAKER_A",
+      "text": "Good compromise. I'll discuss with the CTO. Can you prepare the final summary by Friday?",
+      "start_time": 32.0,
+      "end_time": 39.0
+    },
+    {
+      "speaker": "SPEAKER_B",
+      "text": "Absolutely. I'll have everything ready by Thursday afternoon.",
+      "start_time": 39.0,
+      "end_time": 44.0
+    }
+  ],
+  "expected_keywords": [
+    "budget",
+    "marketing",
+    "fifty thousand",
+    "social media",
+    "developers",
+    "CTO",
+    "Friday"
+  ],
+  "expected_action_items": [
+    {
+      "assignee": "Michael",
+      "task": "Discuss hiring plan with CTO",
+      "due": null
+    },
+    {
+      "assignee": "Sarah",
+      "task": "Prepare final budget summary",
+      "due": "Friday"
+    }
+  ]
+}

@@ -1,0 +1,78 @@
+# Four Speakers Script (300 seconds / 5 minutes)
+# Voices: Use FOUR distinct voices
+#   - SPEAKER_A: Male voice 1 (e.g., "Adam") - Project Manager
+#   - SPEAKER_B: Female voice 1 (e.g., "Rachel") - Designer
+#   - SPEAKER_C: Male voice 2 (e.g., "Clyde") - Developer
+#   - SPEAKER_D: Female voice 2 (e.g., "Domi") - Product Owner
+# Purpose: Test speaker diarization with 4 speakers (meeting simulation)
+
+---
+[SPEAKER_A | 0:00 - 0:12]
+Alright everyone, let's get started with our weekly sprint planning meeting. We have a lot to cover today, so let's dive right in. Lisa, can you start with the product update?
+
+[SPEAKER_D | 0:12 - 0:32]
+Sure, thanks Alex. So, based on customer feedback from last week, we're prioritizing the notification system redesign. Users have been complaining about missing important alerts. I've written up the requirements, and I think we can ship this in two sprints.
+
+[SPEAKER_C | 0:32 - 0:48]
+I've looked at the technical requirements. The backend changes are straightforward, but we'll need to update the push notification service. That integration hasn't been touched in over a year, so there might be some surprises.
+
+[SPEAKER_B | 0:48 - 1:05]
+From a design perspective, I've already started on the mockups. I'm thinking we go with a notification center approach, similar to what iOS does. Users can see all their notifications in one place and manage their preferences easily.
+
+[SPEAKER_A | 1:05 - 1:18]
+That sounds good, Emma. How long do you estimate for the design work?
+
+[SPEAKER_B | 1:18 - 1:30]
+I should have the high-fidelity mockups ready by Wednesday. Then I'll need a day to prepare the specs for handoff to development.
+
+[SPEAKER_C | 1:30 - 1:48]
+That works for me. Once I have the designs, I can start on the frontend implementation. I'm estimating about five days for the UI work, assuming no major changes to the designs.
+
+[SPEAKER_D | 1:48 - 2:05]
+Perfect. Now, there's one more thing. The CEO wants us to add analytics tracking to the notifications. She wants to know which notifications users are engaging with and which ones they're ignoring.
+
+[SPEAKER_A | 2:05 - 2:20]
+That's a reasonable request. Marcus, can you add the analytics events to your implementation estimate?
+
+[SPEAKER_C | 2:20 - 2:35]
+Yeah, that should add about a day. I'll use our existing analytics framework. We just need to define the event names and properties with the data team.
+
+[SPEAKER_B | 2:35 - 2:50]
+Should I include any visual feedback for the analytics? Like showing users which notifications are most popular? That could be a nice engagement feature.
+
+[SPEAKER_D | 2:50 - 3:08]
+Let's keep that out of scope for now, but add it to the backlog. I like the idea, but we need to ship the core functionality first. We can always iterate in future sprints.
+
+[SPEAKER_A | 3:08 - 3:22]
+Good call, Lisa. Okay, let's talk about blockers. Marcus, you mentioned the push notification service might have issues. What's your plan there?
+
+[SPEAKER_C | 3:22 - 3:42]
+I'll spend the first day of the sprint doing a technical spike. I'll review the current implementation, check for any deprecated APIs, and document what needs to be updated. If it's a bigger job than expected, I'll flag it immediately.
+
+[SPEAKER_D | 3:42 - 3:55]
+That's smart. Better to know early than to discover problems mid-sprint. Emma, do you have any dependencies on other teams?
+
+[SPEAKER_B | 3:55 - 4:12]
+Just one. I need the updated brand guidelines from the marketing team. They said they'd have them by Monday. If that's delayed, I can start with our current design system and update later.
+
+[SPEAKER_A | 4:12 - 4:28]
+Alright, I'll follow up with marketing to make sure we get those guidelines on time. Any other concerns before we assign story points?
+
+[SPEAKER_C | 4:28 - 4:40]
+One thing. Should we plan for a bug fix day? We still have a few issues from the last release that need attention.
+
+[SPEAKER_D | 4:40 - 4:55]
+Good point. Let's allocate Friday for bug fixes and tech debt. That gives us four days for the notification work and keeps our quality high.
+
+[SPEAKER_A | 4:55 - 5:00]
+Perfect. Let's start the point estimation. Emma, you're up first.
+
+---
+# METADATA
+# Total Duration: ~300 seconds (5 minutes)
+# Speaker A (Alex - PM): 6 segments (~55 seconds)
+# Speaker B (Emma - Designer): 5 segments (~65 seconds)
+# Speaker C (Marcus - Developer): 6 segments (~80 seconds)
+# Speaker D (Lisa - Product Owner): 6 segments (~100 seconds)
+# Word Count: ~750 words
+# Topics: Sprint planning, Notifications, Analytics, Bug fixes
