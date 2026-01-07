@@ -75,6 +75,11 @@ struct GeneralSettingsView: View {
                 Label("Audio Input", systemImage: "mic")
             }
             
+            // MARK: - Screen Recording Permission (v1.3.0)
+            if #available(macOS 12.3, *) {
+                PermissionStatusView()
+            }
+            
             // MARK: - Transcription Section
             Section {
                 Picker("Input Language", selection: $selectedLanguage) {

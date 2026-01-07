@@ -15,6 +15,21 @@ extension Notification.Name {
     static let switchToVocabularyTab = Notification.Name("switchToVocabularyTab")
     /// Posted to switch to the App Rules tab in settings
     static let switchToAppRulesTab = Notification.Name("switchToAppRulesTab")
+    
+    // MARK: - Meeting Notifications (v1.3)
+    
+    /// Posted when meeting recording starts
+    static let meetingRecordingStarted = Notification.Name("meetingRecordingStarted")
+    /// Posted when meeting recording stops
+    static let meetingRecordingStopped = Notification.Name("meetingRecordingStopped")
+    /// Posted when meeting recording is cancelled
+    static let meetingRecordingCancelled = Notification.Name("meetingRecordingCancelled")
+    /// Posted when meeting processing completes
+    static let meetingProcessingComplete = Notification.Name("meetingProcessingComplete")
+    /// Posted when meeting state changes
+    static let meetingStateChanged = Notification.Name("meetingStateChanged")
+    /// Posted when 85-minute warning should be shown
+    static let meetingDurationWarning = Notification.Name("meetingDurationWarning")
 }
 
 enum Constants {
@@ -22,7 +37,7 @@ enum Constants {
     // MARK: - App Info
 
     static let appName = "WhisperType"
-    static let appVersion = "1.2.0"
+    static let appVersion = "1.3.0"
     static let appBundleIdentifier = "com.whispertype.app"
 
     // MARK: - URLs
@@ -80,6 +95,39 @@ enum Constants {
         static var history: URL {
             applicationSupport.appendingPathComponent("history.json")
         }
+        
+        // MARK: - Meeting Paths (v1.3)
+        
+        /// Base directory for all meetings
+        static var meetings: URL {
+            let meetingsPath = applicationSupport.appendingPathComponent("Meetings")
+            try? FileManager.default.createDirectory(at: meetingsPath, withIntermediateDirectories: true)
+            return meetingsPath
+        }
+        
+        /// SQLite database for meeting metadata
+        static var meetingsDatabase: URL {
+            applicationSupport.appendingPathComponent("meetings.db")
+        }
+        
+        /// Generate a session directory for a new meeting
+        /// Format: 2025-01-06_103000_<uuid>
+        static func meetingSession(id: String, date: Date = Date()) -> URL {
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "yyyy-MM-dd_HHmmss"
+            let dateString = dateFormatter.string(from: date)
+            
+            let sessionDir = meetings.appendingPathComponent("\(dateString)_\(id)")
+            try? FileManager.default.createDirectory(at: sessionDir, withIntermediateDirectories: true)
+            return sessionDir
+        }
+        
+        /// Audio chunks directory within a session
+        static func audioChunks(sessionDirectory: URL) -> URL {
+            let audioDir = sessionDirectory.appendingPathComponent("audio")
+            try? FileManager.default.createDirectory(at: audioDir, withIntermediateDirectories: true)
+            return audioDir
+        }
     }
 
     // MARK: - UserDefaults Keys
@@ -107,6 +155,17 @@ enum Constants {
         // v1.2 Cloud Provider Settings
         static let cloudProviderType = "cloudProviderType"
         static let cloudModel = "cloudModel"
+        
+        // MARK: - v1.3 Meeting Settings
+        
+        static let meetingDefaultAudioSource = "meetingDefaultAudioSource"
+        static let meetingShowLiveSubtitles = "meetingShowLiveSubtitles"
+        static let meetingAudioQualityWarnings = "meetingAudioQualityWarnings"
+        static let meetingKeepAudioFiles = "meetingKeepAudioFiles"
+        static let meetingDefaultTemplate = "meetingDefaultTemplate"
+        static let meetingSpeakerMode = "meetingSpeakerMode"
+        static let meetingPythonPath = "meetingPythonPath"
+        static let meetingLiveSubtitleWindowFrame = "meetingLiveSubtitleWindowFrame"
     }
 
     // MARK: - Default Values
@@ -141,6 +200,15 @@ enum Constants {
         // v1.2 Cloud Provider Defaults
         static let cloudProviderType: CloudProviderType = .openRouter
         static let cloudModel = "openai/gpt-4o-mini"
+        
+        // MARK: - v1.3 Meeting Defaults
+        
+        static let meetingDefaultAudioSource = "both" // "microphone", "system", "both"
+        static let meetingShowLiveSubtitles = true
+        static let meetingAudioQualityWarnings = true
+        static let meetingKeepAudioFiles = false
+        static let meetingDefaultTemplate = "standard"
+        static let meetingSpeakerMode = "basic" // "basic" or "enhanced" (pyannote)
     }
 
     // MARK: - Audio Settings
@@ -152,6 +220,23 @@ enum Constants {
         // Audio format for Whisper
         static let channels: UInt32 = 1 // mono
         static let bitDepth: UInt32 = 32 // Float32
+        
+        // MARK: - v1.3 Meeting Audio Settings
+        
+        /// Sample rate for meeting recordings (16kHz for Whisper compatibility)
+        static let meetingSampleRate: Double = 16000.0
+        
+        /// Bit depth for meeting recordings (16-bit for smaller files)
+        static let meetingBitDepth: UInt32 = 16
+        
+        /// Audio chunk duration in seconds
+        static let chunkDurationSeconds: TimeInterval = 30.0
+        
+        /// Ring buffer size in seconds (max audio held in memory)
+        static let ringBufferSizeSeconds: TimeInterval = 30.0
+        
+        /// Approximate bytes per second for 16kHz 16-bit mono audio
+        static let bytesPerSecond: Int = 32000 // 16000 samples * 2 bytes
     }
 
     // MARK: - Limits
@@ -165,6 +250,23 @@ enum Constants {
 
         // Maximum recording duration (seconds)
         static let maxRecordingDuration: TimeInterval = 300 // 5 minutes
+        
+        // MARK: - v1.3 Meeting Limits
+        
+        /// Maximum meeting recording duration in seconds (90 minutes)
+        static let maxMeetingDuration: TimeInterval = 90 * 60 // 5400 seconds
+        
+        /// Duration warning threshold in seconds (85 minutes)
+        static let meetingWarningDuration: TimeInterval = 85 * 60 // 5100 seconds
+        
+        /// Maximum memory usage for meeting recording in MB
+        static let maxMeetingMemoryMB: Int = 100
+        
+        /// Maximum number of speakers for diarization
+        static let maxSpeakers: Int = 10
+        
+        /// Minimum number of speakers for diarization
+        static let minSpeakers: Int = 2
     }
 
     // MARK: - UI
@@ -177,5 +279,17 @@ enum Constants {
 
         // Window sizes
         static let settingsWindowSize = NSSize(width: 600, height: 500)
+        
+        // MARK: - v1.3 Meeting UI
+        
+        /// Default live subtitle window size
+        static let liveSubtitleWindowSize = NSSize(width: 500, height: 300)
+        
+        /// Minimum live subtitle window size
+        static let liveSubtitleWindowMinSize = NSSize(width: 300, height: 150)
+        
+        /// Live subtitle window opacity
+        static let liveSubtitleWindowOpacity: Double = 0.95
     }
 }
+

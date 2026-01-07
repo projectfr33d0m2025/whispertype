@@ -113,6 +113,12 @@ class AppCoordinator: ObservableObject {
     private(set) var postProcessor: PostProcessor!
     private(set) var appAwareManager: AppAwareManager!
     
+    // MARK: - Meeting Coordinator (v1.3.0)
+    
+    private(set) lazy var meetingCoordinator: MeetingCoordinator = {
+        return MeetingCoordinator.shared
+    }()
+    
     // MARK: - Audio Feedback
     
     private var recordStartSound: NSSound?
@@ -170,6 +176,11 @@ class AppCoordinator: ObservableObject {
         // Cancel any recording in progress
         if isRecording {
             audioRecorder.cancelRecording()
+        }
+        
+        // Cancel any meeting recording in progress (v1.3.0)
+        if meetingCoordinator.isRecording {
+            meetingCoordinator.cancelRecording()
         }
         
         // Clean up recording overlay
@@ -335,6 +346,52 @@ class AppCoordinator: ObservableObject {
         ) { [weak self] _ in
             Task { @MainActor in
                 self?.isRecording = false
+            }
+        }
+        
+        // MARK: - Meeting Notifications (v1.3.0)
+        
+        NotificationCenter.default.addObserver(
+            forName: .meetingRecordingStarted,
+            object: nil,
+            queue: .main
+        ) { [weak self] notification in
+            Task { @MainActor in
+                if let session = notification.object as? MeetingSession {
+                    print("AppCoordinator: Meeting recording started - \(session.id)")
+                }
+            }
+        }
+        
+        NotificationCenter.default.addObserver(
+            forName: .meetingRecordingStopped,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in
+                print("AppCoordinator: Meeting recording stopped")
+            }
+        }
+        
+        NotificationCenter.default.addObserver(
+            forName: .meetingDurationWarning,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in
+                self?.showNotification("Meeting recording will end in 5 minutes", type: .warning)
+            }
+        }
+        
+        NotificationCenter.default.addObserver(
+            forName: .meetingProcessingComplete,
+            object: nil,
+            queue: .main
+        ) { [weak self] notification in
+            Task { @MainActor in
+                if let session = notification.object as? MeetingSession {
+                    self?.showNotification("Meeting '\(session.title)' processing complete", type: .success)
+                }
             }
         }
     }

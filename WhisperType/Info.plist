@@ -15,9 +15,9 @@
 	<key>CFBundlePackageType</key>
 	<string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.1.0</string>
+	<string>1.3.0</string>
 	<key>CFBundleVersion</key>
-	<string>2</string>
+	<string>3</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>$(MACOSX_DEPLOYMENT_TARGET)</string>
 	<key>LSUIElement</key>
@@ -26,5 +26,8 @@
 	<string>WhisperType needs microphone access to record your voice for transcription.</string>
 	<key>NSAccessibilityUsageDescription</key>
 	<string>WhisperType needs accessibility access to insert transcribed text into other applications.</string>
+	<key>NSScreenRecordingUsageDescription</key>
+	<string>WhisperType needs Screen Recording permission to capture audio from other applications like Microsoft Teams, Zoom, and other video calling apps. Your screen content is NOT recorded - only audio is captured.</string>
 </dict>
 </plist>
+
