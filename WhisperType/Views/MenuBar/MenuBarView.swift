@@ -547,6 +547,39 @@ struct MenuBarView: View {
     
     private var actionsSection: some View {
         VStack(spacing: 4) {
+            // Meeting Recording Button
+            if !MeetingCoordinator.shared.isRecording {
+                MenuBarButton(
+                    title: "Start Meeting Recording",
+                    icon: "record.circle",
+                    shortcut: nil
+                ) {
+                    startMeetingRecording()
+                }
+            } else {
+                MenuBarButton(
+                    title: "Stop Meeting Recording",
+                    icon: "stop.circle.fill",
+                    shortcut: nil
+                ) {
+                    stopMeetingRecording()
+                }
+            }
+            
+            // Show Live Transcript (when recording)
+            if MeetingCoordinator.shared.isRecording {
+                MenuBarButton(
+                    title: "Show Live Transcript",
+                    icon: "text.bubble",
+                    shortcut: nil
+                ) {
+                    showLiveTranscript()
+                }
+            }
+            
+            Divider()
+                .padding(.vertical, 4)
+            
             // Settings Button
             MenuBarButton(
                 title: "Settings...",
@@ -564,6 +597,40 @@ struct MenuBarView: View {
             ) {
                 NSApplication.shared.terminate(nil)
             }
+        }
+    }
+    
+    private func startMeetingRecording() {
+        dismiss()
+        Task {
+            do {
+                try await MeetingCoordinator.shared.startRecording()
+            } catch {
+                print("Failed to start meeting recording: \(error)")
+            }
+        }
+    }
+    
+    private func stopMeetingRecording() {
+        dismiss()
+        Task {
+            do {
+                _ = try await MeetingCoordinator.shared.stopRecording()
+            } catch {
+                print("Failed to stop meeting recording: \(error)")
+            }
+        }
+    }
+    
+    private func showLiveTranscript() {
+        print("MenuBarView: showLiveTranscript called")
+        print("MenuBarView: MeetingCoordinator.isRecording = \(MeetingCoordinator.shared.isRecording)")
+        
+        dismiss()
+        
+        // Call toggleSubtitleWindow which is a public method
+        DispatchQueue.main.async {
+            MeetingCoordinator.shared.toggleSubtitleWindow()
         }
     }
     

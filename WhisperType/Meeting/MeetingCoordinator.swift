@@ -55,6 +55,17 @@ class MeetingCoordinator: ObservableObject {
         recorder.formattedDuration
     }
     
+    // MARK: - Live Subtitles
+    
+    /// Whether live subtitles are enabled for recording
+    @Published var liveSubtitlesEnabled: Bool = true
+    
+    /// The streaming processor for live transcription
+    private(set) var streamingProcessor: StreamingWhisperProcessor?
+    
+    /// The live subtitle window
+    private(set) var subtitleWindow: LiveSubtitleWindow?
+    
     // MARK: - Dependencies
     
     private let recorder: MeetingRecorder
@@ -134,6 +145,15 @@ class MeetingCoordinator: ObservableObject {
         // Update state
         state = .recording
         
+        // Start live subtitles if enabled
+        print("MeetingCoordinator: liveSubtitlesEnabled = \(liveSubtitlesEnabled)")
+        if liveSubtitlesEnabled {
+            print("MeetingCoordinator: Starting live subtitles...")
+            startLiveSubtitles()
+        } else {
+            print("MeetingCoordinator: Live subtitles disabled, skipping")
+        }
+        
         // Begin background task protection
         beginBackgroundTask()
         
@@ -151,6 +171,9 @@ class MeetingCoordinator: ObservableObject {
         }
         
         print("MeetingCoordinator: Stopping recording...")
+        
+        // Stop live subtitles
+        stopLiveSubtitles()
         
         // Stop recording
         let chunkURLs = try await recorder.stopRecording()
@@ -170,6 +193,9 @@ class MeetingCoordinator: ObservableObject {
         guard state == .recording || state == .paused else { return }
         
         print("MeetingCoordinator: Cancelling recording...")
+        
+        // Stop live subtitles
+        stopLiveSubtitles()
         
         recorder.cancelRecording()
         
@@ -312,5 +338,124 @@ class MeetingCoordinator: ObservableObject {
     /// Get the session directory for the current session
     var sessionDirectory: URL? {
         recorder.sessionDirectory
+    }
+    
+    // MARK: - Live Subtitles
+    
+    /// Start the live subtitles feature
+    private func startLiveSubtitles() {
+        print("MeetingCoordinator: Starting live subtitles...")
+        
+        // Create streaming processor
+        let processor = StreamingWhisperProcessor(
+            whisperWrapper: .shared,
+            streamBus: streamBus
+        )
+        streamingProcessor = processor
+        
+        // Create subtitle window
+        let window = LiveSubtitleWindow()
+        subtitleWindow = window
+        
+        // Connect window to processor
+        window.connectToProcessor(processor)
+        window.connectToCoordinator(self)
+        
+        // Start processor
+        processor.start()
+        
+        // Show window
+        window.show()
+        
+        print("MeetingCoordinator: Live subtitles started")
+    }
+    
+    /// Stop the live subtitles feature
+    private func stopLiveSubtitles() {
+        print("MeetingCoordinator: Stopping live subtitles...")
+        
+        // Debug: Log processor state
+        if let processor = streamingProcessor {
+            print("MeetingCoordinator: Processor has \(processor.transcriptUpdates.count) transcript updates")
+            print("MeetingCoordinator: Full transcript: \(processor.fullTranscript)")
+            
+            // Save transcript before stopping
+            if !processor.transcriptUpdates.isEmpty {
+                saveTranscriptToDisk(updates: processor.transcriptUpdates)
+            } else {
+                print("MeetingCoordinator: No transcripts to save (updates empty)")
+            }
+        } else {
+            print("MeetingCoordinator: No streaming processor found")
+        }
+        
+        // Stop processor
+        streamingProcessor?.stop()
+        
+        // Hide and cleanup window
+        subtitleWindow?.setRecording(false)
+        subtitleWindow?.disconnect()
+        
+        // Delay hiding to show "Processing..." state briefly
+        Task {
+            try? await Task.sleep(nanoseconds: 500_000_000) // 0.5 seconds
+            await MainActor.run {
+                subtitleWindow?.hide()
+            }
+        }
+        
+        print("MeetingCoordinator: Live subtitles stopped")
+    }
+    
+    /// Save transcript updates to the session directory
+    private func saveTranscriptToDisk(updates: [TranscriptUpdate]) {
+        guard let sessionDir = sessionDirectory else {
+            print("MeetingCoordinator: No session directory, skipping transcript save")
+            return
+        }
+        
+        do {
+            // Save as JSON
+            let jsonURL = sessionDir.appendingPathComponent("live_transcript.json")
+            let encoder = JSONEncoder()
+            encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+            let jsonData = try encoder.encode(updates)
+            try jsonData.write(to: jsonURL, options: .atomic)
+            print("MeetingCoordinator: Saved transcript JSON to \(jsonURL.path)")
+            
+            // Also save as Markdown for easy reading
+            let markdownURL = sessionDir.appendingPathComponent("live_transcript.md")
+            var markdown = "# Live Transcript\n\n"
+            markdown += "**Date:** \(DateFormatter.localizedString(from: Date(), dateStyle: .medium, timeStyle: .short))\n\n"
+            markdown += "---\n\n"
+            for update in updates.sorted(by: { $0.timestamp < $1.timestamp }) {
+                markdown += "\(update.formattedTimestamp)\n\(update.text)\n\n"
+            }
+            try markdown.write(to: markdownURL, atomically: true, encoding: .utf8)
+            print("MeetingCoordinator: Saved transcript Markdown to \(markdownURL.path)")
+            
+        } catch {
+            print("MeetingCoordinator: Failed to save transcript - \(error)")
+        }
+    }
+    
+    /// Toggle the subtitle window visibility
+    func toggleSubtitleWindow() {
+        subtitleWindow?.toggle()
+    }
+    
+    /// Show the subtitle window
+    func showSubtitleWindow() {
+        subtitleWindow?.show()
+    }
+    
+    /// Hide the subtitle window
+    func hideSubtitleWindow() {
+        subtitleWindow?.hide()
+    }
+    
+    /// Whether the subtitle window is visible
+    var isSubtitleWindowVisible: Bool {
+        subtitleWindow?.isVisible ?? false
     }
 }

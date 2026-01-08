@@ -37,6 +37,9 @@ class AudioStreamBus: ObservableObject {
     /// Subject for audio levels - multicast to all subscribers
     private let levelSubject = PassthroughSubject<AudioLevel, Never>()
     
+    /// Subject for real-time audio samples - for live transcription
+    private let sampleSubject = PassthroughSubject<[Float], Never>()
+    
     /// Public publisher for audio chunks
     var chunkPublisher: AnyPublisher<AudioChunk, Never> {
         chunkSubject.eraseToAnyPublisher()
@@ -45,6 +48,11 @@ class AudioStreamBus: ObservableObject {
     /// Public publisher for audio levels
     var levelPublisher: AnyPublisher<AudioLevel, Never> {
         levelSubject.eraseToAnyPublisher()
+    }
+    
+    /// Public publisher for real-time audio samples (for live transcription)
+    var samplePublisher: AnyPublisher<[Float], Never> {
+        sampleSubject.eraseToAnyPublisher()
     }
     
     // MARK: - Private Properties
@@ -108,6 +116,14 @@ class AudioStreamBus: ObservableObject {
         guard isActive else { return }
         
         levelSubject.send(level)
+    }
+    
+    /// Publish real-time audio samples for live transcription
+    /// - Parameter samples: Raw audio samples at the meeting sample rate
+    func publish(samples: [Float]) {
+        guard isActive else { return }
+        
+        sampleSubject.send(samples)
     }
     
     /// Reset the bus state (for testing or fresh start)

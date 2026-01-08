@@ -23,7 +23,15 @@
 		7BBD259E2F0E0687001B3B5A /* AudioChunk.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BBD25822F0E0687001B3B5A /* AudioChunk.swift */; };
 		7BBD259F2F0E0687001B3B5A /* MeetingRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BBD25862F0E0687001B3B5A /* MeetingRecorder.swift */; };
 		7BBD25A02F0E0687001B3B5A /* AudioMixer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BBD257C2F0E0687001B3B5A /* AudioMixer.swift */; };
-		7BBD25A32F0E0BBE001B3B5A /* PermissionStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BBD25A22F0E0BBE001B3B5A /* PermissionStatusView.swift */; };
+		7BBD25B02F0E3D16001B3B5A /* StreamingWhisperProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BBD25AD2F0E3D16001B3B5A /* StreamingWhisperProcessor.swift */; };
+		7BBD25B12F0E3D16001B3B5A /* TranscriptUpdate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BBD25AE2F0E3D16001B3B5A /* TranscriptUpdate.swift */; };
+		7BBD25B72F0E3D2E001B3B5A /* LiveSubtitleWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BBD25B32F0E3D2E001B3B5A /* LiveSubtitleWindow.swift */; };
+		7BBD25B82F0E3D2E001B3B5A /* PermissionStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BBD25B42F0E3D2E001B3B5A /* PermissionStatusView.swift */; };
+		7BBD25B92F0E3D2E001B3B5A /* SubtitleEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BBD25B52F0E3D2E001B3B5A /* SubtitleEntryView.swift */; };
+		7BBD25BA2F0E3D2E001B3B5A /* LiveSubtitleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BBD25B22F0E3D2E001B3B5A /* LiveSubtitleView.swift */; };
+		7BBD25BE2F0E3D5F001B3B5A /* PartialTranscriptStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BBD25BC2F0E3D5F001B3B5A /* PartialTranscriptStore.swift */; };
+		7BBD25BF2F0E3D5F001B3B5A /* WERCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BBD25BD2F0E3D5F001B3B5A /* WERCalculator.swift */; };
+		7BBD25C02F0E3D5F001B3B5A /* LatencyMeasurement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BBD25BB2F0E3D5F001B3B5A /* LatencyMeasurement.swift */; };
 		A1000001000000000000001 /* WhisperTypeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000002000000000000001 /* WhisperTypeApp.swift */; };
 		A1000003000000000000001 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1000004000000000000001 /* Assets.xcassets */; };
 		A1000005000000000000001 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1000006000000000000001 /* Accelerate.framework */; };
@@ -111,7 +119,15 @@
 		7BBD25862F0E0687001B3B5A /* MeetingRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetingRecorder.swift; sourceTree = "<group>"; };
 		7BBD25882F0E0687001B3B5A /* AudioQualityValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioQualityValidator.swift; sourceTree = "<group>"; };
 		7BBD25892F0E0687001B3B5A /* WAVValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WAVValidator.swift; sourceTree = "<group>"; };
-		7BBD25A22F0E0BBE001B3B5A /* PermissionStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionStatusView.swift; sourceTree = "<group>"; };
+		7BBD25AD2F0E3D16001B3B5A /* StreamingWhisperProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamingWhisperProcessor.swift; sourceTree = "<group>"; };
+		7BBD25AE2F0E3D16001B3B5A /* TranscriptUpdate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptUpdate.swift; sourceTree = "<group>"; };
+		7BBD25B22F0E3D2E001B3B5A /* LiveSubtitleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveSubtitleView.swift; sourceTree = "<group>"; };
+		7BBD25B32F0E3D2E001B3B5A /* LiveSubtitleWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveSubtitleWindow.swift; sourceTree = "<group>"; };
+		7BBD25B42F0E3D2E001B3B5A /* PermissionStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionStatusView.swift; sourceTree = "<group>"; };
+		7BBD25B52F0E3D2E001B3B5A /* SubtitleEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubtitleEntryView.swift; sourceTree = "<group>"; };
+		7BBD25BB2F0E3D5F001B3B5A /* LatencyMeasurement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LatencyMeasurement.swift; sourceTree = "<group>"; };
+		7BBD25BC2F0E3D5F001B3B5A /* PartialTranscriptStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PartialTranscriptStore.swift; sourceTree = "<group>"; };
+		7BBD25BD2F0E3D5F001B3B5A /* WERCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WERCalculator.swift; sourceTree = "<group>"; };
 		A1000002000000000000001 /* WhisperTypeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhisperTypeApp.swift; sourceTree = "<group>"; };
 		A1000004000000000000001 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A1000006000000000000001 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
@@ -221,7 +237,6 @@
 		7BBD25802F0E0687001B3B5A /* Audio */ = {
 			isa = PBXGroup;
 			children = (
-				7BBD25A22F0E0BBE001B3B5A /* PermissionStatusView.swift */,
 				7BBD257C2F0E0687001B3B5A /* AudioMixer.swift */,
 				7BBD257D2F0E0687001B3B5A /* AudioStreamBus.swift */,
 				7BBD257E2F0E0687001B3B5A /* ChunkedDiskWriter.swift */,
@@ -251,6 +266,9 @@
 		7BBD258A2F0E0687001B3B5A /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				7BBD25BB2F0E3D5F001B3B5A /* LatencyMeasurement.swift */,
+				7BBD25BC2F0E3D5F001B3B5A /* PartialTranscriptStore.swift */,
+				7BBD25BD2F0E3D5F001B3B5A /* WERCalculator.swift */,
 				7BBD25882F0E0687001B3B5A /* AudioQualityValidator.swift */,
 				7BBD25892F0E0687001B3B5A /* WAVValidator.swift */,
 			);
@@ -260,6 +278,8 @@
 		7BBD25A42F0E0BE4001B3B5A /* Meeting */ = {
 			isa = PBXGroup;
 			children = (
+				7BBD25B62F0E3D2E001B3B5A /* Views */,
+				7BBD25AF2F0E3D16001B3B5A /* Processing */,
 				7BBD25802F0E0687001B3B5A /* Audio */,
 				7BBD25812F0E0687001B3B5A /* MeetingCoordinator.swift */,
 				7BBD25852F0E0687001B3B5A /* Models */,
@@ -267,6 +287,26 @@
 				7BBD258A2F0E0687001B3B5A /* Utilities */,
 			);
 			path = Meeting;
+			sourceTree = "<group>";
+		};
+		7BBD25AF2F0E3D16001B3B5A /* Processing */ = {
+			isa = PBXGroup;
+			children = (
+				7BBD25AD2F0E3D16001B3B5A /* StreamingWhisperProcessor.swift */,
+				7BBD25AE2F0E3D16001B3B5A /* TranscriptUpdate.swift */,
+			);
+			path = Processing;
+			sourceTree = "<group>";
+		};
+		7BBD25B62F0E3D2E001B3B5A /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				7BBD25B22F0E3D2E001B3B5A /* LiveSubtitleView.swift */,
+				7BBD25B32F0E3D2E001B3B5A /* LiveSubtitleWindow.swift */,
+				7BBD25B42F0E3D2E001B3B5A /* PermissionStatusView.swift */,
+				7BBD25B52F0E3D2E001B3B5A /* SubtitleEntryView.swift */,
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 		A1000012000000000000001 = {
@@ -602,6 +642,10 @@
 				B1300001000000000000001 /* SupportedLanguage.swift in Sources */,
 				A1000056000000000000001 /* WhisperModel.swift in Sources */,
 				A1000058000000000000001 /* TranscriptionResult.swift in Sources */,
+				7BBD25B72F0E3D2E001B3B5A /* LiveSubtitleWindow.swift in Sources */,
+				7BBD25B82F0E3D2E001B3B5A /* PermissionStatusView.swift in Sources */,
+				7BBD25B92F0E3D2E001B3B5A /* SubtitleEntryView.swift in Sources */,
+				7BBD25BA2F0E3D2E001B3B5A /* LiveSubtitleView.swift in Sources */,
 				A1000060000000000000001 /* Constants.swift in Sources */,
 				A1000062000000000000001 /* Permissions.swift in Sources */,
 				A1000070000000000000001 /* WhisperWrapper.swift in Sources */,
@@ -609,6 +653,9 @@
 				A1000095000000000000001 /* HotkeyManager.swift in Sources */,
 				7B73EFC22EDD944D0062E68C /* ModelManager.swift in Sources */,
 				7B73EFC42EDD946C0062E68C /* ModelRowView.swift in Sources */,
+				7BBD25BE2F0E3D5F001B3B5A /* PartialTranscriptStore.swift in Sources */,
+				7BBD25BF2F0E3D5F001B3B5A /* WERCalculator.swift in Sources */,
+				7BBD25C02F0E3D5F001B3B5A /* LatencyMeasurement.swift in Sources */,
 				7B73EFC62EDD947C0062E68C /* ModelSettingsView.swift in Sources */,
 				A8000001000000000000001 /* SettingsContainerView.swift in Sources */,
 				A8000003000000000000001 /* GeneralSettingsView.swift in Sources */,
@@ -621,7 +668,6 @@
 				7BBD25962F0E0687001B3B5A /* SystemAudioCapture.swift in Sources */,
 				7BBD25972F0E0687001B3B5A /* WAVValidator.swift in Sources */,
 				7BBD25982F0E0687001B3B5A /* AudioLevel.swift in Sources */,
-				7BBD25A32F0E0BBE001B3B5A /* PermissionStatusView.swift in Sources */,
 				7BBD25992F0E0687001B3B5A /* ChunkedDiskWriter.swift in Sources */,
 				7BBD259A2F0E0687001B3B5A /* MeetingCoordinator.swift in Sources */,
 				7BBD259B2F0E0687001B3B5A /* AudioQualityValidator.swift in Sources */,
@@ -659,6 +705,8 @@
 				G1400009000000000000001 /* DefaultAppPresets.swift in Sources */,
 				G1400011000000000000001 /* AppAwareManager.swift in Sources */,
 				G1400013000000000000001 /* AppRulesSettingsView.swift in Sources */,
+				7BBD25B02F0E3D16001B3B5A /* StreamingWhisperProcessor.swift in Sources */,
+				7BBD25B12F0E3D16001B3B5A /* TranscriptUpdate.swift in Sources */,
 				G1400015000000000000001 /* AddAppSheet.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -35,8 +35,9 @@ enum MeetingRecorderError: LocalizedError {
 }
 
 /// Main recording component for meeting transcription
+@available(macOS 12.3, *)
 @MainActor
-class MeetingRecorder: ObservableObject {
+class MeetingRecorder: ObservableObject, SystemAudioCaptureDelegate {
     
     // MARK: - Published Properties
     
@@ -174,6 +175,9 @@ class MeetingRecorder: ObservableObject {
         // Install audio tap
         installAudioTap()
         
+        // Start system audio capture if needed
+        try await startSystemAudioCapture()
+        
         // Start timers
         startDurationTimer()
         startChunkTimer()
@@ -213,6 +217,10 @@ class MeetingRecorder: ObservableObject {
         
         // Stop stream bus
         streamBus.stop()
+        
+        // Wait briefly for async subscribers to receive final chunks
+        // The subscription uses .receive(on: DispatchQueue.main) which is async
+        try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
         
         // End disk writer session
         let chunkURLs = diskWriter.endSession()
@@ -361,6 +369,9 @@ class MeetingRecorder: ObservableObject {
         // Add to microphone ring buffer
         micRingBuffer.append(contentsOf: samples)
         
+        // Publish samples for live transcription
+        streamBus.publish(samples: samples)
+        
         // Calculate audio level (RMS)
         let rms = calculateRMS(samples)
         let dB = 20 * log10(max(rms, 1e-7))
@@ -507,5 +518,73 @@ class MeetingRecorder: ObservableObject {
     /// Get all chunk URLs written so far
     var chunkURLs: [URL] {
         diskWriter.chunkURLs
+    }
+    
+    // MARK: - System Audio Capture
+    
+    /// Start system audio capture
+    private func startSystemAudioCapture() async throws {
+        guard activeAudioSource == .system || activeAudioSource == .both else {
+            return
+        }
+        
+        let capture = SystemAudioCapture()
+        capture.delegate = self
+        systemAudioCapture = capture
+        
+        // Check permission
+        let permission = await capture.checkPermission()
+        if permission == .denied {
+            print("MeetingRecorder: Screen Recording permission denied")
+            // Don't throw - just fall back to microphone only
+            if activeAudioSource == .both {
+                print("MeetingRecorder: Falling back to microphone only")
+            }
+            return
+        }
+        
+        do {
+            try await capture.startCapture()
+            print("MeetingRecorder: System audio capture started")
+        } catch {
+            print("MeetingRecorder: Failed to start system audio capture - \(error)")
+            // Fall back to microphone only
+            if activeAudioSource == .both {
+                print("MeetingRecorder: Falling back to microphone only")
+            }
+        }
+    }
+    
+    // MARK: - SystemAudioCaptureDelegate
+    
+    nonisolated func systemAudioCapture(_ capture: SystemAudioCapture, didReceiveSamples samples: [Float], timestamp: TimeInterval) {
+        Task { @MainActor in
+            // Add to system ring buffer
+            systemRingBuffer.append(contentsOf: samples)
+            
+            // Publish samples for live transcription
+            streamBus.publish(samples: samples)
+            
+            // Trim if exceeds max size
+            if systemRingBuffer.count > maxBufferSamples * 2 {
+                systemRingBuffer = Array(systemRingBuffer.suffix(maxBufferSamples * 2))
+            }
+        }
+    }
+    
+    nonisolated func systemAudioCapture(_ capture: SystemAudioCapture, didReceiveLevel level: Float) {
+        Task { @MainActor in
+            systemAudioLevel = level
+            
+            // Publish system audio level
+            let audioLevelValue = AudioLevel.system(level)
+            streamBus.publish(level: audioLevelValue)
+        }
+    }
+    
+    nonisolated func systemAudioCapture(_ capture: SystemAudioCapture, didFailWithError error: Error) {
+        Task { @MainActor in
+            print("MeetingRecorder: System audio capture error - \(error)")
+        }
     }
 }
