@@ -22,10 +22,11 @@ struct StreamingProcessorConfig {
     let contextWordCount: Int
     
     /// Default configuration optimized for live subtitles
+    /// NOTE: Context is disabled to prevent error propagation
     static let `default` = StreamingProcessorConfig(
-        bufferDuration: 10.0,
+        bufferDuration: 15.0,  // Increased from 10s for better Whisper context
         processingInterval: 5.0,
-        contextWordCount: 50
+        contextWordCount: 0    // Disabled - was causing cumulative errors
     )
     
     /// Fast configuration for lower latency (less accuracy)
@@ -74,6 +75,23 @@ class StreamingWhisperProcessor: ObservableObject {
     /// Context from previous transcription (for continuity)
     private var contextPrompt: String = ""
     
+    // MARK: - Silence-Triggered Transcription Properties
+    
+    /// Maximum chunk duration for transcription (Whisper works best with <30s)
+    private let maxChunkDuration: TimeInterval = 25.0
+    
+    /// Minimum chunk duration before processing (need enough audio for accuracy)
+    private let minChunkDuration: TimeInterval = 3.0
+    
+    /// The committed (finalized) transcript text from all completed chunks
+    private var committedTranscript: String = ""
+    
+    /// Current pending audio buffer (cleared after each successful transcription)
+    private var pendingAudioBuffer: [Float] = []
+    
+    /// Timestamp when current pending buffer started
+    private var pendingBufferStartTime: TimeInterval = 0
+    
     /// Timer for triggering processing
     private var processingTimer: Timer?
     
@@ -88,6 +106,24 @@ class StreamingWhisperProcessor: ObservableObject {
     
     /// Recording start time (for timestamp calculation)
     private var recordingStartTime: Date?
+    
+    // MARK: - VAD (Voice Activity Detection) Properties
+    
+    /// Silence threshold in dB (below this is considered silence)
+    private let silenceThresholdDB: Float = -35.0
+    
+    /// Duration of silence required to trigger processing (seconds)
+    /// Increased. for more natural sentence boundaries
+    private let silenceDuration: TimeInterval = 0.8
+    
+    /// Minimum buffer duration before silence-triggered processing (seconds)
+    private let minBufferForSilenceTrigger: TimeInterval = 2.0
+    
+    /// Last time speech was detected
+    private var lastSpeechTime: Date?
+    
+    /// Whether we're currently in a speech segment
+    private var isInSpeech: Bool = false
     
     // MARK: - Initialization
     
@@ -167,6 +203,9 @@ class StreamingWhisperProcessor: ObservableObject {
         latestUpdate = nil
         contextPrompt = ""
         audioBuffer = []
+        pendingAudioBuffer = []
+        pendingBufferStartTime = 0
+        committedTranscript = ""
     }
     
     /// Get combined transcript text
@@ -188,11 +227,33 @@ class StreamingWhisperProcessor: ObservableObject {
         // Append samples to buffer
         audioBuffer.append(contentsOf: samples)
         
+        // VAD: Detect speech vs silence
+        let rms = calculateRMS(samples)
+        let dB = 20 * log10(max(rms, 1e-7))
+        let isSpeechNow = dB > silenceThresholdDB
+        
+        if isSpeechNow {
+            lastSpeechTime = Date()
+            isInSpeech = true
+        }
+        
         // Check if we have enough audio to process
         let bufferDuration = Double(audioBuffer.count) / Constants.Audio.meetingSampleRate
         
-        if bufferDuration >= config.bufferDuration {
-            // Trigger immediate processing
+        // Trigger processing in two cases:
+        // 1. Buffer reached max duration (15s)
+        // 2. Silence detected for 400ms after speech (natural boundary)
+        let shouldProcessDueToMaxBuffer = bufferDuration >= config.bufferDuration
+        let shouldProcessDueToSilence = isInSpeech && 
+            !isSpeechNow && 
+            bufferDuration >= minBufferForSilenceTrigger &&
+            (lastSpeechTime.map { Date().timeIntervalSince($0) >= silenceDuration } ?? false)
+        
+        if shouldProcessDueToMaxBuffer || shouldProcessDueToSilence {
+            if shouldProcessDueToSilence {
+                print("StreamingWhisperProcessor: Silence detected, processing at natural boundary (\(String(format: "%.1f", bufferDuration))s)")
+            }
+            isInSpeech = false  // Reset for next speech segment
             Task {
                 await processCurrentBuffer()
             }
@@ -227,60 +288,96 @@ class StreamingWhisperProcessor: ObservableObject {
         // Don't process if already processing
         guard !isProcessing else { return }
         
-        isProcessing = true
+        // SILENCE-TRIGGERED TRANSCRIPTION:
+        // Transcribe the full buffer, commit result, then clear buffer
+        // This mimics option-space mode behavior
         
-        // Capture buffer and timestamp
-        let samplesToProcess = audioBuffer
-        let timestamp = bufferStartTimestamp
-        let captureTime = Date()
-        let audioDuration = Double(samplesToProcess.count) / Constants.Audio.meetingSampleRate
+        let audioDuration = Double(audioBuffer.count) / Constants.Audio.meetingSampleRate
         
-        // Clear buffer (with overlap for continuity)
-        let overlapSamples = Int(Constants.Audio.meetingSampleRate * 1.0) // 1 second overlap
-        if audioBuffer.count > overlapSamples {
-            audioBuffer = Array(audioBuffer.suffix(overlapSamples))
-            bufferStartTimestamp = timestamp + audioDuration - 1.0
-        } else {
-            audioBuffer = []
+        // Wait for minimum audio duration
+        guard audioDuration >= minChunkDuration else {
+            return
         }
         
-        print("StreamingWhisperProcessor: Processing \(String(format: "%.1f", audioDuration))s of audio at \(String(format: "%.1f", timestamp))s")
+        isProcessing = true
+        let captureTime = Date()
         
-        // Process on background queue
+        // Capture the current buffer
+        let samplesToProcess = audioBuffer
+        let timestamp = bufferStartTimestamp
+        
+        // Check audio level
+        let rms = calculateRMS(samplesToProcess)
+        let dB = 20 * log10(max(rms, 1e-7))
+        
+        // Skip if too quiet (silence only)
+        if dB < -40.0 {
+            // Clear the buffer as it's just silence
+            audioBuffer = []
+            print("StreamingWhisperProcessor: Buffer is silence (\(String(format: "%.1f", dB)) dB), clearing")
+            isProcessing = false
+            return
+        }
+        
+        print("StreamingWhisperProcessor: Processing \(String(format: "%.1f", audioDuration))s audio at \(String(format: "%.1f", timestamp))s (level: \(String(format: "%.1f", dB)) dB)")
+        
+        // Process transcription
         do {
             let transcriptionResult = try await whisperWrapper.transcribe(
                 samples: samplesToProcess,
                 language: "en",
-                vocabulary: contextPrompt.isEmpty ? [] : contextPrompt.split(separator: " ").map(String.init)
+                vocabulary: []  // No vocab hints - let Whisper work freely
             )
             
-            // Create update
-            let update = TranscriptUpdate(
-                text: transcriptionResult,
-                timestamp: timestamp,
-                createdAt: Date(),
-                audioDuration: audioDuration
-            )
+            let trimmedResult = transcriptionResult.trimmingCharacters(in: .whitespacesAndNewlines)
+            
+            if !trimmedResult.isEmpty {
+                // Append to committed transcript
+                if committedTranscript.isEmpty {
+                    committedTranscript = trimmedResult
+                } else {
+                    committedTranscript += " " + trimmedResult
+                }
+                
+                print("StreamingWhisperProcessor: Transcribed chunk: \"\(trimmedResult.prefix(60))...\"")
+            }
+            
+            // CLEAR the buffer after successful transcription
+            // Next audio will be fresh, no overlap or re-processing
+            audioBuffer = []
+            bufferStartTimestamp += audioDuration
             
             // Calculate latency
             currentLatency = Date().timeIntervalSince(captureTime)
             
-            // Update context for next transcription
-            contextPrompt = update.lastWords(config.contextWordCount)
+            // Create update with the FULL committed transcript
+            let update = TranscriptUpdate(
+                text: committedTranscript,
+                timestamp: 0,
+                createdAt: Date(),
+                audioDuration: timestamp + audioDuration
+            )
             
-            // Add to updates (skip empty results)
-            if !update.isEmpty {
-                transcriptUpdates.append(update)
-                latestUpdate = update
-                
-                print("StreamingWhisperProcessor: Produced update - \"\(update.text.prefix(50))...\" (latency: \(String(format: "%.2f", currentLatency))s)")
-            }
+            // Single update with full transcript
+            transcriptUpdates = [update]
+            latestUpdate = update
+            
+            print("StreamingWhisperProcessor: Total transcript: \"...\(committedTranscript.suffix(60))\" (latency: \(String(format: "%.2f", currentLatency))s)")
             
         } catch {
             print("StreamingWhisperProcessor: Transcription error - \(error)")
         }
         
         isProcessing = false
+    }
+    
+    // MARK: - Audio Analysis
+    
+    /// Calculate RMS (Root Mean Square) of audio samples for level detection
+    private func calculateRMS(_ samples: [Float]) -> Float {
+        guard !samples.isEmpty else { return 0 }
+        let sumOfSquares = samples.reduce(0) { $0 + $1 * $1 }
+        return sqrt(sumOfSquares / Float(samples.count))
     }
 }
 

@@ -366,11 +366,15 @@ class MeetingRecorder: ObservableObject, SystemAudioCaptureDelegate {
         
         guard !samples.isEmpty else { return }
         
+        // Boost microphone volume (1.5x gain) - helps with clarity after downsampling to 16kHz
+        let microphoneGain: Float = 1.5
+        let boostedSamples = samples.map { min(max($0 * microphoneGain, -1.0), 1.0) } // Clamp to prevent clipping
+        
         // Add to microphone ring buffer
-        micRingBuffer.append(contentsOf: samples)
+        micRingBuffer.append(contentsOf: boostedSamples)
         
         // Publish samples for live transcription
-        streamBus.publish(samples: samples)
+        streamBus.publish(samples: boostedSamples)
         
         // Calculate audio level (RMS)
         let rms = calculateRMS(samples)
@@ -559,11 +563,15 @@ class MeetingRecorder: ObservableObject, SystemAudioCaptureDelegate {
     
     nonisolated func systemAudioCapture(_ capture: SystemAudioCapture, didReceiveSamples samples: [Float], timestamp: TimeInterval) {
         Task { @MainActor in
+            // Boost system audio volume (2.5x gain) - system audio is often quieter than microphone
+            let systemAudioGain: Float = 2.5
+            let boostedSamples = samples.map { min(max($0 * systemAudioGain, -1.0), 1.0) } // Clamp to prevent clipping
+            
             // Add to system ring buffer
-            systemRingBuffer.append(contentsOf: samples)
+            systemRingBuffer.append(contentsOf: boostedSamples)
             
             // Publish samples for live transcription
-            streamBus.publish(samples: samples)
+            streamBus.publish(samples: boostedSamples)
             
             // Trim if exceeds max size
             if systemRingBuffer.count > maxBufferSamples * 2 {

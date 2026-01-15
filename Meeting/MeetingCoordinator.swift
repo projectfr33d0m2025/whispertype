@@ -60,6 +60,9 @@ class MeetingCoordinator: ObservableObject {
     /// Whether live subtitles are enabled for recording
     @Published var liveSubtitlesEnabled: Bool = true
     
+    /// Current recording duration (for subtitle window)
+    @Published private(set) var recordingDuration: TimeInterval = 0
+    
     /// The streaming processor for live transcription
     private(set) var streamingProcessor: StreamingWhisperProcessor?
     
@@ -101,11 +104,12 @@ class MeetingCoordinator: ObservableObject {
             }
             .store(in: &cancellables)
         
-        // Sync duration with session
+        // Sync duration with session and published property
         recorder.$duration
             .receive(on: DispatchQueue.main)
             .sink { [weak self] duration in
                 self?.currentSession?.updateDuration(duration)
+                self?.recordingDuration = duration
             }
             .store(in: &cancellables)
     }
