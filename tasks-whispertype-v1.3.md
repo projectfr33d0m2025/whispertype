@@ -490,78 +490,90 @@ This document breaks down the v1.3.0 Meeting Transcription feature into developm
 
 ### 3.1 Streaming Whisper Processor
 
-- [ ] **3.1.1** Create `StreamingWhisperProcessor.swift`
-- [ ] **3.1.2** Implement 10-second buffer accumulation
-- [ ] **3.1.3** Implement context overlap (last 50 words)
-- [ ] **3.1.4** Implement background processing queue
-- [ ] **3.1.5** Define `TranscriptUpdate` model
-- [ ] **3.1.6** Write tests:
+- [x] **3.1.1** Create `StreamingWhisperProcessor.swift`
+- [x] **3.1.2** Implement 60-second buffer accumulation (increased from 10s for accuracy)
+- [x] **3.1.3** ~~Implement context overlap~~ Removed - clean chunks provide better accuracy
+- [x] **3.1.4** Implement background processing queue
+- [x] **3.1.5** Define `TranscriptUpdate` model
+- [x] **3.1.6** Add vocabulary hints from VocabularyManager
+- [ ] **3.1.7** Write tests:
   - [ ] `testBufferAccumulationTiming` (AUTOMATED)
-  - [ ] `testContextIsPassedToWhisper` (AUTOMATED)
   - [ ] `testUpdatesArePublished` (AUTOMATED)
   - [ ] `testWithKnownTextAudio` (AUTOMATED - uses test file)
 
-### 3.2 Latency Measurement
+### 3.2 Two-Pass Transcription (Final Transcript)
 
-- [ ] **3.2.1** Create `LatencyMeasurement.swift` utility
-- [ ] **3.2.2** Record timestamp when audio chunk sent
-- [ ] **3.2.3** Record timestamp when transcript received
-- [ ] **3.2.4** Write test:
-  - [ ] `testLatencyUnderFiveSeconds` (AUTOMATED)
+- [x] **3.2.1** Implement `loadSamplesFromWAV()` in MeetingCoordinator
+- [x] **3.2.2** Implement full audio concatenation after recording stops
+- [x] **3.2.3** Implement `processRecording()` with full re-transcription
+- [x] **3.2.4** Add `meetingTranscriptReady` notification
+- [x] **3.2.5** Save final transcript to `transcript.md` and `transcript.txt`
+- [ ] **3.2.6** Write tests:
+  - [ ] `testFullTranscriptionAfterRecording` (AUTOMATED)
+  - [ ] `testTranscriptFilesSaved` (AUTOMATED)
 
-### 3.3 Transcription Accuracy
+### 3.3 Latency Measurement
 
-- [ ] **3.3.1** Create `WERCalculator.swift` (Word Error Rate)
-- [ ] **3.3.2** Implement Levenshtein distance for WER
-- [ ] **3.3.3** Write test:
+- [ ] **3.3.1** Create `LatencyMeasurement.swift` utility
+- [ ] **3.3.2** Record timestamp when audio chunk sent
+- [ ] **3.3.3** Record timestamp when transcript received
+- [ ] **3.3.4** Write test:
+  - [ ] `testLatencyUnderSixtySeconds` (AUTOMATED - updated target for accuracy mode)
+
+### 3.4 Transcription Accuracy
+
+- [ ] **3.4.1** Create `WERCalculator.swift` (Word Error Rate)
+- [ ] **3.4.2** Implement Levenshtein distance for WER
+- [ ] **3.4.3** Write test:
   - [ ] `testWERUnderTwentyPercent` (AUTOMATED - uses known_text files)
 
-### 3.4 Partial Transcript Store
+### 3.5 Partial Transcript Store
 
-- [ ] **3.4.1** Create `PartialTranscriptStore.swift`
-- [ ] **3.4.2** Implement in-memory storage
-- [ ] **3.4.3** Implement JSON persistence
-- [ ] **3.4.4** Write unit tests (AUTOMATED):
+- [ ] **3.5.1** Create `PartialTranscriptStore.swift`
+- [ ] **3.5.2** Implement in-memory storage
+- [ ] **3.5.3** Implement JSON persistence
+- [ ] **3.5.4** Write unit tests (AUTOMATED):
   - [ ] `testAppendAddsEntry`
   - [ ] `testGetAllReturnsInOrder`
   - [ ] `testClearRemovesAll`
   - [ ] `testJSONSaveLoadRoundtrip`
 
-### 3.5 Live Subtitle Window
+### 3.6 Live Subtitle Window
 
-- [ ] **3.5.1** Create `LiveSubtitleWindow.swift`
-- [ ] **3.5.2** Create `LiveSubtitleView.swift`
-- [ ] **3.5.3** Create `SubtitleEntryView.swift`
-- [ ] **3.5.4** Implement auto-scroll behavior
-- [ ] **3.5.5** Implement position persistence
-- [ ] **3.5.6** Write UI tests (MANUAL):
+- [x] **3.6.1** Create `LiveSubtitleWindow.swift`
+- [x] **3.6.2** Create `LiveSubtitleView.swift`
+- [x] **3.6.3** Create `SubtitleEntryView.swift`
+- [x] **3.6.4** Implement auto-scroll behavior
+- [x] **3.6.5** Implement position persistence
+- [ ] **3.6.6** Write UI tests (MANUAL):
   - [ ] Window opens at saved position
   - [ ] Window is draggable
   - [ ] Window is resizable
   - [ ] Auto-scroll to bottom works
   - [ ] Scroll pauses when user scrolls up
 
-### 3.6 Window Controls
+### 3.7 Window Controls
 
-- [ ] **3.6.1** Implement close button (hide, continue recording)
-- [ ] **3.6.2** Implement minimize button
-- [ ] **3.6.3** Add "Show Live Transcript" menu item
-- [ ] **3.6.4** Add keyboard shortcut
+- [x] **3.7.1** Implement close button (hide, continue recording)
+- [x] **3.7.2** Implement minimize button
+- [x] **3.7.3** Add "Show Live Transcript" menu item
+- [ ] **3.7.4** Add keyboard shortcut
 
-### 3.7 Integration
+### 3.8 Integration
 
-- [ ] **3.7.1** Connect `MeetingCoordinator` to processor
-- [ ] **3.7.2** Auto-open window on recording start
-- [ ] **3.7.3** Close window on recording stop
-- [ ] **3.7.4** Add toggle to start recording dialog
+- [x] **3.8.1** Connect `MeetingCoordinator` to processor
+- [x] **3.8.2** Auto-open window on recording start
+- [x] **3.8.3** Close window on recording stop
+- [x] **3.8.4** Add toggle to start recording dialog
 
-### 3.8 Phase 3 Validation Checklist
+### 3.9 Phase 3 Validation Checklist
 
-- [ ] **3.8.1** All automated tests pass
-- [ ] **3.8.2** Latency test < 5 seconds
-- [ ] **3.8.3** WER test < 20%
-- [ ] **3.8.4** Manual UI tests pass
-- [ ] **3.8.5** Live subtitles demo successful
+- [ ] **3.9.1** All automated tests pass
+- [ ] **3.9.2** Latency test ~60 seconds (delayed for accuracy)
+- [ ] **3.9.3** WER test < 20%
+- [ ] **3.9.4** Manual UI tests pass
+- [x] **3.9.5** Live subtitles functional
+- [x] **3.9.6** Two-pass transcription implemented
 
 ---
 

@@ -267,28 +267,53 @@ Window Specifications:
 
 ### F3.4 Technical Approach
 
-**Streaming Architecture:**
+**Processing Strategy (Two-Pass Approach):**
 
 ```
-Audio Stream Bus
-       │
-       ├──► Disk Writer (chunks)
-       │
-       └──► Live Whisper Processor
-                    │
-                    │ (every 5-10 seconds)
-                    ▼
-            Partial Transcript
-                    │
-                    ▼
-            Subtitle Window (SwiftUI)
+┌─────────────────────────────────────────────────────────────┐
+│                    DURING RECORDING                         │
+│                                                             │
+│  Audio Stream Bus                                           │
+│         │                                                   │
+│         ├──► Disk Writer (30s chunks to WAV files)          │
+│         │                                                   │
+│         └──► Live Whisper Processor (60s buffer)            │
+│                      │                                      │
+│                      ▼                                      │
+│              Delayed Subtitles (~60s latency)               │
+│                      │                                      │
+│                      ▼                                      │
+│              Subtitle Window (SwiftUI)                      │
+└─────────────────────────────────────────────────────────────┘
+                         │
+                   Recording Stops
+                         ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    AFTER RECORDING                          │
+│                                                             │
+│  Load all WAV chunks → Concatenate → Full Transcription     │
+│         │                                                   │
+│         ▼                                                   │
+│  Accurate Final Transcript (same approach as option-space)  │
+│         │                                                   │
+│         ▼                                                   │
+│  Save to transcript.md + Post Notification                  │
+└─────────────────────────────────────────────────────────────┘
 ```
 
-**Processing Strategy:**
-- Buffer: 10 seconds of audio
-- Process: Every 5-10 seconds (overlapping for continuity)
-- Context: Last 50 words from previous segment as prompt
+**Live Subtitles (Pass 1 - During Recording):**
+- Buffer: 60 seconds of audio (prioritizes accuracy over latency)
+- Process: Every 60 seconds (clean chunks, no overlap)
+- Vocabulary: Uses VocabularyManager hints for domain-specific terms
 - Threading: Background queue, UI updates on main thread
+- Trade-off: ~60 second delay for near option-space accuracy
+
+**Final Transcript (Pass 2 - After Recording):**
+- Loads all saved WAV chunks and concatenates audio
+- Transcribes full audio in single pass (same as option-space dictation)
+- Uses vocabulary hints from VocabularyManager
+- Saves to `transcript.md` and `transcript.txt` in session folder
+- Posts `meetingTranscriptReady` notification for UI display
 
 ### F3.5 Content Display Rules
 

@@ -262,22 +262,58 @@ class MeetingCoordinator: ObservableObject {
     
     // MARK: - Processing
     
-    /// Process a completed recording
-    /// For Phase 1, this is a placeholder that immediately completes
+    /// Process a completed recording with full re-transcription
+    /// Two-pass approach: live subtitles during recording, full transcription after
     private func processRecording(session: MeetingSession, chunkURLs: [URL]) async {
-        print("MeetingCoordinator: Processing \(chunkURLs.count) chunks...")
-        
-        // Phase 1: Just mark as complete
-        // Future phases will add transcription, diarization, summarization
+        print("MeetingCoordinator: Processing \(chunkURLs.count) chunks for full transcription...")
         
         session.setProcessingStage(.transcribing)
         
-        // Simulate minimal processing delay
-        try? await Task.sleep(nanoseconds: 500_000_000) // 0.5 seconds
+        // Load all audio samples from WAV chunks
+        var allSamples: [Float] = []
+        for chunkURL in chunkURLs.sorted(by: { $0.lastPathComponent < $1.lastPathComponent }) {
+            if let samples = loadSamplesFromWAV(url: chunkURL) {
+                allSamples.append(contentsOf: samples)
+                print("MeetingCoordinator: Loaded \(samples.count) samples from \(chunkURL.lastPathComponent)")
+            }
+        }
         
-        session.setProcessingStage(.complete)
+        guard !allSamples.isEmpty else {
+            print("MeetingCoordinator: No audio samples to transcribe")
+            session.setProcessingStage(.complete)
+            completeSession(session)
+            return
+        }
         
-        // Transition to complete
+        let audioDuration = Double(allSamples.count) / Constants.Audio.meetingSampleRate
+        print("MeetingCoordinator: Full audio loaded - \(allSamples.count) samples, \(String(format: "%.1f", audioDuration))s")
+        
+        // Perform full transcription (same approach as option-space dictation)
+        do {
+            let vocabularyHints = VocabularyManager.shared.getWhisperHints(context: nil)
+            
+            let fullTranscript = try await WhisperWrapper.shared.transcribe(
+                samples: allSamples,
+                language: "en",
+                vocabulary: vocabularyHints
+            )
+            
+            print("MeetingCoordinator: Full transcription complete - \(fullTranscript.count) characters")
+            
+            // Save the accurate full transcript
+            saveFullTranscript(fullTranscript, session: session)
+            
+            session.setProcessingStage(.complete)
+            completeSession(session)
+            
+        } catch {
+            print("MeetingCoordinator: Full transcription failed - \(error)")
+            session.setError(error.localizedDescription)
+        }
+    }
+    
+    /// Complete the session and transition to complete state
+    private func completeSession(_ session: MeetingSession) {
         do {
             try session.transition(to: .complete)
             try transition(to: .complete)
@@ -287,6 +323,79 @@ class MeetingCoordinator: ObservableObject {
         }
         
         print("MeetingCoordinator: Processing complete for session \(session.id)")
+    }
+    
+    /// Load Float32 samples from a WAV file
+    private func loadSamplesFromWAV(url: URL) -> [Float]? {
+        guard let data = try? Data(contentsOf: url) else {
+            print("MeetingCoordinator: Failed to read WAV file \(url.lastPathComponent)")
+            return nil
+        }
+        
+        // Skip 44-byte WAV header
+        guard data.count > 44 else {
+            print("MeetingCoordinator: WAV file too small \(url.lastPathComponent)")
+            return nil
+        }
+        
+        let audioData = data.dropFirst(44)
+        
+        // Convert Int16 samples to Float32
+        let int16Count = audioData.count / 2
+        var samples = [Float](repeating: 0, count: int16Count)
+        
+        audioData.withUnsafeBytes { rawBuffer in
+            let int16Buffer = rawBuffer.bindMemory(to: Int16.self)
+            for i in 0..<int16Count {
+                samples[i] = Float(int16Buffer[i]) / Float(Int16.max)
+            }
+        }
+        
+        return samples
+    }
+    
+    /// Save the full accurate transcript to disk and show result window
+    private func saveFullTranscript(_ transcript: String, session: MeetingSession) {
+        guard let sessionDir = sessionDirectory else {
+            print("MeetingCoordinator: No session directory for saving transcript")
+            return
+        }
+        
+        do {
+            // Save as Markdown (main user-facing file)
+            let markdownURL = sessionDir.appendingPathComponent("transcript.md")
+            var markdown = "# Meeting Transcript\n\n"
+            markdown += "**Title:** \(session.title)\n"
+            markdown += "**Date:** \(DateFormatter.localizedString(from: session.createdAt, dateStyle: .medium, timeStyle: .short))\n"
+            markdown += "**Duration:** \(session.formattedDuration)\n\n"
+            markdown += "---\n\n"
+            markdown += transcript
+            
+            try markdown.write(to: markdownURL, atomically: true, encoding: .utf8)
+            print("MeetingCoordinator: Saved full transcript to \(markdownURL.path)")
+            
+            // Also save as plain text for easy copy/paste
+            let textURL = sessionDir.appendingPathComponent("transcript.txt")
+            try transcript.write(to: textURL, atomically: true, encoding: .utf8)
+            
+            // Show the transcript result window
+            TranscriptResultWindow.shared.show(
+                transcript: transcript,
+                sessionTitle: session.title,
+                duration: session.formattedDuration,
+                transcriptPath: markdownURL
+            )
+            
+            // Post notification with transcript for UI display
+            NotificationCenter.default.post(
+                name: .meetingTranscriptReady,
+                object: transcript,
+                userInfo: ["session": session, "path": markdownURL]
+            )
+            
+        } catch {
+            print("MeetingCoordinator: Failed to save transcript - \(error)")
+        }
     }
     
     // MARK: - Background Task Management

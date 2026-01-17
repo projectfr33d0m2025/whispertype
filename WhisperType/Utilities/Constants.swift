@@ -26,6 +26,8 @@ extension Notification.Name {
     static let meetingRecordingCancelled = Notification.Name("meetingRecordingCancelled")
     /// Posted when meeting processing completes
     static let meetingProcessingComplete = Notification.Name("meetingProcessingComplete")
+    /// Posted when full transcript is ready after two-pass processing
+    static let meetingTranscriptReady = Notification.Name("meetingTranscriptReady")
     /// Posted when meeting state changes
     static let meetingStateChanged = Notification.Name("meetingStateChanged")
     /// Posted when 85-minute warning should be shown

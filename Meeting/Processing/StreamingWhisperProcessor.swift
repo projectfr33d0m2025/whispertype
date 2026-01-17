@@ -21,18 +21,18 @@ struct StreamingProcessorConfig {
     /// Number of context words to pass to next transcription
     let contextWordCount: Int
     
-    /// Default configuration optimized for live subtitles
-    /// NOTE: Context is disabled to prevent error propagation
+    /// Default configuration optimized for accurate delayed subtitles
+    /// Uses longer chunks (60s) for better Whisper accuracy, trading latency for quality
     static let `default` = StreamingProcessorConfig(
-        bufferDuration: 15.0,  // Increased from 10s for better Whisper context
-        processingInterval: 5.0,
-        contextWordCount: 0    // Disabled - was causing cumulative errors
+        bufferDuration: 60.0,       // 60 seconds for maximum accuracy
+        processingInterval: 60.0,   // Match buffer duration
+        contextWordCount: 0         // Clean slate each chunk for accuracy
     )
     
     /// Fast configuration for lower latency (less accuracy)
     static let fast = StreamingProcessorConfig(
-        bufferDuration: 5.0,
-        processingInterval: 3.0,
+        bufferDuration: 15.0,
+        processingInterval: 10.0,
         contextWordCount: 30
     )
 }

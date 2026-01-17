@@ -21,17 +21,18 @@ struct StreamingProcessorConfig {
     /// Number of context words to pass to next transcription
     let contextWordCount: Int
     
-    /// Default configuration optimized for live subtitles
+    /// Default configuration optimized for accurate delayed subtitles
+    /// Uses longer chunks (60s) for better Whisper accuracy, trading latency for quality
     static let `default` = StreamingProcessorConfig(
-        bufferDuration: 10.0,
-        processingInterval: 5.0,
-        contextWordCount: 50
+        bufferDuration: 60.0,       // 60 seconds for maximum accuracy
+        processingInterval: 60.0,   // Match buffer duration
+        contextWordCount: 0         // Clean slate each chunk for accuracy
     )
     
     /// Fast configuration for lower latency (less accuracy)
     static let fast = StreamingProcessorConfig(
-        bufferDuration: 5.0,
-        processingInterval: 3.0,
+        bufferDuration: 15.0,
+        processingInterval: 10.0,
         contextWordCount: 30
     )
 }
@@ -235,23 +236,24 @@ class StreamingWhisperProcessor: ObservableObject {
         let captureTime = Date()
         let audioDuration = Double(samplesToProcess.count) / Constants.Audio.meetingSampleRate
         
-        // Clear buffer (with overlap for continuity)
-        let overlapSamples = Int(Constants.Audio.meetingSampleRate * 1.0) // 1 second overlap
-        if audioBuffer.count > overlapSamples {
-            audioBuffer = Array(audioBuffer.suffix(overlapSamples))
-            bufferStartTimestamp = timestamp + audioDuration - 1.0
-        } else {
-            audioBuffer = []
-        }
+        // Clear buffer completely after processing (no overlap for cleaner transcription)
+        audioBuffer = []
+        bufferStartTimestamp = timestamp + audioDuration
         
         print("StreamingWhisperProcessor: Processing \(String(format: "%.1f", audioDuration))s of audio at \(String(format: "%.1f", timestamp))s")
+        
+        // Get vocabulary hints for better recognition (like option-space dictation)
+        let vocabularyHints = VocabularyManager.shared.getWhisperHints(context: nil)
+        if !vocabularyHints.isEmpty {
+            print("StreamingWhisperProcessor: Using \(vocabularyHints.count) vocabulary hints")
+        }
         
         // Process on background queue
         do {
             let transcriptionResult = try await whisperWrapper.transcribe(
                 samples: samplesToProcess,
                 language: "en",
-                vocabulary: contextPrompt.isEmpty ? [] : contextPrompt.split(separator: " ").map(String.init)
+                vocabulary: vocabularyHints
             )
             
             // Create update
