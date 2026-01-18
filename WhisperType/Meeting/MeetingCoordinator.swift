@@ -172,18 +172,21 @@ class MeetingCoordinator: ObservableObject {
         
         print("MeetingCoordinator: Stopping recording...")
         
+        // Capture session directory BEFORE stopRecording clears it
+        let capturedSessionDir = sessionDirectory
+        
         // Stop live subtitles
         stopLiveSubtitles()
         
-        // Stop recording
+        // Stop recording (this clears sessionDirectory in diskWriter)
         let chunkURLs = try await recorder.stopRecording()
         
         // Transition to processing
         state = .processing
         try session.transition(to: .processing)
         
-        // Start processing (for Phase 1, this just completes immediately)
-        await processRecording(session: session, chunkURLs: chunkURLs)
+        // Start processing with captured session directory
+        await processRecording(session: session, chunkURLs: chunkURLs, sessionDir: capturedSessionDir)
         
         return session
     }
@@ -264,7 +267,7 @@ class MeetingCoordinator: ObservableObject {
     
     /// Process a completed recording with full re-transcription
     /// Two-pass approach: live subtitles during recording, full transcription after
-    private func processRecording(session: MeetingSession, chunkURLs: [URL]) async {
+    private func processRecording(session: MeetingSession, chunkURLs: [URL], sessionDir: URL?) async {
         print("MeetingCoordinator: Processing \(chunkURLs.count) chunks for full transcription...")
         
         session.setProcessingStage(.transcribing)
@@ -300,8 +303,8 @@ class MeetingCoordinator: ObservableObject {
             
             print("MeetingCoordinator: Full transcription complete - \(fullTranscript.count) characters")
             
-            // Save the accurate full transcript
-            saveFullTranscript(fullTranscript, session: session)
+            // Save the accurate full transcript (using captured session directory)
+            saveFullTranscript(fullTranscript, session: session, sessionDir: sessionDir)
             
             session.setProcessingStage(.complete)
             completeSession(session)
@@ -355,8 +358,8 @@ class MeetingCoordinator: ObservableObject {
     }
     
     /// Save the full accurate transcript to disk and show result window
-    private func saveFullTranscript(_ transcript: String, session: MeetingSession) {
-        guard let sessionDir = sessionDirectory else {
+    private func saveFullTranscript(_ transcript: String, session: MeetingSession, sessionDir: URL?) {
+        guard let sessionDir = sessionDir else {
             print("MeetingCoordinator: No session directory for saving transcript")
             return
         }
