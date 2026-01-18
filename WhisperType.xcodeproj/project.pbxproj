@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		7B0072E32F1CEA4600D01584 /* TranscriptResultWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0072E22F1CEA4600D01584 /* TranscriptResultWindow.swift */; };
+		7B0072E52F1CF97E00D01584 /* ProcessingIndicatorWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0072E42F1CF97E00D01584 /* ProcessingIndicatorWindow.swift */; };
 		7B73EFC22EDD944D0062E68C /* ModelManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B73EFC12EDD944D0062E68C /* ModelManager.swift */; };
 		7B73EFC42EDD946C0062E68C /* ModelRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B73EFC32EDD946C0062E68C /* ModelRowView.swift */; };
 		7B73EFC62EDD947C0062E68C /* ModelSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B73EFC52EDD947C0062E68C /* ModelSettingsView.swift */; };
@@ -105,6 +106,7 @@
 
 /* Begin PBXFileReference section */
 		7B0072E22F1CEA4600D01584 /* TranscriptResultWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptResultWindow.swift; sourceTree = "<group>"; };
+		7B0072E42F1CF97E00D01584 /* ProcessingIndicatorWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessingIndicatorWindow.swift; sourceTree = "<group>"; };
 		7B73EFC12EDD944D0062E68C /* ModelManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelManager.swift; sourceTree = "<group>"; };
 		7B73EFC32EDD946C0062E68C /* ModelRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelRowView.swift; sourceTree = "<group>"; };
 		7B73EFC52EDD947C0062E68C /* ModelSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelSettingsView.swift; sourceTree = "<group>"; };
@@ -303,6 +305,7 @@
 		7BBD25B62F0E3D2E001B3B5A /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				7B0072E42F1CF97E00D01584 /* ProcessingIndicatorWindow.swift */,
 				7B0072E22F1CEA4600D01584 /* TranscriptResultWindow.swift */,
 				7BBD25B22F0E3D2E001B3B5A /* LiveSubtitleView.swift */,
 				7BBD25B32F0E3D2E001B3B5A /* LiveSubtitleWindow.swift */,
@@ -712,6 +715,7 @@
 				7BBD25B02F0E3D16001B3B5A /* StreamingWhisperProcessor.swift in Sources */,
 				7BBD25B12F0E3D16001B3B5A /* TranscriptUpdate.swift in Sources */,
 				G1400015000000000000001 /* AddAppSheet.swift in Sources */,
+				7B0072E52F1CF97E00D01584 /* ProcessingIndicatorWindow.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

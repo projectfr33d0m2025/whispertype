@@ -275,6 +275,12 @@ class MeetingCoordinator: ObservableObject {
     private func processRecording(session: MeetingSession, chunkURLs: [URL], sessionDir: URL?) async {
         print("📍 processRecording: Starting with \(chunkURLs.count) chunks, sessionDir: \(sessionDir?.path ?? "nil")")
         
+        // Show processing indicator
+        ProcessingIndicatorWindow.shared.show(
+            duration: session.formattedDuration,
+            chunkCount: chunkURLs.count
+        )
+        
         session.setProcessingStage(.transcribing)
         
         // Load all audio samples from WAV chunks
@@ -291,6 +297,10 @@ class MeetingCoordinator: ObservableObject {
         guard !allSamples.isEmpty else {
             print("⚠️ processRecording: No audio samples to transcribe - showing empty result")
             session.setProcessingStage(.complete)
+            
+            // Hide processing indicator
+            ProcessingIndicatorWindow.shared.hide()
+            
             // Still show window even if empty
             await MainActor.run {
                 TranscriptResultWindow.shared.show(
@@ -320,6 +330,9 @@ class MeetingCoordinator: ObservableObject {
             
             print("📍 processRecording: Transcription complete - \(fullTranscript.count) characters")
             
+            // Hide processing indicator before showing result
+            ProcessingIndicatorWindow.shared.hide()
+            
             // Save the accurate full transcript (using captured session directory)
             saveFullTranscript(fullTranscript, session: session, sessionDir: sessionDir)
             
@@ -329,6 +342,10 @@ class MeetingCoordinator: ObservableObject {
         } catch {
             print("❌ processRecording: Transcription failed - \(error)")
             session.setError(error.localizedDescription)
+            
+            // Hide processing indicator before showing error
+            ProcessingIndicatorWindow.shared.hide()
+            
             // Still show window with error message
             await MainActor.run {
                 TranscriptResultWindow.shared.show(
