@@ -60,9 +60,6 @@ class MeetingCoordinator: ObservableObject {
     /// Whether live subtitles are enabled for recording
     @Published var liveSubtitlesEnabled: Bool = true
     
-    /// Current recording duration (for subtitle window)
-    @Published private(set) var recordingDuration: TimeInterval = 0
-    
     /// The streaming processor for live transcription
     private(set) var streamingProcessor: StreamingWhisperProcessor?
     
@@ -104,12 +101,11 @@ class MeetingCoordinator: ObservableObject {
             }
             .store(in: &cancellables)
         
-        // Sync duration with session and published property
+        // Sync duration with session
         recorder.$duration
             .receive(on: DispatchQueue.main)
             .sink { [weak self] duration in
                 self?.currentSession?.updateDuration(duration)
-                self?.recordingDuration = duration
             }
             .store(in: &cancellables)
     }
@@ -174,29 +170,28 @@ class MeetingCoordinator: ObservableObject {
             throw MeetingRecorderError.notRecording
         }
         
-        print("MeetingCoordinator: Stopping recording...")
+        print("📍 MeetingCoordinator: Stopping recording...")
         
-        // IMPORTANT: Capture session directory BEFORE stopping recorder (it becomes nil after stop)
-        let savedSessionDir = sessionDirectory
-        print("MeetingCoordinator: Session directory for saving: \(savedSessionDir?.path ?? "nil")")
+        // Capture session directory BEFORE stopRecording clears it
+        let capturedSessionDir = sessionDirectory
+        print("📍 MeetingCoordinator: Captured session directory: \(capturedSessionDir?.path ?? "nil")")
         
-        // Stop recording FIRST so final audio chunks are published
+        // Stop live subtitles
+        stopLiveSubtitles()
+        
+        // Stop recording (this clears sessionDirectory in diskWriter)
         let chunkURLs = try await recorder.stopRecording()
-        
-        // Wait for the streaming processor to receive and process final chunks
-        // Whisper transcription can take 1-2 seconds, so we wait 2.5s to be safe
-        print("MeetingCoordinator: Waiting for final transcription...")
-        try? await Task.sleep(nanoseconds: 2_500_000_000) // 2.5 seconds
-        
-        // NOW stop live subtitles (processor will save transcripts)
-        stopLiveSubtitles(savingTo: savedSessionDir)
+        print("📍 MeetingCoordinator: Got \(chunkURLs.count) chunk URLs from recorder")
         
         // Transition to processing
         state = .processing
         try session.transition(to: .processing)
+        print("📍 MeetingCoordinator: Transitioned to processing state")
         
-        // Start processing (for Phase 1, this just completes immediately)
-        await processRecording(session: session, chunkURLs: chunkURLs)
+        // Start processing with captured session directory
+        print("📍 MeetingCoordinator: Starting processRecording...")
+        await processRecording(session: session, chunkURLs: chunkURLs, sessionDir: capturedSessionDir)
+        print("📍 MeetingCoordinator: processRecording completed")
         
         return session
     }
@@ -275,22 +270,79 @@ class MeetingCoordinator: ObservableObject {
     
     // MARK: - Processing
     
-    /// Process a completed recording
-    /// For Phase 1, this is a placeholder that immediately completes
-    private func processRecording(session: MeetingSession, chunkURLs: [URL]) async {
-        print("MeetingCoordinator: Processing \(chunkURLs.count) chunks...")
-        
-        // Phase 1: Just mark as complete
-        // Future phases will add transcription, diarization, summarization
+    /// Process a completed recording with full re-transcription
+    /// Two-pass approach: live subtitles during recording, full transcription after
+    private func processRecording(session: MeetingSession, chunkURLs: [URL], sessionDir: URL?) async {
+        print("📍 processRecording: Starting with \(chunkURLs.count) chunks, sessionDir: \(sessionDir?.path ?? "nil")")
         
         session.setProcessingStage(.transcribing)
         
-        // Simulate minimal processing delay
-        try? await Task.sleep(nanoseconds: 500_000_000) // 0.5 seconds
+        // Load all audio samples from WAV chunks
+        var allSamples: [Float] = []
+        for chunkURL in chunkURLs.sorted(by: { $0.lastPathComponent < $1.lastPathComponent }) {
+            if let samples = loadSamplesFromWAV(url: chunkURL) {
+                allSamples.append(contentsOf: samples)
+                print("📍 processRecording: Loaded \(samples.count) samples from \(chunkURL.lastPathComponent)")
+            } else {
+                print("⚠️ processRecording: Failed to load samples from \(chunkURL.lastPathComponent)")
+            }
+        }
         
-        session.setProcessingStage(.complete)
+        guard !allSamples.isEmpty else {
+            print("⚠️ processRecording: No audio samples to transcribe - showing empty result")
+            session.setProcessingStage(.complete)
+            // Still show window even if empty
+            await MainActor.run {
+                TranscriptResultWindow.shared.show(
+                    transcript: "(No audio was recorded)",
+                    sessionTitle: session.title,
+                    duration: session.formattedDuration,
+                    transcriptPath: nil
+                )
+            }
+            completeSession(session)
+            return
+        }
         
-        // Transition to complete
+        let audioDuration = Double(allSamples.count) / Constants.Audio.meetingSampleRate
+        print("📍 processRecording: Full audio loaded - \(allSamples.count) samples, \(String(format: "%.1f", audioDuration))s")
+        
+        // Perform full transcription (same approach as option-space dictation)
+        do {
+            let vocabularyHints = VocabularyManager.shared.getWhisperHints(context: nil)
+            print("📍 processRecording: Starting transcription with \(vocabularyHints.count) vocabulary hints...")
+            
+            let fullTranscript = try await WhisperWrapper.shared.transcribe(
+                samples: allSamples,
+                language: "en",
+                vocabulary: vocabularyHints
+            )
+            
+            print("📍 processRecording: Transcription complete - \(fullTranscript.count) characters")
+            
+            // Save the accurate full transcript (using captured session directory)
+            saveFullTranscript(fullTranscript, session: session, sessionDir: sessionDir)
+            
+            session.setProcessingStage(.complete)
+            completeSession(session)
+            
+        } catch {
+            print("❌ processRecording: Transcription failed - \(error)")
+            session.setError(error.localizedDescription)
+            // Still show window with error message
+            await MainActor.run {
+                TranscriptResultWindow.shared.show(
+                    transcript: "Transcription failed: \(error.localizedDescription)",
+                    sessionTitle: session.title,
+                    duration: session.formattedDuration,
+                    transcriptPath: nil
+                )
+            }
+        }
+    }
+    
+    /// Complete the session and transition to complete state
+    private func completeSession(_ session: MeetingSession) {
         do {
             try session.transition(to: .complete)
             try transition(to: .complete)
@@ -300,13 +352,93 @@ class MeetingCoordinator: ObservableObject {
         }
         
         print("MeetingCoordinator: Processing complete for session \(session.id)")
+    }
+    
+    /// Load Float32 samples from a WAV file
+    private func loadSamplesFromWAV(url: URL) -> [Float]? {
+        guard let data = try? Data(contentsOf: url) else {
+            print("MeetingCoordinator: Failed to read WAV file \(url.lastPathComponent)")
+            return nil
+        }
         
-        // Reset to idle so user can start a new recording
+        // Skip 44-byte WAV header
+        guard data.count > 44 else {
+            print("MeetingCoordinator: WAV file too small \(url.lastPathComponent)")
+            return nil
+        }
+        
+        let audioData = data.dropFirst(44)
+        
+        // Convert Int16 samples to Float32
+        let int16Count = audioData.count / 2
+        var samples = [Float](repeating: 0, count: int16Count)
+        
+        audioData.withUnsafeBytes { rawBuffer in
+            let int16Buffer = rawBuffer.bindMemory(to: Int16.self)
+            for i in 0..<int16Count {
+                samples[i] = Float(int16Buffer[i]) / Float(Int16.max)
+            }
+        }
+        
+        return samples
+    }
+    
+    /// Save the full accurate transcript to disk and show result window
+    private func saveFullTranscript(_ transcript: String, session: MeetingSession, sessionDir: URL?) {
+        print("📍 saveFullTranscript: Starting, sessionDir: \(sessionDir?.path ?? "nil")")
+        
+        guard let sessionDir = sessionDir else {
+            print("❌ saveFullTranscript: No session directory for saving transcript")
+            // Still show window even without saving
+            Task { @MainActor in
+                TranscriptResultWindow.shared.show(
+                    transcript: transcript,
+                    sessionTitle: session.title,
+                    duration: session.formattedDuration,
+                    transcriptPath: nil
+                )
+            }
+            return
+        }
+        
         do {
-            try transition(to: .idle)
-            print("MeetingCoordinator: Reset to idle, ready for new recording")
+            // Save as Markdown (main user-facing file)
+            let markdownURL = sessionDir.appendingPathComponent("transcript.md")
+            var markdown = "# Meeting Transcript\n\n"
+            markdown += "**Title:** \(session.title)\n"
+            markdown += "**Date:** \(DateFormatter.localizedString(from: session.createdAt, dateStyle: .medium, timeStyle: .short))\n"
+            markdown += "**Duration:** \(session.formattedDuration)\n\n"
+            markdown += "---\n\n"
+            markdown += transcript
+            
+            try markdown.write(to: markdownURL, atomically: true, encoding: .utf8)
+            print("📍 saveFullTranscript: Saved to \(markdownURL.path)")
+            
+            // Also save as plain text for easy copy/paste
+            let textURL = sessionDir.appendingPathComponent("transcript.txt")
+            try transcript.write(to: textURL, atomically: true, encoding: .utf8)
+            
+            // Show the transcript result window (must be on main thread!)
+            print("📍 saveFullTranscript: Showing TranscriptResultWindow...")
+            Task { @MainActor in
+                print("📍 saveFullTranscript: On MainActor, calling show()")
+                TranscriptResultWindow.shared.show(
+                    transcript: transcript,
+                    sessionTitle: session.title,
+                    duration: session.formattedDuration,
+                    transcriptPath: markdownURL
+                )
+            }
+            
+            // Post notification with transcript for UI display
+            NotificationCenter.default.post(
+                name: .meetingTranscriptReady,
+                object: transcript,
+                userInfo: ["session": session, "path": markdownURL]
+            )
+            
         } catch {
-            print("MeetingCoordinator: Error resetting to idle - \(error)")
+            print("MeetingCoordinator: Failed to save transcript - \(error)")
         }
     }
     
@@ -392,8 +524,7 @@ class MeetingCoordinator: ObservableObject {
     }
     
     /// Stop the live subtitles feature
-    /// - Parameter savingTo: Optional session directory to save transcripts to
-    private func stopLiveSubtitles(savingTo directory: URL? = nil) {
+    private func stopLiveSubtitles() {
         print("MeetingCoordinator: Stopping live subtitles...")
         
         // Debug: Log processor state
@@ -403,7 +534,7 @@ class MeetingCoordinator: ObservableObject {
             
             // Save transcript before stopping
             if !processor.transcriptUpdates.isEmpty {
-                saveTranscriptToDisk(updates: processor.transcriptUpdates, to: directory)
+                saveTranscriptToDisk(updates: processor.transcriptUpdates)
             } else {
                 print("MeetingCoordinator: No transcripts to save (updates empty)")
             }
@@ -430,16 +561,11 @@ class MeetingCoordinator: ObservableObject {
     }
     
     /// Save transcript updates to the session directory
-    /// - Parameters:
-    ///   - updates: The transcript updates to save
-    ///   - directory: Optional directory to save to (uses sessionDirectory if nil)
-    private func saveTranscriptToDisk(updates: [TranscriptUpdate], to directory: URL? = nil) {
-        guard let sessionDir = directory ?? sessionDirectory else {
+    private func saveTranscriptToDisk(updates: [TranscriptUpdate]) {
+        guard let sessionDir = sessionDirectory else {
             print("MeetingCoordinator: No session directory, skipping transcript save")
             return
         }
-        
-        print("MeetingCoordinator: Saving transcript to \(sessionDir.path)")
         
         do {
             // Save as JSON

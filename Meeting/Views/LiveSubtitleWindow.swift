@@ -226,8 +226,11 @@ class LiveSubtitleWindow {
     
     /// Connect to meeting coordinator for duration updates
     func connectToCoordinator(_ coordinator: MeetingCoordinator) {
-        // Subscribe to coordinator's recordingDuration which updates every second
-        durationSubscription = coordinator.$recordingDuration
+        // Subscribe to the current session's duration property
+        // Use flatMap to follow the session and then its duration changes
+        durationSubscription = coordinator.$currentSession
+            .compactMap { $0 }  // Only non-nil sessions
+            .flatMap { $0.$duration }  // Subscribe to the session's duration publisher
             .receive(on: DispatchQueue.main)
             .sink { [weak self] duration in
                 self?.state.elapsedTime = duration

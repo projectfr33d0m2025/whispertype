@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7B0072E32F1CEA4600D01584 /* TranscriptResultWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0072E22F1CEA4600D01584 /* TranscriptResultWindow.swift */; };
 		7B73EFC22EDD944D0062E68C /* ModelManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B73EFC12EDD944D0062E68C /* ModelManager.swift */; };
 		7B73EFC42EDD946C0062E68C /* ModelRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B73EFC32EDD946C0062E68C /* ModelRowView.swift */; };
 		7B73EFC62EDD947C0062E68C /* ModelSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B73EFC52EDD947C0062E68C /* ModelSettingsView.swift */; };
@@ -103,6 +104,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		7B0072E22F1CEA4600D01584 /* TranscriptResultWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptResultWindow.swift; sourceTree = "<group>"; };
 		7B73EFC12EDD944D0062E68C /* ModelManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelManager.swift; sourceTree = "<group>"; };
 		7B73EFC32EDD946C0062E68C /* ModelRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelRowView.swift; sourceTree = "<group>"; };
 		7B73EFC52EDD947C0062E68C /* ModelSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelSettingsView.swift; sourceTree = "<group>"; };
@@ -301,6 +303,7 @@
 		7BBD25B62F0E3D2E001B3B5A /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				7B0072E22F1CEA4600D01584 /* TranscriptResultWindow.swift */,
 				7BBD25B22F0E3D2E001B3B5A /* LiveSubtitleView.swift */,
 				7BBD25B32F0E3D2E001B3B5A /* LiveSubtitleWindow.swift */,
 				7BBD25B42F0E3D2E001B3B5A /* PermissionStatusView.swift */,
@@ -701,6 +704,7 @@
 				G1400001000000000000001 /* AppInfo.swift in Sources */,
 				G1400003000000000000001 /* AppPreset.swift in Sources */,
 				G1400005000000000000001 /* AppRule.swift in Sources */,
+				7B0072E32F1CEA4600D01584 /* TranscriptResultWindow.swift in Sources */,
 				G1400007000000000000001 /* ContextDetector.swift in Sources */,
 				G1400009000000000000001 /* DefaultAppPresets.swift in Sources */,
 				G1400011000000000000001 /* AppAwareManager.swift in Sources */,
