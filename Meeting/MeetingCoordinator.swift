@@ -404,14 +404,21 @@ class MeetingCoordinator: ObservableObject {
     private func saveFullTranscript(_ transcript: String, session: MeetingSession, sessionDir: URL?) {
         print("📍 saveFullTranscript: Starting, sessionDir: \(sessionDir?.path ?? "nil")")
         
+        // CRITICAL: Capture session properties as local values BEFORE any async operations
+        // This prevents race conditions where the Task runs after state transitions
+        // have modified the session's @Published properties
+        let sessionTitle = session.title
+        let sessionDuration = session.formattedDuration
+        let sessionCreatedAt = session.createdAt
+        
         guard let sessionDir = sessionDir else {
             print("❌ saveFullTranscript: No session directory for saving transcript")
             // Still show window even without saving
             Task { @MainActor in
                 TranscriptResultWindow.shared.show(
                     transcript: transcript,
-                    sessionTitle: session.title,
-                    duration: session.formattedDuration,
+                    sessionTitle: sessionTitle,      // Use captured value
+                    duration: sessionDuration,       // Use captured value
                     transcriptPath: nil
                 )
             }
@@ -422,9 +429,9 @@ class MeetingCoordinator: ObservableObject {
             // Save as Markdown (main user-facing file)
             let markdownURL = sessionDir.appendingPathComponent("transcript.md")
             var markdown = "# Meeting Transcript\n\n"
-            markdown += "**Title:** \(session.title)\n"
-            markdown += "**Date:** \(DateFormatter.localizedString(from: session.createdAt, dateStyle: .medium, timeStyle: .short))\n"
-            markdown += "**Duration:** \(session.formattedDuration)\n\n"
+            markdown += "**Title:** \(sessionTitle)\n"
+            markdown += "**Date:** \(DateFormatter.localizedString(from: sessionCreatedAt, dateStyle: .medium, timeStyle: .short))\n"
+            markdown += "**Duration:** \(sessionDuration)\n\n"
             markdown += "---\n\n"
             markdown += transcript
             
@@ -441,17 +448,17 @@ class MeetingCoordinator: ObservableObject {
                 print("📍 saveFullTranscript: On MainActor, calling show()")
                 TranscriptResultWindow.shared.show(
                     transcript: transcript,
-                    sessionTitle: session.title,
-                    duration: session.formattedDuration,
+                    sessionTitle: sessionTitle,      // Use captured value
+                    duration: sessionDuration,       // Use captured value
                     transcriptPath: markdownURL
                 )
             }
             
-            // Post notification with transcript for UI display
+            // Post notification with transcript path (avoid passing session object)
             NotificationCenter.default.post(
                 name: .meetingTranscriptReady,
                 object: transcript,
-                userInfo: ["session": session, "path": markdownURL]
+                userInfo: ["sessionTitle": sessionTitle, "path": markdownURL]
             )
             
         } catch {
@@ -559,20 +566,22 @@ class MeetingCoordinator: ObservableObject {
             print("MeetingCoordinator: No streaming processor found")
         }
         
-        // Stop processor
-        streamingProcessor?.stop()
+        // SYNCHRONOUS CLEANUP - order matters for preventing race conditions:
+        // 1. Prepare window for shutdown (clears state)
+        subtitleWindow?.prepareForShutdown()
         
-        // Hide and cleanup window
-        subtitleWindow?.setRecording(false)
+        // 2. Disconnect subscriptions
         subtitleWindow?.disconnect()
         
-        // Delay hiding to show "Processing..." state briefly
-        Task {
-            try? await Task.sleep(nanoseconds: 500_000_000) // 0.5 seconds
-            await MainActor.run {
-                subtitleWindow?.hide()
-            }
-        }
+        // 3. Stop processor
+        streamingProcessor?.stop()
+        
+        // 4. Hide window (uses safe orderOut pattern to avoid animation teardown crash)
+        subtitleWindow?.hide()
+        
+        // 5. Nil out references (safe now that windows use orderOut instead of close)
+        streamingProcessor = nil
+        subtitleWindow = nil
         
         print("MeetingCoordinator: Live subtitles stopped")
     }

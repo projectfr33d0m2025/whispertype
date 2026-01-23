@@ -44,8 +44,15 @@ class TranscriptResultWindow {
     }
     
     private func createAndShowWindow() {
-        // Close existing window if any
-        window?.close()
+        // CRITICAL FIX: Properly tear down previous window's SwiftUI view
+        // before closing to prevent autorelease pool crash
+        if let existingWindow = window {
+            if let hostingView = existingWindow.contentView as? NSHostingView<TranscriptResultView> {
+                hostingView.removeFromSuperview()
+            }
+            existingWindow.close()
+            self.window = nil
+        }
         
         // Create SwiftUI view
         let view = TranscriptResultView(
@@ -58,21 +65,21 @@ class TranscriptResultWindow {
         )
         
         // Create window
-        let window = NSWindow(
+        let newWindow = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: 600, height: 500),
             styleMask: [.titled, .closable, .resizable, .miniaturizable],
             backing: .buffered,
             defer: false
         )
         
-        window.title = "Meeting Transcript"
-        window.contentView = NSHostingView(rootView: view)
-        window.minSize = NSSize(width: 400, height: 300)
-        window.center()
+        newWindow.title = "Meeting Transcript"
+        newWindow.contentView = NSHostingView(rootView: view)
+        newWindow.minSize = NSSize(width: 400, height: 300)
+        newWindow.center()
         
-        self.window = window
+        self.window = newWindow
         
-        window.makeKeyAndOrderFront(nil)
+        newWindow.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
         
         print("TranscriptResultWindow: Showing transcript (\(transcript.count) characters)")
@@ -92,8 +99,17 @@ class TranscriptResultWindow {
     }
     
     func close() {
-        window?.close()
-        window = nil
+        // CRITICAL FIX for autorelease pool crash:
+        // Same issue as ProcessingIndicatorWindow - SwiftUI views with animations
+        // cause crashes when closed during animation. Just hide the window.
+        window?.orderOut(nil)
+        
+        // Don't close or nil the window - let it be reused/closed when show() is called
+        print("TranscriptResultWindow: Closed (hidden)")
+    }
+    
+    deinit {
+        print("⚠️ DEINIT: TranscriptResultWindow - \(ObjectIdentifier(self))")
     }
 }
 

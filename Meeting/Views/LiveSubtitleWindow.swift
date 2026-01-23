@@ -38,6 +38,9 @@ class LiveSubtitleWindow {
     private var processorSubscription: AnyCancellable?
     private var durationSubscription: AnyCancellable?
     
+    /// Panel delegate - must be stored as strong reference to prevent deallocation
+    private var panelDelegate: PanelDelegate?
+    
     // MARK: - Initialization
     
     init() {
@@ -94,11 +97,13 @@ class LiveSubtitleWindow {
             contentView.addSubview(hostingView)
         }
         
-        // Handle window close
-        panel.delegate = PanelDelegate(onClose: { [weak self] in
+        // Handle window close - store delegate as property to prevent deallocation
+        let delegate = PanelDelegate(onClose: { [weak self] in
             self?.saveFrame()
             self?.isVisible = false
         })
+        self.panelDelegate = delegate
+        panel.delegate = delegate
         
         self.panel = panel
         self.hostingView = hostingView
@@ -176,7 +181,14 @@ class LiveSubtitleWindow {
         isVisible = true
     }
     
-    /// Hide the subtitle window (recording continues)
+    /// Prepare for shutdown - clears state safely before disconnect
+    func prepareForShutdown() {
+        // Clear state first while subscriptions are still valid
+        state.updates = []
+        state.isRecording = false
+    }
+    
+    /// Hide the subtitle window (synchronous - no animation to prevent race conditions)
     func hide() {
         guard let panel = panel else { return }
         guard isVisible else { return }
@@ -185,15 +197,9 @@ class LiveSubtitleWindow {
         
         saveFrame()
         
-        NSAnimationContext.runAnimationGroup { context in
-            context.duration = 0.15
-            context.timingFunction = CAMediaTimingFunction(name: .easeIn)
-            panel.animator().alphaValue = 0
-        } completionHandler: { [weak self] in
-            Task { @MainActor [weak self] in
-                self?.panel?.orderOut(nil)
-            }
-        }
+        // Synchronous hide - no animation to prevent race conditions during cleanup
+        panel.alphaValue = 0
+        panel.orderOut(nil)
         
         isVisible = false
     }
@@ -267,9 +273,44 @@ class LiveSubtitleWindow {
     func cleanup() {
         saveFrame()
         disconnect()
+        
+        // CRITICAL FIX for autorelease pool crash:
+        // The SwiftUI view observes 'state' via @ObservedObject. If we deallocate
+        // the hostingView while it's still observing state, the Combine observers
+        // create autoreleased objects that become invalid. This causes a crash
+        // when the autorelease pool drains at the end of the run loop cycle.
+        //
+        // Fix: Properly tear down the view hierarchy BEFORE releasing references,
+        // then defer the final nil-out to the NEXT run loop cycle.
+        
+        // 1. Clear state's @Published properties to disconnect Combine observers
+        state.updates = []
+        state.isRecording = false
+        state.elapsedTime = 0
+        
+        // 2. Remove hosting view from superview to break SwiftUI observation
+        hostingView?.removeFromSuperview()
+        
+        // 3. Clear delegate references
+        panel?.delegate = nil
+        panelDelegate = nil
+        
+        // 4. Close and order out the panel
         panel?.orderOut(nil)
-        panel = nil
+        
+        // 5. CRITICAL: Defer the final reference cleanup to the NEXT run loop cycle
+        //    This allows the current autorelease pool to drain completely before
+        //    our references are released, preventing use-after-free during drain.
+        let hostingViewToRelease = hostingView
+        let panelToRelease = panel
         hostingView = nil
+        panel = nil
+        
+        DispatchQueue.main.async {
+            // These references are now released on the next run loop cycle
+            _ = hostingViewToRelease
+            _ = panelToRelease
+        }
     }
     
     deinit {

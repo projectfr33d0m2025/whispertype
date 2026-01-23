@@ -26,6 +26,10 @@ class LiveSubtitleViewState: ObservableObject {
         }
         return String(format: "%02d:%02d", minutes, seconds)
     }
+    
+    deinit {
+        print("⚠️ DEINIT: LiveSubtitleViewState - \(ObjectIdentifier(self))")
+    }
 }
 
 /// Main view for displaying live subtitles

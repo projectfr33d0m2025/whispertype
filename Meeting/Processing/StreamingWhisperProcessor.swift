@@ -81,7 +81,8 @@ class StreamingWhisperProcessor: ObservableObject {
     private let maxChunkDuration: TimeInterval = 25.0
     
     /// Minimum chunk duration before processing (need enough audio for accuracy)
-    private let minChunkDuration: TimeInterval = 3.0
+    /// Increased to 8s get more text per timestamp segment
+    private let minChunkDuration: TimeInterval = 8.0
     
     /// The committed (finalized) transcript text from all completed chunks
     private var committedTranscript: String = ""
@@ -113,11 +114,12 @@ class StreamingWhisperProcessor: ObservableObject {
     private let silenceThresholdDB: Float = -35.0
     
     /// Duration of silence required to trigger processing (seconds)
-    /// Increased. for more natural sentence boundaries
-    private let silenceDuration: TimeInterval = 0.8
+    /// Increased for more natural paragraph boundaries
+    private let silenceDuration: TimeInterval = 1.5
     
     /// Minimum buffer duration before silence-triggered processing (seconds)
-    private let minBufferForSilenceTrigger: TimeInterval = 2.0
+    /// Increased to 6s to get more text per segment
+    private let minBufferForSilenceTrigger: TimeInterval = 6.0
     
     /// Last time speech was detected
     private var lastSpeechTime: Date?
@@ -186,12 +188,9 @@ class StreamingWhisperProcessor: ObservableObject {
         // Cancel subscriptions
         cancellables.removeAll()
         
-        // Process any remaining audio
-        if !audioBuffer.isEmpty {
-            Task {
-                await processCurrentBuffer()
-            }
-        }
+        // Don't process remaining buffer during stop - it causes race conditions
+        // The final transcript pass will handle any remaining audio
+        audioBuffer = []
         
         isRunning = false
         print("StreamingWhisperProcessor: Stopped with \(transcriptUpdates.count) updates")
@@ -329,6 +328,15 @@ class StreamingWhisperProcessor: ObservableObject {
                 vocabulary: []  // No vocab hints - let Whisper work freely
             )
             
+            // CRITICAL FIX: Check if processor was stopped during transcription
+            // If stopped, don't update @Published properties - this prevents
+            // autorelease pool crashes from Combine observers during shutdown
+            guard isRunning else {
+                print("StreamingWhisperProcessor: Stopped during transcription, discarding result")
+                isProcessing = false
+                return
+            }
+            
             let trimmedResult = transcriptionResult.trimmingCharacters(in: .whitespacesAndNewlines)
             
             if !trimmedResult.isEmpty {
@@ -340,6 +348,18 @@ class StreamingWhisperProcessor: ObservableObject {
                 }
                 
                 print("StreamingWhisperProcessor: Transcribed chunk: \"\(trimmedResult.prefix(60))...\"")
+                
+                // Create update for THIS segment with proper timestamp
+                let update = TranscriptUpdate(
+                    text: trimmedResult,
+                    timestamp: timestamp,  // Use the actual timestamp for this segment
+                    createdAt: Date(),
+                    audioDuration: audioDuration
+                )
+                
+                // Append to existing updates (each segment gets its own entry)
+                transcriptUpdates.append(update)
+                latestUpdate = update
             }
             
             // CLEAR the buffer after successful transcription
@@ -349,18 +369,6 @@ class StreamingWhisperProcessor: ObservableObject {
             
             // Calculate latency
             currentLatency = Date().timeIntervalSince(captureTime)
-            
-            // Create update with the FULL committed transcript
-            let update = TranscriptUpdate(
-                text: committedTranscript,
-                timestamp: 0,
-                createdAt: Date(),
-                audioDuration: timestamp + audioDuration
-            )
-            
-            // Single update with full transcript
-            transcriptUpdates = [update]
-            latestUpdate = update
             
             print("StreamingWhisperProcessor: Total transcript: \"...\(committedTranscript.suffix(60))\" (latency: \(String(format: "%.2f", currentLatency))s)")
             

@@ -342,4 +342,10 @@ class MeetingSession: ObservableObject, Identifiable, Codable {
         try container.encode(sessionDirectory, forKey: .sessionDirectory)
         try container.encode(keepAudioFiles, forKey: .keepAudioFiles)
     }
+    
+    // MARK: - Debugging
+    
+    deinit {
+        print("⚠️ DEINIT: MeetingSession - id: \(id), title: \(title)")
+    }
 }

@@ -28,41 +28,82 @@ class ProcessingIndicatorWindow {
     
     /// Show the processing indicator
     func show(duration: String, chunkCount: Int) {
-        // Close existing window if any
-        window?.close()
+        // CRITICAL FIX: Properly tear down previous window's SwiftUI view
+        // Set contentView to nil FIRST to stop SwiftUI rendering and animations,
+        // then close the window
+        if let existingWindow = window {
+            existingWindow.contentView = nil
+            existingWindow.orderOut(nil)
+            existingWindow.close()
+            self.window = nil
+        }
         
         let view = ProcessingIndicatorView(
             duration: duration,
             chunkCount: chunkCount
         )
         
-        let window = NSWindow(
+        let newWindow = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: 320, height: 150),
             styleMask: [.titled, .fullSizeContentView],
             backing: .buffered,
             defer: false
         )
         
-        window.title = "Processing Recording"
-        window.titlebarAppearsTransparent = true
-        window.isMovableByWindowBackground = true
-        window.contentView = NSHostingView(rootView: view)
-        window.center()
-        window.level = .floating
+        newWindow.title = "Processing Recording"
+        newWindow.titlebarAppearsTransparent = true
+        newWindow.isMovableByWindowBackground = true
+        newWindow.contentView = NSHostingView(rootView: view)
+        newWindow.center()
+        newWindow.level = .floating
         
-        self.window = window
+        self.window = newWindow
         
-        window.makeKeyAndOrderFront(nil)
+        newWindow.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
         
         print("ProcessingIndicatorWindow: Showing")
     }
     
-    /// Hide and close the processing indicator
+    /// Hide the processing indicator (keeps window alive to avoid animation teardown crash)
     func hide() {
-        window?.close()
-        window = nil
+        guard let window = window else { return }
+        
+        // CRITICAL FIX for autorelease pool crash:
+        // 
+        // The ProcessingIndicatorView uses withAnimation(.repeatForever). Core Animation
+        // continues running even after we set contentView = nil. When the animation
+        // timer fires after the view is deallocated, it creates autoreleased objects
+        // that become invalid, crashing during autorelease pool drain.
+        //
+        // SOLUTION: Don't close the window at all when hiding!
+        // Just order it out (hide visually). The window stays alive with its animation
+        // running harmlessly in the background. Close only when show() is called again
+        // or when explicitly cleaned up.
+        
+        window.orderOut(nil)
+        
         print("ProcessingIndicatorWindow: Hidden")
+    }
+    
+    /// Clean up the window completely (call only when you know it's safe)
+    func cleanup() {
+        guard let window = window else { return }
+        
+        // Schedule cleanup on next run loop to avoid issues
+        let windowToCleanup = window
+        self.window = nil
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            windowToCleanup.contentView = nil
+            windowToCleanup.close()
+        }
+        
+        print("ProcessingIndicatorWindow: Cleaned up")
+    }
+    
+    deinit {
+        print("⚠️ DEINIT: ProcessingIndicatorWindow - \(ObjectIdentifier(self))")
     }
 }
 
