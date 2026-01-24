@@ -1,0 +1,122 @@
+{
+  "audio_file": "two_speakers_120s.wav",
+  "duration_seconds": 106.527375,
+  "speakers": [
+    "SPEAKER_00",
+    "SPEAKER_01"
+  ],
+  "segments": [
+    {
+      "speaker": "SPEAKER_00",
+      "start": 0.166,
+      "end": 0.79
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "start": 1.398,
+      "end": 6.359
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "start": 7.034,
+      "end": 9.498
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "start": 10.46,
+      "end": 14.493
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "start": 15.32,
+      "end": 24.567
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "start": 25.31,
+      "end": 28.263
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "start": 28.398,
+      "end": 35.367
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "start": 36.143,
+      "end": 39.839
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "start": 40.632,
+      "end": 50.099
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "start": 50.858,
+      "end": 53.018
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "start": 53.626,
+      "end": 57.136
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "start": 57.895,
+      "end": 63.177
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "start": 64.038,
+      "end": 72.56
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "start": 73.471,
+      "end": 77.69
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "start": 78.888,
+      "end": 81.048
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "start": 81.503,
+      "end": 88.692
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "start": 89.57,
+      "end": 94.497
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "start": 94.649,
+      "end": 96.961
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "start": 97.906,
+      "end": 98.868
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "start": 99.374,
+      "end": 103.34
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "start": 103.88,
+      "end": 106.343
+    }
+  ],
+  "metadata": {
+    "model": "pyannote/speaker-diarization-3.1",
+    "device": "mps",
+    "load_time_seconds": 2.255,
+    "diarization_time_seconds": 7.216,
+    "realtime_factor": 0.068
+  }
+}

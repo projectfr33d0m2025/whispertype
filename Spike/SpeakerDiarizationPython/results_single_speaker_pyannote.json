@@ -1,0 +1,31 @@
+{
+  "audio_file": "single_speaker_60s.wav",
+  "duration_seconds": 89.2343125,
+  "speakers": [
+    "SPEAKER_00"
+  ],
+  "segments": [
+    {
+      "speaker": "SPEAKER_00",
+      "start": 0.031,
+      "end": 48.04
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "start": 48.614,
+      "end": 85.553
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "start": 85.739,
+      "end": 89.249
+    }
+  ],
+  "metadata": {
+    "model": "pyannote/speaker-diarization-3.1",
+    "device": "mps",
+    "load_time_seconds": 2.486,
+    "diarization_time_seconds": 6.052,
+    "realtime_factor": 0.068
+  }
+}
