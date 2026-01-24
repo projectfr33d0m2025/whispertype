@@ -41,18 +41,18 @@ class SimpleKMeans {
         guard !data.isEmpty else {
             return ClusterResult(labels: [], centroids: [], iterations: 0, inertia: 0)
         }
-        
+
         guard let featureCount = data.first?.count, featureCount > 0 else {
             return ClusterResult(labels: [], centroids: [], iterations: 0, inertia: 0)
         }
-        
+
         guard k > 0 && k <= data.count else {
             return ClusterResult(labels: [], centroids: [], iterations: 0, inertia: 0)
         }
-        
+
         // Normalize features for better clustering
-        let (normalizedData, means, stds) = normalizeFeatures(data)
-        
+        let (normalizedData, _, _) = normalizeFeatures(data)
+
         // Initialize centroids using k-means++
         var centroids = initializeCentroidsKMeansPlusPlus(data: normalizedData, k: k)
         var labels = [Int](repeating: 0, count: normalizedData.count)
@@ -153,7 +153,7 @@ class SimpleKMeans {
     private func initializeCentroidsKMeansPlusPlus(data: [[Float]], k: Int) -> [[Float]] {
         var centroids: [[Float]] = []
         var usedIndices = Set<Int>()
-        
+
         // First centroid: random selection
         let firstIndex = Int.random(in: 0..<data.count)
         centroids.append(data[firstIndex])
@@ -161,26 +161,27 @@ class SimpleKMeans {
         
         // Remaining centroids: weighted by squared distance to nearest existing centroid
         for _ in 1..<k {
+            let countBefore = centroids.count
             var distances = [Float](repeating: 0, count: data.count)
             var totalDistance: Float = 0
-            
+
             for (i, point) in data.enumerated() {
                 if usedIndices.contains(i) {
                     distances[i] = 0
                     continue
                 }
-                
+
                 // Find minimum distance to any existing centroid
                 let minDist = centroids.map { euclideanDistance(point, $0) }.min() ?? 0
                 distances[i] = minDist * minDist  // Square for D² weighting
                 totalDistance += distances[i]
             }
-            
+
             // Weighted random selection
             if totalDistance > 0 {
                 let threshold = Float.random(in: 0..<totalDistance)
                 var cumulative: Float = 0
-                
+
                 for (i, dist) in distances.enumerated() {
                     cumulative += dist
                     if cumulative >= threshold && !usedIndices.contains(i) {
@@ -190,9 +191,9 @@ class SimpleKMeans {
                     }
                 }
             }
-            
-            // Fallback if something went wrong
-            if centroids.count < k {
+
+            // Fallback only if we didn't add a centroid this iteration
+            if centroids.count == countBefore {
                 for i in 0..<data.count {
                     if !usedIndices.contains(i) {
                         centroids.append(data[i])

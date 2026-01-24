@@ -49,15 +49,21 @@ class AudioFeatureExtractor {
             throw AudioFeatureError.invalidWAVFile("Missing WAVE format")
         }
         
+        // Helper to read UInt32 (little-endian) without alignment issues
+        func readUInt32(at offset: Int) -> UInt32 {
+            return UInt32(data[offset]) |
+                   (UInt32(data[offset + 1]) << 8) |
+                   (UInt32(data[offset + 2]) << 16) |
+                   (UInt32(data[offset + 3]) << 24)
+        }
+        
         // Find data chunk (skip header, may have extra chunks)
         var dataOffset = 12
         var dataSize = 0
         
         while dataOffset < data.count - 8 {
             let chunkID = String(data: data[dataOffset..<dataOffset+4], encoding: .ascii)
-            let chunkSize = data[dataOffset+4..<dataOffset+8].withUnsafeBytes { 
-                $0.load(as: UInt32.self) 
-            }
+            let chunkSize = readUInt32(at: dataOffset + 4)
             
             if chunkID == "data" {
                 dataOffset += 8
@@ -72,11 +78,22 @@ class AudioFeatureExtractor {
             throw AudioFeatureError.invalidWAVFile("No data chunk found")
         }
         
-        // Convert 16-bit samples to Float
-        let sampleData = data[dataOffset..<dataOffset+dataSize]
-        let samples = sampleData.withUnsafeBytes { buffer -> [Float] in
-            let int16Samples = buffer.bindMemory(to: Int16.self)
-            return int16Samples.map { Float($0) / Float(Int16.max) }
+        // Clamp dataSize to actual available data (in case header is incorrect)
+        let actualDataSize = min(dataSize, data.count - dataOffset)
+        guard actualDataSize > 0 else {
+            throw AudioFeatureError.invalidWAVFile("No audio data available")
+        }
+        
+        // Convert 16-bit samples to Float (read byte-by-byte to avoid alignment issues)
+        let numSamples = actualDataSize / 2
+        var samples = [Float](repeating: 0, count: numSamples)
+        
+        for i in 0..<numSamples {
+            let byteOffset = dataOffset + (i * 2)
+            let low = UInt16(data[byteOffset])
+            let high = UInt16(data[byteOffset + 1])
+            let int16Value = Int16(bitPattern: low | (high << 8))
+            samples[i] = Float(int16Value) / Float(Int16.max)
         }
         
         return samples
@@ -187,7 +204,7 @@ class AudioFeatureExtractor {
         var window = [Float](repeating: 0, count: fftSize)
         vDSP_hann_window(&window, vDSP_Length(fftSize), Int32(vDSP_HANN_NORM))
         var windowedSamples = [Float](repeating: 0, count: fftSize)
-        vDSP_vmul(paddedSamples, 1, window, 1, &windowedSamples, vDSP_Length(fftSize))
+        vDSP_vmul(paddedSamples, 1, window, 1, &windowedSamples, 1, vDSP_Length(fftSize))
         
         // FFT setup
         let log2n = vDSP_Length(log2(Float(fftSize)))
@@ -196,26 +213,24 @@ class AudioFeatureExtractor {
         }
         defer { vDSP_destroy_fftsetup(fftSetup) }
         
-        // Convert to split complex format
+        // Pack real data into split complex format manually (avoid alignment issues)
         var realPart = [Float](repeating: 0, count: fftSize/2)
         var imagPart = [Float](repeating: 0, count: fftSize/2)
         
-        windowedSamples.withUnsafeBufferPointer { inputPtr in
-            realPart.withUnsafeMutableBufferPointer { realPtr in
-                imagPart.withUnsafeMutableBufferPointer { imagPtr in
-                    var splitComplex = DSPSplitComplex(
-                        realp: realPtr.baseAddress!,
-                        imagp: imagPtr.baseAddress!
-                    )
-                    
-                    // Pack input into split complex
-                    inputPtr.baseAddress!.withMemoryRebound(to: DSPComplex.self, capacity: fftSize/2) { complexPtr in
-                        vDSP_ctoz(complexPtr, 2, &splitComplex, 1, vDSP_Length(fftSize/2))
-                    }
-                    
-                    // Perform FFT
-                    vDSP_fft_zrip(fftSetup, &splitComplex, 1, log2n, FFTDirection(FFT_FORWARD))
-                }
+        // Pack even indices into real, odd indices into imag
+        for i in 0..<(fftSize/2) {
+            realPart[i] = windowedSamples[i * 2]
+            imagPart[i] = windowedSamples[i * 2 + 1]
+        }
+        
+        // Perform FFT
+        realPart.withUnsafeMutableBufferPointer { realPtr in
+            imagPart.withUnsafeMutableBufferPointer { imagPtr in
+                var splitComplex = DSPSplitComplex(
+                    realp: realPtr.baseAddress!,
+                    imagp: imagPtr.baseAddress!
+                )
+                vDSP_fft_zrip(fftSetup, &splitComplex, 1, log2n, FFTDirection(FFT_FORWARD))
             }
         }
         
@@ -234,7 +249,6 @@ class AudioFeatureExtractor {
         // Convert to dB scale for better dynamic range
         var one: Float = 1e-10  // Small value to avoid log(0)
         vDSP_vsadd(magnitudes, 1, &one, &magnitudes, 1, vDSP_Length(fftSize/2))
-        var twentyOverLog10: Float = 20.0 / log(10.0)
         vDSP_vdbcon(magnitudes, 1, &one, &magnitudes, 1, vDSP_Length(fftSize/2), 1)
         
         return magnitudes
@@ -295,22 +309,20 @@ class AudioFeatureExtractor {
         let minLag = Int(sampleRate / 500)   // Max pitch 500 Hz
         let maxLag = Int(sampleRate / 50)    // Min pitch 50 Hz
         
-        guard maxLag < samples.count / 2 else { return 0 }
+        guard maxLag < samples.count / 2, minLag < maxLag else { return 0 }
         
         var maxCorrelation: Float = 0
         var bestLag = 0
         
-        // Simple autocorrelation
+        // Simple autocorrelation using manual loop (avoids array allocation issues)
         for lag in minLag..<min(maxLag, samples.count / 2) {
-            var correlation: Float = 0
             let length = samples.count - lag
+            guard length > 0 else { continue }
             
-            vDSP_dotpr(
-                samples, 1,
-                Array(samples[lag..<samples.count]), 1,
-                &correlation,
-                vDSP_Length(length)
-            )
+            var correlation: Float = 0
+            for i in 0..<length {
+                correlation += samples[i] * samples[i + lag]
+            }
             
             // Normalize by length
             correlation /= Float(length)
