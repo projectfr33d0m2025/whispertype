@@ -331,15 +331,83 @@ class MeetingCoordinator: ObservableObject {
             let vocabularyHints = VocabularyManager.shared.getWhisperHints(context: nil)
             print("📍 processRecording: Starting transcription with \(vocabularyHints.count) vocabulary hints...")
             
-            let fullTranscript = try await WhisperWrapper.shared.transcribe(
+            // Use transcribeWithSegments to get timestamped segments
+            let segments = try await WhisperWrapper.shared.transcribeWithSegments(
                 samples: allSamples,
                 language: "en",
                 vocabulary: vocabularyHints
             )
             
-            print("📍 processRecording: Transcription complete - \(fullTranscript.count) characters")
+            print("📍 processRecording: Transcription complete - \(segments.count) segments")
             
-            // Hide processing indicator before showing result
+            // Format segments with timestamps, grouped by ~30 second blocks
+            var fullTranscript = ""
+            var currentBlockText = ""
+            var blockStartTime: Double?
+            
+            // Configuration for block duration (30 seconds)
+            let blockDuration: Double = 30.0
+            
+            for segment in segments {
+                let segmentStart = Double(segment.startTime) / 1000.0
+                let segmentEnd = Double(segment.endTime) / 1000.0
+                
+                // Set start time for the new block if needed
+                if blockStartTime == nil {
+                    blockStartTime = segmentStart
+                }
+                
+                // Append text to current block
+                let text = segment.text.trimmingCharacters(in: .whitespacesAndNewlines)
+                if !text.isEmpty {
+                    if !currentBlockText.isEmpty {
+                         currentBlockText += " "
+                    }
+                    currentBlockText += text
+                }
+                
+                // Check if block is full (duration exceeded)
+                // We use segmentEnd to check if the accumulated block covers > 30s
+                if let start = blockStartTime, (segmentEnd - start) >= blockDuration {
+                    // Flush the block
+                    let hours = Int(start) / 3600
+                    let minutes = (Int(start) % 3600) / 60
+                    let seconds = Int(start) % 60
+                    
+                    let formattedTimestamp: String
+                    if hours > 0 {
+                        formattedTimestamp = String(format: "[%02d:%02d:%02d]", hours, minutes, seconds)
+                    } else {
+                        formattedTimestamp = String(format: "[%02d:%02d]", minutes, seconds)
+                    }
+                    
+                    fullTranscript += "\(formattedTimestamp)  \(currentBlockText)\n\n"
+                    
+                    // Reset for next block
+                    currentBlockText = ""
+                    blockStartTime = nil
+                }
+            }
+            
+            // Flush any remaining text
+            if !currentBlockText.isEmpty, let start = blockStartTime {
+                let hours = Int(start) / 3600
+                let minutes = (Int(start) % 3600) / 60
+                let seconds = Int(start) % 60
+                
+                let formattedTimestamp: String
+                if hours > 0 {
+                    formattedTimestamp = String(format: "[%02d:%02d:%02d]", hours, minutes, seconds)
+                } else {
+                    formattedTimestamp = String(format: "[%02d:%02d]", minutes, seconds)
+                }
+                
+                fullTranscript += "\(formattedTimestamp)  \(currentBlockText)\n\n"
+            }
+            
+            // Trim trailing newlines
+            fullTranscript = fullTranscript.trimmingCharacters(in: .whitespacesAndNewlines)
+            
             // Hide processing indicator before showing result
             ProcessingIndicatorWindow.shared.hide()
             
@@ -353,7 +421,6 @@ class MeetingCoordinator: ObservableObject {
             print("❌ processRecording: Transcription failed - \(error)")
             session.setError(error.localizedDescription)
             
-            // Hide processing indicator before showing error
             // Hide processing indicator before showing error
             ProcessingIndicatorWindow.shared.hide()
             

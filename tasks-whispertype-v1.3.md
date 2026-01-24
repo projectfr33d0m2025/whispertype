@@ -507,7 +507,7 @@ This document breaks down the v1.3.0 Meeting Transcription feature into developm
 - [x] **3.2.2** Implement full audio concatenation after recording stops
 - [x] **3.2.3** Implement `processRecording()` with full re-transcription
 - [x] **3.2.4** Add `meetingTranscriptReady` notification
-- [x] **3.2.5** Save final transcript to `transcript.md` and `transcript.txt`
+- [x] **3.2.5** Save final transcript to `transcript.md` and `transcript.txt` (Grouped by 30s timestamps)
 - [x] **3.2.6** Write tests:
   - [x] `testFullTranscriptionAfterRecording` (Verified via manual testing)
   - [x] `testTranscriptFilesSaved` (Verified via manual testing)

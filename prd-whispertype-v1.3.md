@@ -310,7 +310,8 @@ Window Specifications:
 
 **Final Transcript (Pass 2 - After Recording):**
 - Loads all saved WAV chunks and concatenates audio
-- Transcribes full audio in single pass (same as option-space dictation)
+- Transcribes full audio in segments to preserve timing information
+- Groups text into ~30-second blocks with `[HH:MM:SS]` or `[MM:SS]` timestamps
 - Uses vocabulary hints from VocabularyManager
 - Saves to `transcript.md` and `transcript.txt` in session folder
 
