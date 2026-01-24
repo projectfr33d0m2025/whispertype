@@ -313,7 +313,14 @@ Window Specifications:
 - Transcribes full audio in single pass (same as option-space dictation)
 - Uses vocabulary hints from VocabularyManager
 - Saves to `transcript.md` and `transcript.txt` in session folder
+
 - Posts `meetingTranscriptReady` notification for UI display
+
+**Window Management Strategy (CRITICAL):**
+To prevent "Zombie Object" crashes (EXC_BAD_ACCESS) on macOS, all auxiliary windows (`LiveSubtitleWindow`, `ProcessingIndicatorWindow`, `TranscriptResultWindow`) MUST implement the **Singleton + Persistent State** pattern:
+- **Singleton:** The `NSWindow` is created once and reused. It is NEVER deallocated.
+- **Persistent State:** The SwitUI view observes a persistent `ObservableObject`.
+- **Behavior:** "Closing" a window hides it (`orderOut`) but keeps the object alive. This ensures that pending SwiftUI animations and Combine subscriptions do not trigger crashes during autorelease pool drains.
 
 ### F3.5 Content Display Rules
 
@@ -330,8 +337,8 @@ Window Specifications:
 |--------|----------|
 | Close button (×) | Hide window, recording continues |
 | Minimize button (–) | Minimize to dock, recording continues |
-| Menu bar → "Show Live Transcript" | Re-open window |
-| Recording stops | Window shows "Processing..." then closes |
+| Menu bar → "Show Live Transcript" | Re-open window (unhide) |
+| Recording stops | Window hides (persists in background) |
 | App loses focus | Window can stay visible (always on top) |
 
 ---
