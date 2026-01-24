@@ -339,7 +339,7 @@ class StreamingWhisperProcessor: ObservableObject {
         do {
             let transcriptionResult = try await whisperWrapper.transcribe(
                 samples: samplesToProcess,
-                language: "en",
+                language: AppSettings.shared.whisperLanguageCode,
                 vocabulary: []  // No vocab hints - let Whisper work freely
             )
             

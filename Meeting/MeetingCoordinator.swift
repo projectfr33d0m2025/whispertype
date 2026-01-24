@@ -334,7 +334,7 @@ class MeetingCoordinator: ObservableObject {
             // Use transcribeWithSegments to get timestamped segments
             let segments = try await WhisperWrapper.shared.transcribeWithSegments(
                 samples: allSamples,
-                language: "en",
+                language: AppSettings.shared.whisperLanguageCode,
                 vocabulary: vocabularyHints
             )
             
