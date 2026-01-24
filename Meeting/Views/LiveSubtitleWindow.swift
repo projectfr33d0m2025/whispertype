@@ -3,6 +3,7 @@
 //  WhisperType
 //
 //  NSPanel wrapper for floating live subtitle window during meeting recording.
+//  Uses singleton pattern to prevent autorelease pool crashes from SwiftUI view deallocation.
 //
 
 import AppKit
@@ -10,8 +11,16 @@ import SwiftUI
 import Combine
 
 /// Manages the floating live subtitle window
+/// SINGLETON: This class is reused across sessions to prevent autorelease pool crashes.
+/// When SwiftUI views with @Published state are deallocated, they create autoreleased
+/// objects that can become zombies if the object graph is complex.
 @MainActor
 class LiveSubtitleWindow {
+    
+    // MARK: - Singleton
+    
+    /// Shared instance - window is reused across sessions
+    static let shared = LiveSubtitleWindow()
     
     // MARK: - Constants
     
@@ -28,7 +37,7 @@ class LiveSubtitleWindow {
     private var panel: NSPanel?
     private var hostingView: NSHostingView<LiveSubtitleView>?
     
-    /// State shared with SwiftUI view
+    /// State shared with SwiftUI view - persists across sessions
     let state = LiveSubtitleViewState()
     
     /// Whether the window is currently visible
@@ -43,7 +52,8 @@ class LiveSubtitleWindow {
     
     // MARK: - Initialization
     
-    init() {
+    private init() {
+        print("LiveSubtitleWindow: init (singleton)")
         setupPanel()
     }
     
@@ -156,17 +166,18 @@ class LiveSubtitleWindow {
     
     // MARK: - Show/Hide
     
-    /// Show the subtitle window
+    /// Show the subtitle window and reset state for new session
     func show() {
         guard let panel = panel else { return }
         guard !isVisible else { return }
         
         print("LiveSubtitleWindow: Showing")
         
-        // Reset state
+        // Reset state for new session
         state.updates = []
         state.isRecording = true
         state.isAutoScrollEnabled = true
+        state.elapsedTime = 0
         
         // Animate in
         panel.alphaValue = 0
@@ -179,13 +190,6 @@ class LiveSubtitleWindow {
         }
         
         isVisible = true
-    }
-    
-    /// Prepare for shutdown - clears state safely before disconnect
-    func prepareForShutdown() {
-        // Clear state first while subscriptions are still valid
-        state.updates = []
-        state.isRecording = false
     }
     
     /// Hide the subtitle window (synchronous - no animation to prevent race conditions)
@@ -222,33 +226,49 @@ class LiveSubtitleWindow {
     
     /// Connect to a streaming processor to receive updates
     func connectToProcessor(_ processor: StreamingWhisperProcessor) {
+        print("LiveSubtitleWindow: Connecting to processor \(ObjectIdentifier(processor))")
+        
+        // Cancel any existing subscription first
+        processorSubscription?.cancel()
+        
         // Subscribe to transcript updates
         processorSubscription = processor.$transcriptUpdates
             .receive(on: DispatchQueue.main)
             .sink { [weak self] updates in
                 self?.state.updates = updates
             }
+        print("LiveSubtitleWindow: processorSubscription created")
     }
     
     /// Connect to meeting coordinator for duration updates
     func connectToCoordinator(_ coordinator: MeetingCoordinator) {
-        // Subscribe to the current session's duration property
-        // Use flatMap to follow the session and then its duration changes
-        durationSubscription = coordinator.$currentSession
-            .compactMap { $0 }  // Only non-nil sessions
-            .flatMap { $0.$duration }  // Subscribe to the session's duration publisher
+        print("LiveSubtitleWindow: Connecting to coordinator for duration")
+        
+        // Cancel any existing subscription first
+        durationSubscription?.cancel()
+        
+        // Subscribe directly to coordinator's currentDuration
+        durationSubscription = coordinator.$currentDuration
             .receive(on: DispatchQueue.main)
             .sink { [weak self] duration in
                 self?.state.elapsedTime = duration
             }
+        print("LiveSubtitleWindow: durationSubscription created")
     }
     
-    /// Disconnect from processor
+    /// Disconnect subscriptions (but don't deallocate - this is a singleton)
     func disconnect() {
+        print("LiveSubtitleWindow: disconnect() - cancelling subscriptions")
         processorSubscription?.cancel()
         processorSubscription = nil
         durationSubscription?.cancel()
         durationSubscription = nil
+        
+        // Mark as not recording but DON'T clear the state completely
+        // The window stays alive, just hidden
+        state.isRecording = false
+        
+        print("LiveSubtitleWindow: subscriptions cancelled")
     }
     
     // MARK: - State Updates
@@ -268,54 +288,7 @@ class LiveSubtitleWindow {
         state.isRecording = isRecording
     }
     
-    // MARK: - Cleanup
-    
-    func cleanup() {
-        saveFrame()
-        disconnect()
-        
-        // CRITICAL FIX for autorelease pool crash:
-        // The SwiftUI view observes 'state' via @ObservedObject. If we deallocate
-        // the hostingView while it's still observing state, the Combine observers
-        // create autoreleased objects that become invalid. This causes a crash
-        // when the autorelease pool drains at the end of the run loop cycle.
-        //
-        // Fix: Properly tear down the view hierarchy BEFORE releasing references,
-        // then defer the final nil-out to the NEXT run loop cycle.
-        
-        // 1. Clear state's @Published properties to disconnect Combine observers
-        state.updates = []
-        state.isRecording = false
-        state.elapsedTime = 0
-        
-        // 2. Remove hosting view from superview to break SwiftUI observation
-        hostingView?.removeFromSuperview()
-        
-        // 3. Clear delegate references
-        panel?.delegate = nil
-        panelDelegate = nil
-        
-        // 4. Close and order out the panel
-        panel?.orderOut(nil)
-        
-        // 5. CRITICAL: Defer the final reference cleanup to the NEXT run loop cycle
-        //    This allows the current autorelease pool to drain completely before
-        //    our references are released, preventing use-after-free during drain.
-        let hostingViewToRelease = hostingView
-        let panelToRelease = panel
-        hostingView = nil
-        panel = nil
-        
-        DispatchQueue.main.async {
-            // These references are now released on the next run loop cycle
-            _ = hostingViewToRelease
-            _ = panelToRelease
-        }
-    }
-    
-    deinit {
-        print("LiveSubtitleWindow: Deinit")
-    }
+    // NOTE: No deinit logging - this singleton should NEVER be deallocated
 }
 
 // MARK: - Panel Delegate

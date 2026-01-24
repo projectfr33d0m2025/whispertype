@@ -306,6 +306,22 @@ class MeetingSession: ObservableObject, Identifiable, Codable {
         }
     }
     
+    // MARK: - Cleanup
+    
+    /// Prepare the session for deallocation to prevent autorelease pool crashes
+    /// Call this before releasing the last reference to the session
+    /// This clears all @Published properties to disconnect Combine observers
+    func prepareForDeallocation() {
+        // CRITICAL: Clear @Published properties to prevent Combine from creating
+        // autoreleased objects during deallocation that become zombies
+        errorMessage = nil
+        speakerCount = 0
+        duration = 0
+        processingStage = .none
+        // Note: 'state' and 'title' are also @Published but typically don't cause issues
+        print("MeetingSession: Prepared for deallocation - id: \(id)")
+    }
+    
     // MARK: - Codable
     
     enum CodingKeys: String, CodingKey {

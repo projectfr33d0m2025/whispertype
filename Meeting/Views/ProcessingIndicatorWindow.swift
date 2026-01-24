@@ -8,41 +8,54 @@
 import AppKit
 import SwiftUI
 
+/// Observable state for the processing indicator
+/// Using ObservableObject allows us to update content without recreating the SwiftUI view,
+/// which prevents autorelease pool crashes from zombie objects during view teardown (especially with .repeatForever animations).
+@MainActor
+class ProcessingIndicatorState: ObservableObject {
+    @Published var duration: String = ""
+    @Published var chunkCount: Int = 0
+    @Published var isVisible: Bool = false
+    
+    func update(duration: String, chunkCount: Int) {
+        self.duration = duration
+        self.chunkCount = chunkCount
+        self.isVisible = true
+    }
+    
+    func reset() {
+        self.isVisible = false
+    }
+}
+
 /// Manages the processing indicator window shown during final transcription
+/// SINGLETON: This class is reused across sessions to prevent autorelease pool crashes.
 @MainActor
 class ProcessingIndicatorWindow {
     
     // MARK: - Properties
     
     private var window: NSWindow?
-    private var progressValue: Double = 0
-    private var statusMessage: String = "Processing..."
+    
+    /// Shared state - persists across sessions
+    private let state = ProcessingIndicatorState()
     
     // MARK: - Singleton
     
     static let shared = ProcessingIndicatorWindow()
     
-    private init() {}
+    private init() {
+        // Initialize window immediately
+        setupWindow()
+    }
     
-    // MARK: - Show/Hide
+    // MARK: - Setup
     
-    /// Show the processing indicator
-    func show(duration: String, chunkCount: Int) {
-        // CRITICAL FIX: Properly tear down previous window's SwiftUI view
-        // Set contentView to nil FIRST to stop SwiftUI rendering and animations,
-        // then close the window
-        if let existingWindow = window {
-            existingWindow.contentView = nil
-            existingWindow.orderOut(nil)
-            existingWindow.close()
-            self.window = nil
-        }
+    private func setupWindow() {
+        // Create SwiftUI view with persistent state
+        let view = ProcessingIndicatorView(state: state)
         
-        let view = ProcessingIndicatorView(
-            duration: duration,
-            chunkCount: chunkCount
-        )
-        
+        // Create window
         let newWindow = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: 320, height: 150),
             styleMask: [.titled, .fullSizeContentView],
@@ -56,10 +69,22 @@ class ProcessingIndicatorWindow {
         newWindow.contentView = NSHostingView(rootView: view)
         newWindow.center()
         newWindow.level = .floating
+        newWindow.isReleasedWhenClosed = false
         
         self.window = newWindow
+    }
+    
+    // MARK: - Show/Hide
+    
+    /// Show the processing indicator
+    func show(duration: String, chunkCount: Int) {
+        // Update state (triggers SwiftUI update)
+        state.update(duration: duration, chunkCount: chunkCount)
         
-        newWindow.makeKeyAndOrderFront(nil)
+        guard let window = window else { return }
+        
+        // Show window
+        window.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
         
         print("ProcessingIndicatorWindow: Showing")
@@ -67,90 +92,47 @@ class ProcessingIndicatorWindow {
     
     /// Hide the processing indicator (keeps window alive to avoid animation teardown crash)
     func hide() {
+        // Update state
+        state.reset()
+        
         guard let window = window else { return }
         
-        // CRITICAL FIX for autorelease pool crash:
-        // 
-        // The ProcessingIndicatorView uses withAnimation(.repeatForever). Core Animation
-        // continues running even after we set contentView = nil. When the animation
-        // timer fires after the view is deallocated, it creates autoreleased objects
-        // that become invalid, crashing during autorelease pool drain.
-        //
-        // SOLUTION: Don't close the window at all when hiding!
-        // Just order it out (hide visually). The window stays alive with its animation
-        // running harmlessly in the background. Close only when show() is called again
-        // or when explicitly cleaned up.
-        
+        // Just hide the window - never close or deallocate it
         window.orderOut(nil)
         
         print("ProcessingIndicatorWindow: Hidden")
-    }
-    
-    /// Clean up the window completely (call only when you know it's safe)
-    func cleanup() {
-        guard let window = window else { return }
-        
-        // Schedule cleanup on next run loop to avoid issues
-        let windowToCleanup = window
-        self.window = nil
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            windowToCleanup.contentView = nil
-            windowToCleanup.close()
-        }
-        
-        print("ProcessingIndicatorWindow: Cleaned up")
-    }
-    
-    deinit {
-        print("⚠️ DEINIT: ProcessingIndicatorWindow - \(ObjectIdentifier(self))")
     }
 }
 
 // MARK: - SwiftUI View
 
 struct ProcessingIndicatorView: View {
-    let duration: String
-    let chunkCount: Int
-    
-    @State private var animationPhase = 0.0
+    @ObservedObject var state: ProcessingIndicatorState
     
     var body: some View {
-        VStack(spacing: 16) {
-            // Animated processing icon
-            ZStack {
-                Circle()
-                    .stroke(Color.blue.opacity(0.2), lineWidth: 4)
-                    .frame(width: 50, height: 50)
-                
-                Circle()
-                    .trim(from: 0, to: 0.7)
-                    .stroke(Color.blue, style: StrokeStyle(lineWidth: 4, lineCap: .round))
-                    .frame(width: 50, height: 50)
-                    .rotationEffect(.degrees(animationPhase))
-            }
-            .onAppear {
-                withAnimation(.linear(duration: 1).repeatForever(autoreverses: false)) {
-                    animationPhase = 360
-                }
-            }
+        VStack(spacing: 20) {
+            Text("Processing Recording...")
+                .font(.headline)
             
-            VStack(spacing: 4) {
-                Text("Generating Final Transcript")
-                    .font(.headline)
+            HStack(spacing: 12) {
+                ProgressView()
+                    .controlSize(.small)
                 
-                Text("Processing \(duration) of audio...")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                
-                if chunkCount > 0 {
-                    Text("\(chunkCount) audio chunks")
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Duration: \(state.duration)")
                         .font(.caption)
                         .foregroundColor(.secondary)
+                    
+                    if state.chunkCount > 1 {
+                        Text("Processing \(state.chunkCount) chunks...")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                    }
                 }
             }
         }
         .padding(24)
-        .frame(width: 320)
+        .frame(width: 320, height: 150)
+        .background(.regularMaterial)
     }
 }

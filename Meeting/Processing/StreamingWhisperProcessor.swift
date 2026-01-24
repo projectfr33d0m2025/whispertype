@@ -138,7 +138,7 @@ class StreamingWhisperProcessor: ObservableObject {
         self.streamBus = streamBus
         self.config = config
         
-        print("StreamingWhisperProcessor: Initialized with buffer=\(config.bufferDuration)s, interval=\(config.processingInterval)s")
+        print("StreamingWhisperProcessor: init - \(ObjectIdentifier(self)) buffer=\(config.bufferDuration)s, interval=\(config.processingInterval)s")
     }
     
     // MARK: - Public API
@@ -181,6 +181,9 @@ class StreamingWhisperProcessor: ObservableObject {
         
         print("StreamingWhisperProcessor: Stopping...")
         
+        // Set running flag first to prevent new work from starting
+        isRunning = false
+        
         // Stop timer
         processingTimer?.invalidate()
         processingTimer = nil
@@ -191,9 +194,21 @@ class StreamingWhisperProcessor: ObservableObject {
         // Don't process remaining buffer during stop - it causes race conditions
         // The final transcript pass will handle any remaining audio
         audioBuffer = []
+        pendingAudioBuffer = []
         
-        isRunning = false
-        print("StreamingWhisperProcessor: Stopped with \(transcriptUpdates.count) updates")
+        // CRITICAL: Clear ALL @Published properties to disconnect Combine observers
+        // This prevents autorelease pool crashes during processor deallocation
+        // When @Published properties change, Combine may create autoreleased objects
+        // that reference the processor. If the processor deallocates first, zombie crash!
+        let updateCount = transcriptUpdates.count
+        transcriptUpdates = []
+        latestUpdate = nil
+        
+        print("StreamingWhisperProcessor: Stopped with \(updateCount) updates (now cleared)")
+    }
+    
+    deinit {
+        print("StreamingWhisperProcessor: deinit - \(ObjectIdentifier(self))")
     }
     
     /// Clear all transcript updates

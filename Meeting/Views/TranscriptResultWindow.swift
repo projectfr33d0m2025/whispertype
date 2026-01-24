@@ -8,6 +8,48 @@
 import AppKit
 import SwiftUI
 
+/// Observable state for the transcript result window
+/// Using ObservableObject allows us to update content without recreating the SwiftUI view,
+/// which prevents autorelease pool crashes from zombie objects during view teardown.
+@MainActor
+class TranscriptResultState: ObservableObject {
+    @Published var transcript: String = ""
+    @Published var sessionTitle: String = ""
+    @Published var duration: String = ""
+    @Published var transcriptPath: URL?
+    @Published var showCopiedFeedback: Bool = false
+    
+    func update(transcript: String, sessionTitle: String, duration: String, transcriptPath: URL?) {
+        self.transcript = transcript
+        self.sessionTitle = sessionTitle
+        self.duration = duration
+        self.transcriptPath = transcriptPath
+        self.showCopiedFeedback = false
+    }
+    
+    func copyTranscript() {
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(transcript, forType: .string)
+        showCopiedFeedback = true
+        
+        // Reset feedback after delay
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in
+            self?.showCopiedFeedback = false
+        }
+        
+        print("TranscriptResultWindow: Copied transcript to clipboard")
+    }
+    
+    func openTranscriptFile() {
+        guard let path = transcriptPath else { return }
+        NSWorkspace.shared.open(path)
+    }
+    
+    var wordCount: Int {
+        transcript.split(separator: " ").count
+    }
+}
+
 /// Manages the transcript result window shown after recording
 @MainActor
 class TranscriptResultWindow {
@@ -15,10 +57,10 @@ class TranscriptResultWindow {
     // MARK: - Properties
     
     private var window: NSWindow?
-    private var transcript: String = ""
-    private var sessionTitle: String = ""
-    private var duration: String = ""
-    private var transcriptPath: URL?
+    
+    /// Shared state object - survives across multiple show() calls
+    /// This prevents SwiftUI view teardown which causes autorelease crashes
+    private let state = TranscriptResultState()
     
     // MARK: - Singleton
     
@@ -35,32 +77,30 @@ class TranscriptResultWindow {
         duration: String,
         transcriptPath: URL?
     ) {
-        self.transcript = transcript
-        self.sessionTitle = sessionTitle
-        self.duration = duration
-        self.transcriptPath = transcriptPath
-        
-        createAndShowWindow()
-    }
-    
-    private func createAndShowWindow() {
-        // CRITICAL FIX: Properly tear down previous window's SwiftUI view
-        // before closing to prevent autorelease pool crash
-        if let existingWindow = window {
-            if let hostingView = existingWindow.contentView as? NSHostingView<TranscriptResultView> {
-                hostingView.removeFromSuperview()
-            }
-            existingWindow.close()
-            self.window = nil
-        }
-        
-        // Create SwiftUI view
-        let view = TranscriptResultView(
+        // Update state (this triggers SwiftUI to re-render, not recreate)
+        state.update(
             transcript: transcript,
             sessionTitle: sessionTitle,
             duration: duration,
-            onCopy: { [weak self] in self?.copyTranscript() },
-            onOpenFile: { [weak self] in self?.openTranscriptFile() },
+            transcriptPath: transcriptPath
+        )
+        
+        // Create window only if it doesn't exist
+        if window == nil {
+            createWindow()
+        }
+        
+        // Show the window
+        window?.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
+        
+        print("TranscriptResultWindow: Showing transcript (\(transcript.count) characters)")
+    }
+    
+    private func createWindow() {
+        // Create SwiftUI view with persistent state
+        let view = TranscriptResultView(
+            state: state,
             onClose: { [weak self] in self?.close() }
         )
         
@@ -78,33 +118,13 @@ class TranscriptResultWindow {
         newWindow.center()
         
         self.window = newWindow
-        
-        newWindow.makeKeyAndOrderFront(nil)
-        NSApp.activate(ignoringOtherApps: true)
-        
-        print("TranscriptResultWindow: Showing transcript (\(transcript.count) characters)")
     }
     
     // MARK: - Actions
     
-    private func copyTranscript() {
-        NSPasteboard.general.clearContents()
-        NSPasteboard.general.setString(transcript, forType: .string)
-        print("TranscriptResultWindow: Copied transcript to clipboard")
-    }
-    
-    private func openTranscriptFile() {
-        guard let path = transcriptPath else { return }
-        NSWorkspace.shared.open(path)
-    }
-    
     func close() {
-        // CRITICAL FIX for autorelease pool crash:
-        // Same issue as ProcessingIndicatorWindow - SwiftUI views with animations
-        // cause crashes when closed during animation. Just hide the window.
+        // Just hide the window - it will be reused next time
         window?.orderOut(nil)
-        
-        // Don't close or nil the window - let it be reused/closed when show() is called
         print("TranscriptResultWindow: Closed (hidden)")
     }
     
@@ -116,14 +136,8 @@ class TranscriptResultWindow {
 // MARK: - SwiftUI View
 
 struct TranscriptResultView: View {
-    let transcript: String
-    let sessionTitle: String
-    let duration: String
-    let onCopy: () -> Void
-    let onOpenFile: () -> Void
+    @ObservedObject var state: TranscriptResultState
     let onClose: () -> Void
-    
-    @State private var showCopiedFeedback = false
     
     var body: some View {
         VStack(spacing: 0) {
@@ -134,7 +148,7 @@ struct TranscriptResultView: View {
             
             // Transcript content
             ScrollView {
-                Text(transcript.isEmpty ? "No transcript available" : transcript)
+                Text(state.transcript.isEmpty ? "No transcript available" : state.transcript)
                     .font(.system(.body, design: .default))
                     .textSelection(.enabled)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -153,15 +167,15 @@ struct TranscriptResultView: View {
     private var headerView: some View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
-                Text(sessionTitle.isEmpty ? "Meeting Transcript" : sessionTitle)
+                Text(state.sessionTitle.isEmpty ? "Meeting Transcript" : state.sessionTitle)
                     .font(.headline)
                 
                 HStack(spacing: 12) {
-                    Label(duration, systemImage: "clock")
+                    Label(state.duration, systemImage: "clock")
                         .font(.caption)
                         .foregroundColor(.secondary)
                     
-                    Label("\(wordCount) words", systemImage: "text.alignleft")
+                    Label("\(state.wordCount) words", systemImage: "text.alignleft")
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
@@ -183,17 +197,15 @@ struct TranscriptResultView: View {
     private var footerView: some View {
         HStack {
             Button(action: {
-                onCopy()
-                showCopiedFeedback = true
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                    showCopiedFeedback = false
-                }
+                state.copyTranscript()
             }) {
-                Label(showCopiedFeedback ? "Copied!" : "Copy", systemImage: showCopiedFeedback ? "checkmark" : "doc.on.doc")
+                Label(state.showCopiedFeedback ? "Copied!" : "Copy", systemImage: state.showCopiedFeedback ? "checkmark" : "doc.on.doc")
             }
             .buttonStyle(.bordered)
             
-            Button(action: onOpenFile) {
+            Button(action: {
+                state.openTranscriptFile()
+            }) {
                 Label("Open File", systemImage: "doc.text")
             }
             .buttonStyle(.bordered)
@@ -204,9 +216,5 @@ struct TranscriptResultView: View {
                 .keyboardShortcut(.escape)
         }
         .padding()
-    }
-    
-    private var wordCount: Int {
-        transcript.split(separator: " ").count
     }
 }

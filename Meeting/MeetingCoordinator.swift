@@ -25,6 +25,9 @@ class MeetingCoordinator: ObservableObject {
     /// Current state of the coordinator
     @Published private(set) var state: MeetingState = .idle
     
+    /// Current recording duration (published directly for simple subscription)
+    @Published private(set) var currentDuration: TimeInterval = 0
+    
     /// Whether a meeting is currently active
     var isActive: Bool {
         state.isActive
@@ -101,11 +104,13 @@ class MeetingCoordinator: ObservableObject {
             }
             .store(in: &cancellables)
         
-        // Sync duration with session
+        // Sync duration with session AND publish directly
         recorder.$duration
             .receive(on: DispatchQueue.main)
             .sink { [weak self] duration in
                 self?.currentSession?.updateDuration(duration)
+                // Also publish directly for simple subscriptions (avoids flatMap retain cycles)
+                self?.currentDuration = duration
             }
             .store(in: &cancellables)
     }
@@ -209,6 +214,7 @@ class MeetingCoordinator: ObservableObject {
         
         // Reset state
         state = .idle
+        currentSession?.prepareForDeallocation()
         currentSession = nil
         
         // End background task
@@ -243,6 +249,7 @@ class MeetingCoordinator: ObservableObject {
         // Handle state-specific actions
         switch newState {
         case .idle:
+            currentSession?.prepareForDeallocation()
             currentSession = nil
             endBackgroundTask()
         case .complete:
@@ -262,6 +269,7 @@ class MeetingCoordinator: ObservableObject {
         }
         
         state = .idle
+        currentSession?.prepareForDeallocation()
         currentSession = nil
         endBackgroundTask()
         
@@ -299,6 +307,7 @@ class MeetingCoordinator: ObservableObject {
             session.setProcessingStage(.complete)
             
             // Hide processing indicator
+            // Hide processing indicator
             ProcessingIndicatorWindow.shared.hide()
             
             // Still show window even if empty
@@ -331,6 +340,7 @@ class MeetingCoordinator: ObservableObject {
             print("📍 processRecording: Transcription complete - \(fullTranscript.count) characters")
             
             // Hide processing indicator before showing result
+            // Hide processing indicator before showing result
             ProcessingIndicatorWindow.shared.hide()
             
             // Save the accurate full transcript (using captured session directory)
@@ -343,6 +353,7 @@ class MeetingCoordinator: ObservableObject {
             print("❌ processRecording: Transcription failed - \(error)")
             session.setError(error.localizedDescription)
             
+            // Hide processing indicator before showing error
             // Hide processing indicator before showing error
             ProcessingIndicatorWindow.shared.hide()
             
@@ -363,6 +374,10 @@ class MeetingCoordinator: ObservableObject {
         do {
             try session.transition(to: .complete)
             try transition(to: .complete)
+            
+            // Reset to idle immediately so a new recording can be started
+            // The session data has been saved, so we don't need to keep the complete state
+            try transition(to: .idle)
         } catch {
             print("MeetingCoordinator: Error completing session - \(error)")
             session.setError(error.localizedDescription)
@@ -521,7 +536,7 @@ class MeetingCoordinator: ObservableObject {
     
     /// Start the live subtitles feature
     private func startLiveSubtitles() {
-        print("MeetingCoordinator: Starting live subtitles...")
+        print("MeetingCoordinator: ========== STARTING LIVE SUBTITLES ==========")
         
         // Create streaming processor
         let processor = StreamingWhisperProcessor(
@@ -529,10 +544,12 @@ class MeetingCoordinator: ObservableObject {
             streamBus: streamBus
         )
         streamingProcessor = processor
+        print("MeetingCoordinator: Created processor \(ObjectIdentifier(processor))")
         
         // Create subtitle window
-        let window = LiveSubtitleWindow()
+        let window = LiveSubtitleWindow.shared
         subtitleWindow = window
+        print("MeetingCoordinator: Created window \(ObjectIdentifier(window)), state=\(ObjectIdentifier(window.state))")
         
         // Connect window to processor
         window.connectToProcessor(processor)
@@ -544,17 +561,17 @@ class MeetingCoordinator: ObservableObject {
         // Show window
         window.show()
         
-        print("MeetingCoordinator: Live subtitles started")
+        print("MeetingCoordinator: ========== LIVE SUBTITLES STARTED ==========")
     }
     
     /// Stop the live subtitles feature
     private func stopLiveSubtitles() {
-        print("MeetingCoordinator: Stopping live subtitles...")
+        print("MeetingCoordinator: ========== STOPPING LIVE SUBTITLES ==========")
         
-        // Debug: Log processor state
+        // Debug: Log current object IDs
         if let processor = streamingProcessor {
+            print("MeetingCoordinator: Stopping processor \(ObjectIdentifier(processor))")
             print("MeetingCoordinator: Processor has \(processor.transcriptUpdates.count) transcript updates")
-            print("MeetingCoordinator: Full transcript: \(processor.fullTranscript)")
             
             // Save transcript before stopping
             if !processor.transcriptUpdates.isEmpty {
@@ -566,25 +583,58 @@ class MeetingCoordinator: ObservableObject {
             print("MeetingCoordinator: No streaming processor found")
         }
         
-        // SYNCHRONOUS CLEANUP - order matters for preventing race conditions:
-        // 1. Prepare window for shutdown (clears state)
-        subtitleWindow?.prepareForShutdown()
+        if let window = subtitleWindow {
+            print("MeetingCoordinator: Stopping window \(ObjectIdentifier(window)), state=\(ObjectIdentifier(window.state))")
+        } else {
+            print("MeetingCoordinator: No subtitle window found")
+        }
         
-        // 2. Disconnect subscriptions
+        // AUTORELEASE POOL CRASH FIX:
+        // The crash occurs during [NSAutoreleasePool drain] in the main run loop.
+        // Combine/SwiftUI creates autoreleased objects that reference our @Published properties.
+        // When those autoreleased objects are released during pool drain, they access
+        // deallocated memory if our objects are already freed.
+        //
+        // Fix: Use asyncAfter with a delay to ensure we're in a COMPLETELY NEW run loop
+        // iteration where the previous autorelease pool has fully drained.
+        
+        // Step 1: Disconnect all Combine subscriptions while objects are still alive
+        print("MeetingCoordinator: Step 1 - Disconnecting subscriptions")
         subtitleWindow?.disconnect()
         
-        // 3. Stop processor
+        // Step 2: Stop the processor (stops timer, cancels subscriptions, clears @Published)
+        print("MeetingCoordinator: Step 2 - Stopping processor")
         streamingProcessor?.stop()
         
-        // 4. Hide window (uses safe orderOut pattern to avoid animation teardown crash)
+        // Step 3: Cleanup window (clears state, removes views, defers panel release)
+        print("MeetingCoordinator: Step 3 - Cleaning up window")
         subtitleWindow?.hide()
         
-        // 5. Nil out references (safe now that windows use orderOut instead of close)
+        // Step 4: CRITICAL - Defer final reference cleanup with a DELAY
+        // Using asyncAfter ensures we're in a new run loop iteration after pool drain
+        print("MeetingCoordinator: Step 4 - Deferring final release with delay")
+        let processorToRelease = streamingProcessor
+        let windowToRelease = subtitleWindow
         streamingProcessor = nil
         subtitleWindow = nil
         
-        print("MeetingCoordinator: Live subtitles stopped")
+        // Use asyncAfter with 1 second delay to ensure autorelease pool has fully drained
+        // and all Core Animation timers have completed
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            autoreleasepool {
+                print("MeetingCoordinator: Deferred release (after delay)")
+                // These references are now safely released after autorelease pool drain
+                _ = processorToRelease
+                _ = windowToRelease
+            }
+        }
+        
+        print("MeetingCoordinator: ========== LIVE SUBTITLES STOPPED ==========")
     }
+
+
+
+
     
     /// Save transcript updates to the session directory
     private func saveTranscriptToDisk(updates: [TranscriptUpdate]) {
