@@ -1,0 +1,11 @@
+{
+  "audio_file": "two_speakers_clear.wav",
+  "segments": [
+    {"speaker": "A", "start": 0.0, "end": 12.5},
+    {"speaker": "B", "start": 14.0, "end": 26.0},
+    {"speaker": "A", "start": 28.0, "end": 41.5},
+    {"speaker": "B", "start": 43.0, "end": 55.0},
+    {"speaker": "A", "start": 57.0, "end": 70.0},
+    {"speaker": "B", "start": 72.0, "end": 85.0}
+  ]
+}
