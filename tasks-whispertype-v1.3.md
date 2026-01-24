@@ -1,10 +1,10 @@
 # WhisperType v1.3.0 - Development Tasks (Final)
 
 **Version:** 1.3.0  
-**Status:** Planning  
+**Status:** In Progress  
 **Created:** January 6, 2025  
-**Revised:** January 6, 2025 (v3 - Added User Acceptance Tests)  
-**Estimated Duration:** 10-12 weeks  
+**Revised:** January 24, 2025 (v4 - Phase 4 Speaker Diarization deferred to v1.4.0)  
+**Estimated Duration:** 8-10 weeks (reduced from 10-12 weeks)  
 
 ---
 
@@ -18,6 +18,8 @@ This document breaks down the v1.3.0 Meeting Transcription feature into developm
 - ✅ **User Acceptance Tests (UAT)** - Step-by-step manual testing guide
 - ✅ Test artifacts with expected outputs
 
+> **⚠️ Phase 4 Update (January 24, 2025):** Speaker Diarization has been **deferred to v1.4.0** due to HuggingFace token UX issues and implementation complexity. See Phase 4 section for details. All other phases remain on track.
+
 ---
 
 ## Phase Dependency Graph
@@ -29,14 +31,14 @@ This document breaks down the v1.3.0 Meeting Transcription feature into developm
                     │        (includes Test Artifacts creation)               │
                     └─────────────────────────┬───────────────────────────────┘
                                               │
-              ┌───────────────┬───────────────┼───────────────┬───────────────┐
-              ▼               ▼               ▼               ▼               ▼
-       ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐
-       │ PHASE 2  │    │ PHASE 3  │    │ PHASE 4  │    │ PHASE 5  │    │ PHASE 6  │
-       │ System   │    │  Live    │    │ Speaker  │    │   LLM    │    │ History  │
-       │  Audio   │    │ Subtitles│    │ Diarizn. │    │ Summary  │    │ Storage  │
-       └────┬─────┘    └────┬─────┘    └────┬─────┘    └────┬─────┘    └────┬─────┘
-            └───────────────┴───────────────┴───────┬───────┴───────────────┘
+              ┌───────────────────────────────┼───────────────┬───────────────┐
+              ▼                               ▼               ▼               ▼
+       ┌──────────┐                    ┌──────────┐    ┌──────────┐    ┌──────────┐
+       │ PHASE 2  │                    │ PHASE 3  │    │ PHASE 5  │    │ PHASE 6  │
+       │ System   │                    │  Live    │    │   LLM    │    │ History  │
+       │  Audio   │                    │ Subtitles│    │ Summary  │    │ Storage  │
+       └────┬─────┘                    └────┬─────┘    └────┬─────┘    └────┬─────┘
+            └───────────────────────────────┴───────┬───────┴───────────────┘
                                                     ▼
                                             ┌──────────────┐
                                             │   PHASE 7    │
@@ -47,20 +49,28 @@ This document breaks down the v1.3.0 Meeting Transcription feature into developm
                                             │   PHASE 8    │
                                             │   Release    │
                                             └──────────────┘
+
+        ┌──────────────────────────────────────────────────────────────────────┐
+        │  ⏭️ PHASE 4 (Speaker Diarization) - DEFERRED TO v1.4.0               │
+        │     Reason: HuggingFace token requirement creates poor UX            │
+        │     Impact: Transcripts work fully, just without speaker labels      │
+        └──────────────────────────────────────────────────────────────────────┘
 ```
 
 ### Phase Summary
 
-| Phase | Name | Duration | Dependencies | Parallel With |
-|-------|------|----------|--------------|---------------|
-| 1 | Foundation & Architecture | 2-3 weeks | None | - |
-| 2 | System Audio Capture | 1-2 weeks | Phase 1 | 3, 4, 5, 6 |
-| 3 | Live Subtitles | 1-2 weeks | Phase 1 | 2, 4, 5, 6 |
-| 4 | Speaker Diarization | 2 weeks | Phase 1 | 2, 3, 5, 6 |
-| 5 | LLM Summarization | 1-2 weeks | Phase 1 | 2, 3, 4, 6 |
-| 6 | Meeting History & Storage | 1-2 weeks | Phase 1 | 2, 3, 4, 5 |
-| 7 | Integration & Polish | 1-2 weeks | 1-6 | - |
-| 8 | Testing & Release | 1 week | 7 | - |
+| Phase | Name | Duration | Dependencies | Status |
+|-------|------|----------|--------------|--------|
+| 1 | Foundation & Architecture | 2-3 weeks | None | ✅ Done |
+| 2 | System Audio Capture | 1-2 weeks | Phase 1 | ✅ Done |
+| 3 | Live Subtitles | 1-2 weeks | Phase 1 | ✅ Done |
+| 4 | ~~Speaker Diarization~~ | ~~2 weeks~~ | ~~Phase 1~~ | ⏭️ **DEFERRED to v1.4.0** |
+| 5 | LLM Summarization | 1-2 weeks | Phase 1 | 🔜 Next |
+| 6 | Meeting History & Storage | 1-2 weeks | Phase 1 | 🔜 Next |
+| 7 | Integration & Polish | 1-2 weeks | 1-3, 5-6 | Pending |
+| 8 | Testing & Release | 1 week | 7 | Pending |
+
+> **Revised Estimate:** 8-10 weeks (reduced from 10-12 weeks by deferring Phase 4)
 
 ---
 
@@ -656,11 +666,38 @@ This document breaks down the v1.3.0 Meeting Transcription feature into developm
 
 ---
 
-## Phase 4: Speaker Diarization
-**Goal:** Identify and label speakers in transcript  
-**Duration:** 2 weeks  
-**Dependencies:** Phase 1  
-**Can Parallel With:** Phases 2, 3, 5, 6
+## Phase 4: Speaker Diarization ⏭️ DEFERRED TO v1.4.0
+
+> ⚠️ **THIS PHASE IS DEFERRED TO v1.4.0**
+> 
+> **Decision Date:** January 24, 2025
+> 
+> **Reasons for Deferral:**
+> 1. **HuggingFace Token Requirement** - PyAnnote requires users to create a HuggingFace account, accept model license, and generate API token. This is unacceptable UX for a consumer desktop app.
+> 2. **Large Model Downloads** - ~500MB+ models would significantly increase app size or require complex first-run setup.
+> 3. **Python Dependency** - Managing Python subprocess from Swift adds complexity and potential failure points.
+> 4. **Swift-Only Approach Failed** - Technical spike showed only 39-58% accuracy with pure Swift implementation (k-means clustering on MFCC features) - insufficient for production use.
+> 
+> **Impact on v1.3.0:**
+> - Transcripts will NOT have speaker labels ("Speaker A:", "Speaker B:")
+> - Users can still read the full transcript and manually identify speakers based on context
+> - All other features (recording, transcription, summarization, history) work fully
+> 
+> **v1.4.0 Plan:**
+> - Option A: Core ML speaker embedding model (no Python, no HuggingFace)
+> - Option B: Alternative library without HF token requirement (speechbrain, resemblyzer)
+> - Option C: Optional cloud diarization API (opt-in for users who want it)
+> 
+> **Spike Branches Preserved:**
+> - `spike/speaker-diarization-swift` - Swift-only approach (failed, 39-58% accuracy)
+> - `spike/speaker-diarization-python` - PyAnnote approach (works but UX issues)
+
+~~**Goal:** Identify and label speakers in transcript~~  
+~~**Duration:** 2 weeks~~  
+~~**Dependencies:** Phase 1~~  
+~~**Can Parallel With:** Phases 2, 3, 5, 6~~
+
+**Status:** ⏭️ DEFERRED - All tasks below are NOT required for v1.3.0
 
 ### Phase 4 Validation Criteria
 
@@ -782,23 +819,27 @@ This document breaks down the v1.3.0 Meeting Transcription feature into developm
 - [ ] **4.9.1** Add diarization section to Settings
 - [ ] **4.9.2** Create PyAnnote setup wizard
 
-### 4.10 Phase 4 Validation Checklist
+### 4.10 Phase 4 Validation Checklist ⏭️ SKIPPED
 
-- [ ] **4.10.1** All automated tests pass
-- [ ] **4.10.2** Basic mode DER < 25% (2-speaker)
-- [ ] **4.10.3** Basic mode DER < 35% (4-speaker)
-- [ ] **4.10.4** Fallback test passes (no Python)
-- [ ] **4.10.5** Diarization demo successful
+> **All validation items below are SKIPPED for v1.3.0 - Phase 4 is deferred to v1.4.0**
+
+- [SKIP] **4.10.1** ~~All automated tests pass~~
+- [SKIP] **4.10.2** ~~Basic mode DER < 25% (2-speaker)~~
+- [SKIP] **4.10.3** ~~Basic mode DER < 35% (4-speaker)~~
+- [SKIP] **4.10.4** ~~Fallback test passes (no Python)~~
+- [SKIP] **4.10.5** ~~Diarization demo successful~~
 
 ---
 
-### 4.11 Phase 4 User Acceptance Tests (UAT)
+### 4.11 Phase 4 User Acceptance Tests (UAT) ⏭️ SKIPPED
 
-**Time Required:** ~25 minutes
+> **All UAT tests below are SKIPPED for v1.3.0 - Phase 4 is deferred to v1.4.0**
 
-**Prerequisites:**
-- Another person to help (or ability to change voice pitch significantly)
-- Python 3.8+ installed (optional, for enhanced mode test)
+~~**Time Required:** ~25 minutes~~
+
+~~**Prerequisites:**~~
+~~- Another person to help (or ability to change voice pitch significantly)~~
+~~- Python 3.8+ installed (optional, for enhanced mode test)~~
 
 #### UAT 4.1: Two-Person Conversation Test
 | Step | Action | Expected Result | ✓ |
@@ -1338,15 +1379,17 @@ Also, remind everyone that the office will be closed next Thursday for the holid
 ```
 1. Start meeting recording (Both sources)
 2. Enable live subtitles
-3. Speak for 5 minutes with 2 voices (or simulated)
+3. Speak for 5 minutes
 4. Stop recording
 5. Wait for processing (observe progress UI)
-6. Verify: Summary shows 2 speakers
-7. Verify: Transcript has speaker labels
+6. Verify: Transcript is complete and accurate
+7. Verify: Summary is generated with key points
 8. Verify: Meeting appears in history
 9. Export to Markdown
 10. Verify: File contains all expected sections
 ```
+
+> **Note:** Speaker labels (e.g., "Speaker A:", "Speaker B:") are NOT included in v1.3.0 - deferred to v1.4.0
 
 ---
 
@@ -1379,14 +1422,14 @@ Also, remind everyone that the office will be closed next Thursday for the holid
 | Disk full during recording | Stop recording, save what exists, show error | Manual |
 | Microphone permission revoked | Stop recording, show permission dialog | Manual |
 | Screen Recording permission revoked | Fall back to mic-only | Manual |
-| Python crashes during diarization | Skip diarization, proceed with transcript | Automated |
+| ~~Python crashes during diarization~~ | ~~Skip diarization, proceed with transcript~~ | ~~Automated~~ **(N/A - Phase 4 deferred)** |
 | LLM timeout | Skip summary, show transcript only | Automated |
 | LLM returns invalid response | Use fallback template | Automated |
 | App crash during recording | Recover chunks on next launch | Manual |
 | Network failure (cloud LLM) | Fall back to local or skip | Automated |
 
 - [ ] **7.4.1** Implement error handler for each scenario
-- [ ] **7.4.2** Test: `testDiarizationFailureContinuesWithTranscript` (AUTOMATED)
+- [N/A] **7.4.2** ~~Test: `testDiarizationFailureContinuesWithTranscript`~~ **(Phase 4 deferred)**
 - [ ] **7.4.3** Test: `testLLMTimeoutSkipsSummary` (AUTOMATED)
 - [ ] **7.4.4** Test: `testLLMInvalidResponseUsesFallback` (AUTOMATED)
 - [ ] **7.4.5** Manual: Test audio device disconnection
@@ -1475,18 +1518,17 @@ Also, remind everyone that the office will be closed next Thursday for the holid
 | 5 | Play a YouTube video with speech | System audio captured | [ ] |
 | 6 | Speak yourself: "I am testing the meeting recorder" | Your voice captured | [ ] |
 | 7 | Continue for 5 minutes with both sources | Recording proceeds | [ ] |
-| 8 | Observe live subtitles | Both voices transcribed | [ ] |
+| 8 | Observe live subtitles | Both audio sources transcribed | [ ] |
 | 9 | Click "Stop Recording" | Recording stops, processing begins | [ ] |
 | 10 | Watch progress stages: | | |
 |    | - "Saving audio..." | Shown | [ ] |
 |    | - "Transcribing (1/X)..." | Shown with progress | [ ] |
-|    | - "Identifying speakers..." | Shown | [ ] |
 |    | - "Generating summary..." | Shown | [ ] |
 | 11 | Wait for completion | Notification appears | [ ] |
 | 12 | View the meeting result | Detail view opens | [ ] |
 | 13 | Check Summary tab | Summary generated with key points | [ ] |
-| 14 | Check Transcript tab | Full transcript with speaker labels | [ ] |
-| 15 | Check Speakers tab | 2+ speakers detected | [ ] |
+| 14 | Check Transcript tab | Full transcript with timestamps | [ ] |
+| 15 | ~~Check Speakers tab~~ | ~~2+ speakers detected~~ | [N/A] **(Phase 4 deferred)** |
 | 16 | Check Action Items tab | Any action items shown | [ ] |
 | 17 | Open Meeting History | New meeting at top of list | [ ] |
 | 18 | Export to Markdown | File saved successfully | [ ] |
@@ -1579,7 +1621,7 @@ Also, remind everyone that the office will be closed next Thursday for the holid
 | 2 | See sections: | | |
 |    | - Default audio source | Dropdown works | [ ] |
 |    | - Show live subtitles by default | Toggle works | [ ] |
-|    | - Speaker identification mode | Options shown | [ ] |
+|    | - ~~Speaker identification mode~~ | ~~Options shown~~ | [N/A] **(Phase 4 deferred)** |
 |    | - Summary template | Dropdown works | [ ] |
 |    | - Storage settings | Options visible | [ ] |
 | 3 | Change settings | Changes apply | [ ] |
@@ -1645,10 +1687,10 @@ Also, remind everyone that the office will be closed next Thursday for the holid
 - [ ] **8.5.1** Recording with complete silence
 - [ ] **8.5.2** Recording with very loud audio (clipping)
 - [ ] **8.5.3** Recording with background noise
-- [ ] **8.5.4** Meeting with 10 speakers
+- [N/A] **8.5.4** ~~Meeting with 10 speakers~~ **(Phase 4 deferred - no speaker detection)**
 - [ ] **8.5.5** Non-English meeting
 - [ ] **8.5.6** Permission denied at start
-- [ ] **8.5.7** No Python installed
+- [N/A] **8.5.7** ~~No Python installed~~ **(Phase 4 deferred - Python not required)**
 
 ### 8.6 Manual QA Checklist
 
@@ -1922,7 +1964,7 @@ If you prefer not to use ElevenLabs API:
 | 1 | Record + chunks | Memory < 100 MB, 10 chunks for 5 min |
 | 2 | System audio | Correlation > 0.8 with original |
 | 3 | Live subtitles | Latency < 5s, WER < 20% |
-| 4 | Diarization | DER < 25% (2-speaker), < 35% (4-speaker) |
+| 4 | ~~Diarization~~ | ~~DER < 25% (2-speaker), < 35% (4-speaker)~~ **⏭️ DEFERRED to v1.4.0** |
 | 5 | Summarization | All variables filled, keywords > 80% |
 | 6 | Storage | CRUD works, cleanup complete |
 | 7 | Integration | All scenarios handled, regression pass |
@@ -1952,14 +1994,14 @@ A phase is complete when:
 | 1 | 4 tests | 15 min | Recording, chunks, memory, cancel |
 | 2 | 5 tests | 20 min | Permissions, YouTube, Teams, mixed, fallback |
 | 3 | 6 tests | 15 min | Subtitles, latency, accuracy, window, scroll |
-| 4 | 6 tests | 25 min | 2-person, names, single speaker, fallback, PyAnnote |
+| 4 | ~~6 tests~~ | ~~25 min~~ | ~~2-person, names, single speaker, fallback, PyAnnote~~ **⏭️ SKIPPED (deferred to v1.4.0)** |
 | 5 | 7 tests | 20 min | Summary, action items, templates, custom, fallback |
 | 6 | 9 tests | 20 min | History, detail, edit, search, export, delete, storage |
 | 7 | 10 tests | 45 min | E2E flow, sources, errors, regression, polish |
 | 8 | 13 tests | 2 hours | Stress, edge cases, install, compatibility, accessibility |
 
-**Total UAT Tests:** ~60 tests  
-**Total UAT Time:** ~4-5 hours
+**Total UAT Tests:** ~54 tests (reduced from ~60 by deferring Phase 4)  
+**Total UAT Time:** ~3.5-4 hours (reduced from ~4-5 hours)
 
 ---
 

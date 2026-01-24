@@ -2,15 +2,18 @@
 # Meeting Transcription & Live Subtitles
 
 **Version:** 1.3.0  
-**Status:** Draft  
+**Status:** In Progress  
 **Created:** January 6, 2025  
+**Revised:** January 24, 2025 (Phase 4 Speaker Diarization deferred to v1.4.0)  
 **Author:** Eng Leong  
 
 ---
 
 ## Executive Summary
 
-WhisperType v1.3.0 introduces **Meeting Transcription** - a major feature that transforms WhisperType from a quick voice-to-text tool into a comprehensive meeting productivity assistant. Users can record meetings up to 90 minutes, view live subtitles during recording, and receive AI-powered summaries with speaker identification after the meeting ends.
+WhisperType v1.3.0 introduces **Meeting Transcription** - a major feature that transforms WhisperType from a quick voice-to-text tool into a comprehensive meeting productivity assistant. Users can record meetings up to 90 minutes, view live subtitles during recording, and receive AI-powered summaries after the meeting ends.
+
+> **Note (January 2025):** Speaker Diarization (F4) has been **deferred to v1.4.0** due to implementation complexity (HuggingFace token requirement creates poor UX for consumer apps). The core meeting recording, transcription, summarization, and history features remain fully functional without speaker labels.
 
 ### Key Value Propositions
 
@@ -49,7 +52,7 @@ WhisperType v1.3.0 introduces **Meeting Transcription** - a major feature that t
 |------|-------------|
 | **G1** | Enable recording of meetings up to 90 minutes without memory issues |
 | **G2** | Provide real-time visual feedback via live subtitles |
-| **G3** | Accurately identify and label different speakers |
+| ~~**G3**~~ | ~~Accurately identify and label different speakers~~ **(DEFERRED to v1.4.0)** |
 | **G4** | Generate useful, customizable meeting summaries |
 | **G5** | Maintain complete privacy with local-first processing |
 
@@ -59,7 +62,7 @@ WhisperType v1.3.0 introduces **Meeting Transcription** - a major feature that t
 |--------|--------|
 | Memory usage during 60-min recording | < 150 MB |
 | Transcription accuracy (WER) | Maintain v1.2 levels |
-| Speaker diarization accuracy | > 85% correct speaker assignment |
+| ~~Speaker diarization accuracy~~ | ~~> 85% correct speaker assignment~~ **(DEFERRED)** |
 | End-to-end processing time (60-min meeting) | < 15 minutes |
 | User can start recording within | 3 clicks from menu bar |
 
@@ -345,6 +348,18 @@ To prevent "Zombie Object" crashes (EXC_BAD_ACCESS) on macOS, all auxiliary wind
 ---
 
 ## F4: Speaker Diarization
+
+> ⚠️ **DEFERRED TO v1.4.0**
+> 
+> Speaker diarization has been deferred due to implementation complexity:
+> - PyAnnote requires HuggingFace token, creating poor UX for consumer apps
+> - ~500MB+ model downloads required
+> - Python subprocess management adds complexity
+> - Swift-only approach (spike tested) achieved only 39-58% accuracy - insufficient
+> 
+> **Impact:** Transcripts will not have speaker labels (e.g., "Speaker A:", "Speaker B:"). Users can still read the full transcript and manually identify speakers based on context.
+> 
+> **v1.4.0 Plan:** Investigate Core ML speaker embedding models or alternative libraries without HuggingFace dependency.
 
 ### F4.1 Overview
 
@@ -979,9 +994,9 @@ New "Meetings" tab in Settings:
 | **Recording** | Recover chunks after app crash |
 | **Live Subtitles** | Latency < 5 seconds consistently |
 | **Live Subtitles** | Window responsiveness during long recordings |
-| **Diarization** | 2-speaker accuracy > 85% |
-| **Diarization** | 4-speaker accuracy > 80% |
-| **Diarization** | Graceful fallback without Python |
+| ~~**Diarization**~~ | ~~2-speaker accuracy > 85%~~ **(DEFERRED to v1.4.0)** |
+| ~~**Diarization**~~ | ~~4-speaker accuracy > 80%~~ **(DEFERRED to v1.4.0)** |
+| ~~**Diarization**~~ | ~~Graceful fallback without Python~~ **(DEFERRED to v1.4.0)** |
 | **Summary** | Template variable substitution correct |
 | **Summary** | Hierarchical summarization for 60-min meeting |
 | **History** | Search by title returns correct results |
@@ -996,7 +1011,7 @@ New "Meetings" tab in Settings:
 
 - [ ] 90-minute recording completes without crash or memory issue
 - [ ] Live subtitles display with < 5 second latency
-- [ ] Speaker diarization achieves > 80% accuracy on test set
+- ~~[ ] Speaker diarization achieves > 80% accuracy on test set~~ **(DEFERRED to v1.4.0)**
 - [ ] All 6 built-in templates generate valid output
 - [ ] Meeting history correctly stores and retrieves meetings
 - [ ] Export to Markdown produces valid file
@@ -1009,11 +1024,12 @@ New "Meetings" tab in Settings:
 
 | Feature | Version | Notes |
 |---------|---------|-------|
-| Real-time speaker labels in subtitles | v1.4.0 | Architecture ready |
+| **Speaker Diarization** | **v1.4.0** | **Deferred from v1.3.0** - Requires better approach (Core ML model or library without HF token) |
+| Real-time speaker labels in subtitles | v1.4.0 | Depends on speaker diarization |
+| Core ML diarization model | v1.4.0 | Remove Python/HuggingFace dependency |
 | Export to DOCX/PDF | v1.4.0 | Deferred |
 | App auto-detection | v1.4.0 | Deferred |
 | Full-text search | v1.4.0 | Nice-to-have |
-| Core ML diarization model | v1.4.0 | Remove Python dependency |
 | Calendar integration | v2.0.0 | Auto-create meetings from calendar |
 | Cloud sync | v2.0.0 | Sync meetings across devices |
 
@@ -1029,7 +1045,7 @@ New "Meetings" tab in Settings:
 | **Custom Templates** | ✅ Yes | Limited | Limited | ❌ No |
 | **Any App Audio** | ✅ Yes | ✅ Yes | ✅ Yes | Teams only |
 | **Live Subtitles** | ✅ Yes | ✅ Yes | ❌ No | ✅ Yes |
-| **Speaker ID** | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Yes |
+| **Speaker ID** | ⏳ v1.4.0 | ✅ Yes | ✅ Yes | ✅ Yes |
 | **Action Items** | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Yes |
 
 ---
