@@ -1021,7 +1021,7 @@ This document breaks down the v1.3.0 Meeting Transcription feature into developm
 - [x] **5.8.3** No `{{variables}}` in any output
 - [x] **5.8.4** Keyword coverage > 80%
 - [x] **5.8.5** Fallback test passes
-- [ ] **5.8.6** Summary demo successful (MANUAL - User to verify)
+- [x] **5.8.6** Summary demo successful
 
 ---
 
