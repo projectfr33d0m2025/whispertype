@@ -577,6 +577,15 @@ struct MenuBarView: View {
                 }
             }
             
+            // Meeting History (Phase 6)
+            MenuBarButton(
+                title: "Meeting History...",
+                icon: "clock.arrow.circlepath",
+                shortcut: nil
+            ) {
+                openMeetingHistory()
+            }
+            
             Divider()
                 .padding(.vertical, 4)
             
@@ -641,6 +650,16 @@ struct MenuBarView: View {
         // Use AppDelegate's method to show settings window (more reliable for menu bar apps)
         DispatchQueue.main.async {
             AppDelegate.shared?.showSettingsWindow()
+        }
+    }
+    
+    private func openMeetingHistory() {
+        // Dismiss the menu bar popover first
+        dismiss()
+        
+        // Use AppDelegate's method to show meeting history window
+        DispatchQueue.main.async {
+            AppDelegate.shared?.showMeetingHistoryWindow()
         }
     }
 }

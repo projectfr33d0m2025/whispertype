@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		13BB0F2E41D6C189F3A1DFEC /* ActionItemExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00E741F82F928527B0B8AE8 /* ActionItemExtractor.swift */; };
+		161B017FDECF67B09F6F2545 /* MeetingDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2114F3EDCEA868ED89C91BE6 /* MeetingDetailView.swift */; };
+		25D747FDCBBA9AE071924E8A /* MeetingFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C93FB278665ECBA6D85B396 /* MeetingFileManager.swift */; };
+		2A4F92F72A879816076F778E /* MeetingDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = C21C338605A942978A346C12 /* MeetingDatabase.swift */; };
 		365B1CAC1E16210254CB5DA3 /* SummaryValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A837CEC44FDBE8285546EC93 /* SummaryValidator.swift */; };
 		45AEEB78D285C9AEB70EEC48 /* SummaryTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54D552FC30ACDEDF2BA8B5D7 /* SummaryTemplate.swift */; };
 		5982D2A68B8E47B9D3CA129A /* MeetingSummarizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23138F52294687A98610E758 /* MeetingSummarizer.swift */; };
@@ -63,10 +66,13 @@
 		A8000001000000000000001 /* SettingsContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8000002000000000000001 /* SettingsContainerView.swift */; };
 		A8000003000000000000001 /* GeneralSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8000004000000000000001 /* GeneralSettingsView.swift */; };
 		A8000005000000000000001 /* HotkeySettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8000006000000000000001 /* HotkeySettingsView.swift */; };
+		AE7AE289AA499883557C7E32 /* MeetingHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B782D17B7319EAC44A543BF7 /* MeetingHistoryView.swift */; };
 		B1200001000000000000001 /* WaveformView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1200002000000000000001 /* WaveformView.swift */; };
 		B1200004000000000000001 /* RecordingOverlayWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1200005000000000000001 /* RecordingOverlayWindow.swift */; };
 		B1200006000000000000001 /* RecordingOverlayContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1200007000000000000001 /* RecordingOverlayContentView.swift */; };
 		B1300001000000000000001 /* SupportedLanguage.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1300002000000000000001 /* SupportedLanguage.swift */; };
+		B20E461CBA544E7D72818846 /* StorageManagementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63DCB56E3D59240BDC3FEBF9 /* StorageManagementView.swift */; };
+		BAEB6E67F99A76331AAD74EB /* MeetingExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CE712A25E84AD3FEE2DD39 /* MeetingExporter.swift */; };
 		C1200001000000000000001 /* ProcessingMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1200002000000000000001 /* ProcessingMode.swift */; };
 		C1200003000000000000001 /* LLMPreference.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1200004000000000000001 /* LLMPreference.swift */; };
 		C1200005000000000000001 /* FillerRemover.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1200006000000000000001 /* FillerRemover.swift */; };
@@ -113,11 +119,14 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2114F3EDCEA868ED89C91BE6 /* MeetingDetailView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MeetingDetailView.swift; sourceTree = "<group>"; };
 		23138F52294687A98610E758 /* MeetingSummarizer.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MeetingSummarizer.swift; sourceTree = "<group>"; };
 		300B6E3DC2DBB02739FD2392 /* ActionItem.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ActionItem.swift; sourceTree = "<group>"; };
 		4DBCF8A1CA7BDFCB790FC15F /* TemplateEditorView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TemplateEditorView.swift; sourceTree = "<group>"; };
 		4E3C82EFE84D0FA2AB5D5B78 /* TemplateListView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TemplateListView.swift; sourceTree = "<group>"; };
 		54D552FC30ACDEDF2BA8B5D7 /* SummaryTemplate.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SummaryTemplate.swift; sourceTree = "<group>"; };
+		63DCB56E3D59240BDC3FEBF9 /* StorageManagementView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = StorageManagementView.swift; sourceTree = "<group>"; };
+		6C93FB278665ECBA6D85B396 /* MeetingFileManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MeetingFileManager.swift; path = Storage/MeetingFileManager.swift; sourceTree = "<group>"; };
 		7B0072E22F1CEA4600D01584 /* TranscriptResultWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptResultWindow.swift; sourceTree = "<group>"; };
 		7B0072E42F1CF97E00D01584 /* ProcessingIndicatorWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessingIndicatorWindow.swift; sourceTree = "<group>"; };
 		7B73EFC12EDD944D0062E68C /* ModelManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelManager.swift; sourceTree = "<group>"; };
@@ -180,6 +189,7 @@
 		B1200005000000000000001 /* RecordingOverlayWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingOverlayWindow.swift; sourceTree = "<group>"; };
 		B1200007000000000000001 /* RecordingOverlayContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingOverlayContentView.swift; sourceTree = "<group>"; };
 		B1300002000000000000001 /* SupportedLanguage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportedLanguage.swift; sourceTree = "<group>"; };
+		B782D17B7319EAC44A543BF7 /* MeetingHistoryView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MeetingHistoryView.swift; sourceTree = "<group>"; };
 		BE3A0ABCA6AA17FA9B219848 /* SummaryTemplateStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SummaryTemplateStore.swift; sourceTree = "<group>"; };
 		C1200002000000000000001 /* ProcessingMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessingMode.swift; sourceTree = "<group>"; };
 		C1200004000000000000001 /* LLMPreference.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMPreference.swift; sourceTree = "<group>"; };
@@ -188,6 +198,8 @@
 		C1200010000000000000001 /* LLMEngineProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMEngineProtocol.swift; sourceTree = "<group>"; };
 		C1200014000000000000001 /* PostProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostProcessor.swift; sourceTree = "<group>"; };
 		C1200016000000000000001 /* ProcessingSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessingSettingsView.swift; sourceTree = "<group>"; };
+		C21C338605A942978A346C12 /* MeetingDatabase.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MeetingDatabase.swift; path = Storage/MeetingDatabase.swift; sourceTree = "<group>"; };
+		C7CE712A25E84AD3FEE2DD39 /* MeetingExporter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MeetingExporter.swift; path = Export/MeetingExporter.swift; sourceTree = "<group>"; };
 		D1200002000000000000001 /* LLMProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMProvider.swift; sourceTree = "<group>"; };
 		D1200004000000000000001 /* PromptBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptBuilder.swift; sourceTree = "<group>"; };
 		D1200006000000000000001 /* OllamaProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OllamaProvider.swift; sourceTree = "<group>"; };
@@ -214,7 +226,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		7BBD25A12F0E0857001B3B5A /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+		7BBD25A12F0E0857001B3B5A /* Exceptions for "WhisperTypeTests" folder in "WhisperTypeTests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Meeting/AudioMixerTests.swift,
@@ -224,7 +236,18 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		7BBD25612F0E041A001B3B5A /* WhisperTypeTests */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (7BBD25A12F0E0857001B3B5A /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = WhisperTypeTests; sourceTree = "<group>"; };
+		7BBD25612F0E041A001B3B5A /* WhisperTypeTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				7BBD25A12F0E0857001B3B5A /* Exceptions for "WhisperTypeTests" folder in "WhisperTypeTests" target */,
+			);
+			explicitFileTypes = {
+			};
+			explicitFolders = (
+			);
+			path = WhisperTypeTests;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -254,6 +277,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		6DD5148581FD35B270666532 /* Storage */ = {
+			isa = PBXGroup;
+			children = (
+				C21C338605A942978A346C12 /* MeetingDatabase.swift */,
+				6C93FB278665ECBA6D85B396 /* MeetingFileManager.swift */,
+			);
+			name = Storage;
+			sourceTree = "<group>";
+		};
 		7BBD25802F0E0687001B3B5A /* Audio */ = {
 			isa = PBXGroup;
 			children = (
@@ -308,6 +340,8 @@
 				7BBD25872F0E0687001B3B5A /* Recording */,
 				7BBD258A2F0E0687001B3B5A /* Utilities */,
 				8296FCAABF027BBCBF51A4D2 /* Summarization */,
+				6DD5148581FD35B270666532 /* Storage */,
+				D640C222C1186F6CA98984BA /* Export */,
 			);
 			path = Meeting;
 			sourceTree = "<group>";
@@ -332,6 +366,9 @@
 				7BBD25B52F0E3D2E001B3B5A /* SubtitleEntryView.swift */,
 				4DBCF8A1CA7BDFCB790FC15F /* TemplateEditorView.swift */,
 				4E3C82EFE84D0FA2AB5D5B78 /* TemplateListView.swift */,
+				B782D17B7319EAC44A543BF7 /* MeetingHistoryView.swift */,
+				2114F3EDCEA868ED89C91BE6 /* MeetingDetailView.swift */,
+				63DCB56E3D59240BDC3FEBF9 /* StorageManagementView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -559,6 +596,14 @@
 			path = Processing;
 			sourceTree = "<group>";
 		};
+		D640C222C1186F6CA98984BA /* Export */ = {
+			isa = PBXGroup;
+			children = (
+				C7CE712A25E84AD3FEE2DD39 /* MeetingExporter.swift */,
+			);
+			name = Export;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -754,6 +799,12 @@
 				45AEEB78D285C9AEB70EEC48 /* SummaryTemplate.swift in Sources */,
 				6BB38A88BA91289A6459387D /* TemplateEditorView.swift in Sources */,
 				CB8852D400592E31B85FDFC1 /* TemplateListView.swift in Sources */,
+				2A4F92F72A879816076F778E /* MeetingDatabase.swift in Sources */,
+				25D747FDCBBA9AE071924E8A /* MeetingFileManager.swift in Sources */,
+				BAEB6E67F99A76331AAD74EB /* MeetingExporter.swift in Sources */,
+				AE7AE289AA499883557C7E32 /* MeetingHistoryView.swift in Sources */,
+				161B017FDECF67B09F6F2545 /* MeetingDetailView.swift in Sources */,
+				B20E461CBA544E7D72818846 /* StorageManagementView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

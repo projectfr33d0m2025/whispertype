@@ -91,6 +91,39 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         settingsWindow?.makeKeyAndOrderFront(nil)
     }
+    
+    // MARK: - Meeting History Window (Phase 6)
+    
+    private var meetingHistoryWindow: NSWindow?
+    
+    func showMeetingHistoryWindow() {
+        // Bring app to foreground
+        NSApp.activate(ignoringOtherApps: true)
+        
+        // Try to find existing meeting history window
+        if let existingWindow = NSApp.windows.first(where: { $0.identifier?.rawValue == "meetingHistory" }) {
+            existingWindow.makeKeyAndOrderFront(nil)
+            return
+        }
+        
+        // Create new meeting history window if it doesn't exist
+        if meetingHistoryWindow == nil || meetingHistoryWindow?.isVisible == false {
+            let historyView = MeetingHistoryView()
+            let hostingController = NSHostingController(rootView: historyView)
+            
+            let window = NSWindow(contentViewController: hostingController)
+            window.title = "Meeting History"
+            window.identifier = NSUserInterfaceItemIdentifier("meetingHistory")
+            window.styleMask = [.titled, .closable, .miniaturizable, .resizable]
+            window.setContentSize(NSSize(width: 900, height: 600))
+            window.minSize = NSSize(width: 700, height: 400)
+            window.center()
+            
+            meetingHistoryWindow = window
+        }
+        
+        meetingHistoryWindow?.makeKeyAndOrderFront(nil)
+    }
 
     // MARK: - Permission Checking
 

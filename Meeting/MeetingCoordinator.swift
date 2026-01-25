@@ -504,9 +504,13 @@ class MeetingCoordinator: ObservableObject {
         // CRITICAL: Capture session properties as local values BEFORE any async operations
         // This prevents race conditions where the Task runs after state transitions
         // have modified the session's @Published properties
+        let sessionId = session.id
         let sessionTitle = session.title
         let sessionDuration = session.formattedDuration
+        let sessionDurationSeconds = Int(session.duration)
         let sessionCreatedAt = session.createdAt
+        let sessionAudioSource = session.audioSource
+        let sessionKeepAudioFiles = session.keepAudioFiles
         
         guard let sessionDir = sessionDir else {
             print("❌ saveFullTranscript: No session directory for saving transcript")
@@ -541,9 +545,9 @@ class MeetingCoordinator: ObservableObject {
             try transcript.write(to: textURL, atomically: true, encoding: .utf8)
             
             // Save summary if available
-            var summaryURL: URL? = nil
+            var summaryFilename: String? = nil
             if let summary = summary, !summary.isEmpty {
-                summaryURL = sessionDir.appendingPathComponent("summary.md")
+                let summaryURL = sessionDir.appendingPathComponent("summary.md")
                 var summaryMarkdown = "# Meeting Summary\n\n"
                 summaryMarkdown += "**Title:** \(sessionTitle)\n"
                 summaryMarkdown += "**Date:** \(DateFormatter.localizedString(from: sessionCreatedAt, dateStyle: .medium, timeStyle: .short))\n"
@@ -551,9 +555,24 @@ class MeetingCoordinator: ObservableObject {
                 summaryMarkdown += "---\n\n"
                 summaryMarkdown += summary
                 
-                try summaryMarkdown.write(to: summaryURL!, atomically: true, encoding: .utf8)
-                print("📍 saveFullTranscript: Saved summary to \(summaryURL!.path)")
+                try summaryMarkdown.write(to: summaryURL, atomically: true, encoding: .utf8)
+                summaryFilename = "summary.md"
+                print("📍 saveFullTranscript: Saved summary to \(summaryURL.path)")
             }
+            
+            // PHASE 6: Save meeting record to database
+            saveMeetingToDatabase(
+                id: sessionId,
+                title: sessionTitle,
+                createdAt: sessionCreatedAt,
+                durationSeconds: sessionDurationSeconds,
+                audioSource: sessionAudioSource.rawValue,
+                sessionDirectory: sessionDir.path,
+                transcriptFile: "transcript.md",
+                summaryFile: summaryFilename,
+                summary: summary,
+                audioKept: sessionKeepAudioFiles
+            )
             
             // Show the transcript result window (must be on main thread!)
             print("📍 saveFullTranscript: Showing TranscriptResultWindow...")
@@ -572,11 +591,64 @@ class MeetingCoordinator: ObservableObject {
             NotificationCenter.default.post(
                 name: .meetingTranscriptReady,
                 object: transcript,
-                userInfo: ["sessionTitle": sessionTitle, "path": markdownURL, "summaryPath": summaryURL as Any]
+                userInfo: ["sessionTitle": sessionTitle, "path": markdownURL, "summaryPath": sessionDir.appendingPathComponent(summaryFilename ?? "") as Any]
             )
             
         } catch {
             print("MeetingCoordinator: Failed to save transcript - \(error)")
+        }
+    }
+    
+    /// Save meeting record to the database (Phase 6)
+    private func saveMeetingToDatabase(
+        id: String,
+        title: String,
+        createdAt: Date,
+        durationSeconds: Int,
+        audioSource: String,
+        sessionDirectory: String,
+        transcriptFile: String?,
+        summaryFile: String?,
+        summary: String?,
+        audioKept: Bool
+    ) {
+        // Generate summary preview (first 200 characters)
+        let summaryPreview: String?
+        if let summary = summary, !summary.isEmpty {
+            let cleanSummary = summary
+                .replacingOccurrences(of: "#", with: "")
+                .replacingOccurrences(of: "*", with: "")
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+            summaryPreview = String(cleanSummary.prefix(200))
+        } else {
+            summaryPreview = nil
+        }
+        
+        let record = MeetingRecord(
+            id: id,
+            title: title,
+            createdAt: createdAt,
+            durationSeconds: durationSeconds,
+            audioSource: audioSource,
+            speakerCount: 0, // Speaker diarization deferred to v1.4
+            status: .complete,
+            errorMessage: nil,
+            sessionDirectory: sessionDirectory,
+            transcriptFile: transcriptFile,
+            summaryFile: summaryFile,
+            audioKept: audioKept,
+            summaryPreview: summaryPreview,
+            templateUsed: UserDefaults.standard.string(forKey: Constants.UserDefaultsKeys.meetingDefaultTemplate) ?? "standard"
+        )
+        
+        do {
+            try MeetingDatabase.shared.insertMeeting(record)
+            print("📍 MeetingCoordinator: Saved meeting to database - id: \(id)")
+            
+            // Post notification that meeting was saved to history
+            NotificationCenter.default.post(name: .meetingProcessingComplete, object: record)
+        } catch {
+            print("❌ MeetingCoordinator: Failed to save meeting to database - \(error.localizedDescription)")
         }
     }
     
