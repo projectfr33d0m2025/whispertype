@@ -15,16 +15,23 @@ import SwiftUI
 class ProcessingIndicatorState: ObservableObject {
     @Published var duration: String = ""
     @Published var chunkCount: Int = 0
+    @Published var stage: String = "Processing..."
     @Published var isVisible: Bool = false
     
     func update(duration: String, chunkCount: Int) {
         self.duration = duration
         self.chunkCount = chunkCount
+        self.stage = "Processing..."
         self.isVisible = true
+    }
+    
+    func updateStage(_ stage: String) {
+        self.stage = stage
     }
     
     func reset() {
         self.isVisible = false
+        self.stage = "Processing..."
     }
 }
 
@@ -102,6 +109,12 @@ class ProcessingIndicatorWindow {
         
         print("ProcessingIndicatorWindow: Hidden")
     }
+    
+    /// Update the current processing stage message
+    func updateStage(_ stage: String) {
+        state.updateStage(stage)
+        print("ProcessingIndicatorWindow: Stage updated to '\(stage)'")
+    }
 }
 
 // MARK: - SwiftUI View
@@ -111,7 +124,7 @@ struct ProcessingIndicatorView: View {
     
     var body: some View {
         VStack(spacing: 20) {
-            Text("Processing Recording...")
+            Text(state.stage)
                 .font(.headline)
             
             HStack(spacing: 12) {

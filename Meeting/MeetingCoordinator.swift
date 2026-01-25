@@ -408,11 +408,26 @@ class MeetingCoordinator: ObservableObject {
             // Trim trailing newlines
             fullTranscript = fullTranscript.trimmingCharacters(in: .whitespacesAndNewlines)
             
+            // Generate summary (Phase 5 - LLM Summarization)
+            session.setProcessingStage(.summarizing)
+            ProcessingIndicatorWindow.shared.updateStage("Generating summary...")
+            
+            let summaryResult = await MeetingSummarizer.shared.summarize(
+                transcript: fullTranscript,
+                duration: session.formattedDuration,
+                date: session.createdAt
+            )
+            
             // Hide processing indicator before showing result
             ProcessingIndicatorWindow.shared.hide()
             
-            // Save the accurate full transcript (using captured session directory)
-            saveFullTranscript(fullTranscript, session: session, sessionDir: sessionDir)
+            // Save the accurate full transcript and summary (using captured session directory)
+            saveFullTranscript(
+                fullTranscript,
+                summary: summaryResult.summary,
+                session: session,
+                sessionDir: sessionDir
+            )
             
             session.setProcessingStage(.complete)
             completeSession(session)
@@ -482,8 +497,8 @@ class MeetingCoordinator: ObservableObject {
         return samples
     }
     
-    /// Save the full accurate transcript to disk and show result window
-    private func saveFullTranscript(_ transcript: String, session: MeetingSession, sessionDir: URL?) {
+    /// Save the full accurate transcript and summary to disk and show result window
+    private func saveFullTranscript(_ transcript: String, summary: String? = nil, session: MeetingSession, sessionDir: URL?) {
         print("📍 saveFullTranscript: Starting, sessionDir: \(sessionDir?.path ?? "nil")")
         
         // CRITICAL: Capture session properties as local values BEFORE any async operations
@@ -499,6 +514,7 @@ class MeetingCoordinator: ObservableObject {
             Task { @MainActor in
                 TranscriptResultWindow.shared.show(
                     transcript: transcript,
+                    summary: summary,
                     sessionTitle: sessionTitle,      // Use captured value
                     duration: sessionDuration,       // Use captured value
                     transcriptPath: nil
@@ -518,11 +534,26 @@ class MeetingCoordinator: ObservableObject {
             markdown += transcript
             
             try markdown.write(to: markdownURL, atomically: true, encoding: .utf8)
-            print("📍 saveFullTranscript: Saved to \(markdownURL.path)")
+            print("📍 saveFullTranscript: Saved transcript to \(markdownURL.path)")
             
             // Also save as plain text for easy copy/paste
             let textURL = sessionDir.appendingPathComponent("transcript.txt")
             try transcript.write(to: textURL, atomically: true, encoding: .utf8)
+            
+            // Save summary if available
+            var summaryURL: URL? = nil
+            if let summary = summary, !summary.isEmpty {
+                summaryURL = sessionDir.appendingPathComponent("summary.md")
+                var summaryMarkdown = "# Meeting Summary\n\n"
+                summaryMarkdown += "**Title:** \(sessionTitle)\n"
+                summaryMarkdown += "**Date:** \(DateFormatter.localizedString(from: sessionCreatedAt, dateStyle: .medium, timeStyle: .short))\n"
+                summaryMarkdown += "**Duration:** \(sessionDuration)\n\n"
+                summaryMarkdown += "---\n\n"
+                summaryMarkdown += summary
+                
+                try summaryMarkdown.write(to: summaryURL!, atomically: true, encoding: .utf8)
+                print("📍 saveFullTranscript: Saved summary to \(summaryURL!.path)")
+            }
             
             // Show the transcript result window (must be on main thread!)
             print("📍 saveFullTranscript: Showing TranscriptResultWindow...")
@@ -530,6 +561,7 @@ class MeetingCoordinator: ObservableObject {
                 print("📍 saveFullTranscript: On MainActor, calling show()")
                 TranscriptResultWindow.shared.show(
                     transcript: transcript,
+                    summary: summary,
                     sessionTitle: sessionTitle,      // Use captured value
                     duration: sessionDuration,       // Use captured value
                     transcriptPath: markdownURL
@@ -540,7 +572,7 @@ class MeetingCoordinator: ObservableObject {
             NotificationCenter.default.post(
                 name: .meetingTranscriptReady,
                 object: transcript,
-                userInfo: ["sessionTitle": sessionTitle, "path": markdownURL]
+                userInfo: ["sessionTitle": sessionTitle, "path": markdownURL, "summaryPath": summaryURL as Any]
             )
             
         } catch {

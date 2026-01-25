@@ -14,6 +14,7 @@ struct SettingsContainerView: View {
         case processing = "Processing"
         case vocabulary = "Vocabulary"
         case appRules = "App Rules"
+        case meetings = "Meetings"
         case models = "Models"
         case hotkey = "Hotkey"
         
@@ -23,6 +24,7 @@ struct SettingsContainerView: View {
             case .processing: return "wand.and.stars"
             case .vocabulary: return "textformat.abc"
             case .appRules: return "app.badge.checkmark"
+            case .meetings: return "person.3.fill"
             case .models: return "cpu"
             case .hotkey: return "keyboard"
             }
@@ -57,6 +59,12 @@ struct SettingsContainerView: View {
                 }
                 .tag(SettingsTab.appRules)
             
+            MeetingsSettingsTabView()
+                .tabItem {
+                    Label(SettingsTab.meetings.rawValue, systemImage: SettingsTab.meetings.icon)
+                }
+                .tag(SettingsTab.meetings)
+            
             ModelsSettingsTabView()
                 .tabItem {
                     Label(SettingsTab.models.rawValue, systemImage: SettingsTab.models.icon)
@@ -85,6 +93,14 @@ struct SettingsContainerView: View {
 struct ModelsSettingsTabView: View {
     var body: some View {
         ModelSettingsView()
+            .padding(.top, 8)
+    }
+}
+
+/// Wrapper view for Meetings/Summary Templates settings
+struct MeetingsSettingsTabView: View {
+    var body: some View {
+        TemplateListView()
             .padding(.top, 8)
     }
 }

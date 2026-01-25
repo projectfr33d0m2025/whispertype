@@ -14,22 +14,33 @@ import SwiftUI
 @MainActor
 class TranscriptResultState: ObservableObject {
     @Published var transcript: String = ""
+    @Published var summary: String = ""
     @Published var sessionTitle: String = ""
     @Published var duration: String = ""
     @Published var transcriptPath: URL?
     @Published var showCopiedFeedback: Bool = false
+    @Published var selectedTab: ResultTab = .summary
     
-    func update(transcript: String, sessionTitle: String, duration: String, transcriptPath: URL?) {
+    enum ResultTab: String, CaseIterable {
+        case summary = "Summary"
+        case transcript = "Transcript"
+    }
+    
+    func update(transcript: String, summary: String?, sessionTitle: String, duration: String, transcriptPath: URL?) {
         self.transcript = transcript
+        self.summary = summary ?? ""
         self.sessionTitle = sessionTitle
         self.duration = duration
         self.transcriptPath = transcriptPath
         self.showCopiedFeedback = false
+        // Default to summary tab if summary is available, otherwise transcript
+        self.selectedTab = (summary != nil && !summary!.isEmpty) ? .summary : .transcript
     }
     
-    func copyTranscript() {
+    func copyCurrentContent() {
+        let content = selectedTab == .summary ? summary : transcript
         NSPasteboard.general.clearContents()
-        NSPasteboard.general.setString(transcript, forType: .string)
+        NSPasteboard.general.setString(content, forType: .string)
         showCopiedFeedback = true
         
         // Reset feedback after delay
@@ -37,7 +48,7 @@ class TranscriptResultState: ObservableObject {
             self?.showCopiedFeedback = false
         }
         
-        print("TranscriptResultWindow: Copied transcript to clipboard")
+        print("TranscriptResultWindow: Copied \(selectedTab.rawValue.lowercased()) to clipboard")
     }
     
     func openTranscriptFile() {
@@ -47,6 +58,10 @@ class TranscriptResultState: ObservableObject {
     
     var wordCount: Int {
         transcript.split(separator: " ").count
+    }
+    
+    var hasSummary: Bool {
+        !summary.isEmpty
     }
 }
 
@@ -70,9 +85,10 @@ class TranscriptResultWindow {
     
     // MARK: - Show Window
     
-    /// Show the transcript result window with the final transcript
+    /// Show the transcript result window with the final transcript and optional summary
     func show(
         transcript: String,
+        summary: String? = nil,
         sessionTitle: String,
         duration: String,
         transcriptPath: URL?
@@ -80,6 +96,7 @@ class TranscriptResultWindow {
         // Update state (this triggers SwiftUI to re-render, not recreate)
         state.update(
             transcript: transcript,
+            summary: summary,
             sessionTitle: sessionTitle,
             duration: duration,
             transcriptPath: transcriptPath
@@ -146,13 +163,35 @@ struct TranscriptResultView: View {
             
             Divider()
             
-            // Transcript content
+            // Tab picker (only show if we have a summary)
+            if state.hasSummary {
+                Picker("", selection: $state.selectedTab) {
+                    ForEach(TranscriptResultState.ResultTab.allCases, id: \.self) { tab in
+                        Text(tab.rawValue).tag(tab)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .padding(.horizontal)
+                .padding(.vertical, 8)
+                
+                Divider()
+            }
+            
+            // Content based on selected tab
             ScrollView {
-                Text(state.transcript.isEmpty ? "No transcript available" : state.transcript)
-                    .font(.system(.body, design: .default))
-                    .textSelection(.enabled)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding()
+                if state.selectedTab == .summary && state.hasSummary {
+                    Text(state.summary)
+                        .font(.system(.body, design: .default))
+                        .textSelection(.enabled)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding()
+                } else {
+                    Text(state.transcript.isEmpty ? "No transcript available" : state.transcript)
+                        .font(.system(.body, design: .default))
+                        .textSelection(.enabled)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding()
+                }
             }
             .background(Color(NSColor.textBackgroundColor))
             
@@ -197,7 +236,7 @@ struct TranscriptResultView: View {
     private var footerView: some View {
         HStack {
             Button(action: {
-                state.copyTranscript()
+                state.copyCurrentContent()
             }) {
                 Label(state.showCopiedFeedback ? "Copied!" : "Copy", systemImage: state.showCopiedFeedback ? "checkmark" : "doc.on.doc")
             }
