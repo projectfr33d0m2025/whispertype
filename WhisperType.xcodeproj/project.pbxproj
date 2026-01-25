@@ -17,6 +17,7 @@
 		6BB38A88BA91289A6459387D /* TemplateEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DBCF8A1CA7BDFCB790FC15F /* TemplateEditorView.swift */; };
 		7B0072E32F1CEA4600D01584 /* TranscriptResultWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0072E22F1CEA4600D01584 /* TranscriptResultWindow.swift */; };
 		7B0072E52F1CF97E00D01584 /* ProcessingIndicatorWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0072E42F1CF97E00D01584 /* ProcessingIndicatorWindow.swift */; };
+		7B6931462F25C270001B7EF8 /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = 7B6931452F25C270001B7EF8 /* MarkdownUI */; };
 		7B73EFC22EDD944D0062E68C /* ModelManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B73EFC12EDD944D0062E68C /* ModelManager.swift */; };
 		7B73EFC42EDD946C0062E68C /* ModelRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B73EFC32EDD946C0062E68C /* ModelRowView.swift */; };
 		7B73EFC62EDD947C0062E68C /* ModelSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B73EFC52EDD947C0062E68C /* ModelSettingsView.swift */; };
@@ -226,7 +227,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		7BBD25A12F0E0857001B3B5A /* Exceptions for "WhisperTypeTests" folder in "WhisperTypeTests" target */ = {
+		7BBD25A12F0E0857001B3B5A /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Meeting/AudioMixerTests.swift,
@@ -236,18 +237,7 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		7BBD25612F0E041A001B3B5A /* WhisperTypeTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				7BBD25A12F0E0857001B3B5A /* Exceptions for "WhisperTypeTests" folder in "WhisperTypeTests" target */,
-			);
-			explicitFileTypes = {
-			};
-			explicitFolders = (
-			);
-			path = WhisperTypeTests;
-			sourceTree = "<group>";
-		};
+		7BBD25612F0E041A001B3B5A /* WhisperTypeTests */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (7BBD25A12F0E0857001B3B5A /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = WhisperTypeTests; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -271,6 +261,7 @@
 				7B73EFCF2EDDD9D10062E68C /* HotKey in Frameworks */,
 				A1000005000000000000001 /* Accelerate.framework in Frameworks */,
 				A1000072000000000000001 /* Metal.framework in Frameworks */,
+				7B6931462F25C270001B7EF8 /* MarkdownUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -675,6 +666,7 @@
 			mainGroup = A1000012000000000000001;
 			packageReferences = (
 				7B73EFCD2EDDD9D10062E68C /* XCRemoteSwiftPackageReference "HotKey" */,
+				7B6931442F25C1B3001B7EF8 /* XCRemoteSwiftPackageReference "MarkdownUI" */,
 			);
 			productRefGroup = A1000016000000000000001 /* Products */;
 			projectDirPath = "";
@@ -1103,6 +1095,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		7B6931442F25C1B3001B7EF8 /* XCRemoteSwiftPackageReference "MarkdownUI" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/gonzalezreal/MarkdownUI";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.4.1;
+			};
+		};
 		7B73EFCD2EDDD9D10062E68C /* XCRemoteSwiftPackageReference "HotKey" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/soffes/HotKey";
@@ -1114,6 +1114,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		7B6931452F25C270001B7EF8 /* MarkdownUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7B6931442F25C1B3001B7EF8 /* XCRemoteSwiftPackageReference "MarkdownUI" */;
+			productName = MarkdownUI;
+		};
 		7B73EFCE2EDDD9D10062E68C /* HotKey */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 7B73EFCD2EDDD9D10062E68C /* XCRemoteSwiftPackageReference "HotKey" */;

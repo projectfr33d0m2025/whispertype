@@ -6,8 +6,10 @@
 //
 
 import SwiftUI
+import MarkdownUI // Add import
 
-// MARK: - Detail Tab
+// ... (existing code)
+
 
 enum MeetingDetailTab: String, CaseIterable {
     case summary = "Summary"
@@ -275,17 +277,24 @@ struct MeetingDetailView: View {
 
 // MARK: - Summary Tab View
 
+// MARK: - Summary Tab View
+
 struct SummaryTabView: View {
     let content: String
     
     var body: some View {
         ScrollView {
-            Text(content)
+            Markdown(preprocess(content))
                 .textSelection(.enabled)
+                .markdownTheme(.whisperType)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding()
         }
         .background(Color(nsColor: .textBackgroundColor))
+    }
+    
+    private func preprocess(_ text: String) -> String {
+        return text.replacingOccurrences(of: "\n", with: "  \n")
     }
 }
 
@@ -296,13 +305,17 @@ struct TranscriptTabView: View {
     
     var body: some View {
         ScrollView {
-            Text(content)
+            Markdown(preprocess(content))
                 .textSelection(.enabled)
-                .font(.system(.body, design: .monospaced))
+                .markdownTheme(.whisperType)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding()
         }
         .background(Color(nsColor: .textBackgroundColor))
+    }
+    
+    private func preprocess(_ text: String) -> String {
+        return text.replacingOccurrences(of: "\n", with: "  \n")
     }
 }
 
@@ -448,4 +461,40 @@ import UniformTypeIdentifiers
         onTitleChange: { _ in },
         onDelete: {}
     )
+}
+
+// MARK: - Custom Theme
+
+extension Theme {
+    static let whisperType = Theme.gitHub
+        .text {
+            FontSize(13)
+        }
+        .heading1 { configuration in
+            VStack(alignment: .leading, spacing: 0) {
+                configuration.label
+                    .markdownMargin(top: 24, bottom: 16)
+                    .markdownTextStyle {
+                        FontWeight(.bold)
+                        FontSize(18)
+                    }
+                Divider()
+            }
+        }
+        .heading2 { configuration in
+            configuration.label
+                .markdownMargin(top: 16, bottom: 8)
+                .markdownTextStyle {
+                    FontWeight(.semibold)
+                    FontSize(15)
+                }
+        }
+        .heading3 { configuration in
+            configuration.label
+                .markdownMargin(top: 16, bottom: 8)
+                .markdownTextStyle {
+                    FontWeight(.semibold)
+                    FontSize(14)
+                }
+        }
 }
