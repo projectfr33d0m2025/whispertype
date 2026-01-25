@@ -1163,83 +1163,83 @@ Also, remind everyone that the office will be closed next Thursday for the holid
 
 ### 6.1 SQLite Database
 
-- [ ] **6.1.1** Create `MeetingDatabase.swift`
-- [ ] **6.1.2** Define database schema
-- [ ] **6.1.3** Implement migrations
-- [ ] **6.1.4** Add indexes
-- [ ] **6.1.5** Write tests (AUTOMATED):
-  - [ ] `testDatabaseInitialization`
-  - [ ] `testInsertMeeting`
-  - [ ] `testUpdateMeeting`
-  - [ ] `testGetMeetingByID`
-  - [ ] `testGetAllMeetings`
-  - [ ] `testSearchByTitle`
-  - [ ] `testDeleteMeeting`
-  - [ ] `testMigrationFromV1ToV2` (future-proofing)
+- [x] **6.1.1** Create `MeetingDatabase.swift`
+- [x] **6.1.2** Define database schema
+- [x] **6.1.3** Implement migrations
+- [x] **6.1.4** Add indexes
+- [x] **6.1.5** Write tests (AUTOMATED):
+  - [x] `testDatabaseInitialization`
+  - [x] `testInsertMeeting`
+  - [x] `testUpdateMeeting`
+  - [x] `testGetMeetingByID`
+  - [x] `testGetAllMeetings`
+  - [x] `testSearchByTitle`
+  - [x] `testDeleteMeeting`
+  - [x] `testMigrationFromV1ToV2` (future-proofing)
 
 ### 6.2 File Storage Manager
 
-- [ ] **6.2.1** Create `MeetingFileManager.swift`
-- [ ] **6.2.2** Implement directory creation
-- [ ] **6.2.3** Implement transcript/summary saving
-- [ ] **6.2.4** Implement audio cleanup
-- [ ] **6.2.5** Implement storage calculation
-- [ ] **6.2.6** Write tests (AUTOMATED):
-  - [ ] `testDirectoryCreation`
-  - [ ] `testFileSaving`
-  - [ ] `testFileDeletion`
-  - [ ] `testStorageCalculation`
-  - [ ] `testCleanupRemovesOrphanFiles`
+- [x] **6.2.1** Create `MeetingFileManager.swift`
+- [x] **6.2.2** Implement directory creation
+- [x] **6.2.3** Implement transcript/summary saving
+- [x] **6.2.4** Implement audio cleanup
+- [x] **6.2.5** Implement storage calculation
+- [x] **6.2.6** Write tests (AUTOMATED):
+  - [x] `testDirectoryCreation`
+  - [x] `testFileSaving`
+  - [x] `testFileDeletion`
+  - [x] `testStorageCalculation`
+  - [x] `testCleanupRemovesOrphanFiles`
 
 ### 6.3 Meeting Record Model
 
-- [ ] **6.3.1** Create `MeetingRecord.swift`
-- [ ] **6.3.2** Create `MeetingSpeaker` model
-- [ ] **6.3.3** Create `MeetingMetadata` model
-- [ ] **6.3.4** Write tests (AUTOMATED):
-  - [ ] `testModelEncodingDecoding`
+- [x] **6.3.1** Create `MeetingRecord.swift`
+- [x] **6.3.2** Create `MeetingSpeaker` model
+- [x] **6.3.3** Create `MeetingMetadata` model
+- [x] **6.3.4** Write tests (AUTOMATED):
+  - [x] `testModelEncodingDecoding`
 
 ### 6.4 Meeting History UI
 
-- [ ] **6.4.1** Create `MeetingHistoryView.swift`
-- [ ] **6.4.2** Create `MeetingRowView.swift`
-- [ ] **6.4.3** Create `MeetingDetailView.swift`
-- [ ] **6.4.4** Create `SummaryTabView.swift`
-- [ ] **6.4.5** Create `TranscriptTabView.swift`
-- [ ] **6.4.6** Create `ActionItemsTabView.swift`
-- [ ] **6.4.7** Create `SpeakersTabView.swift`
-- [ ] **6.4.8** Write UI tests (MANUAL):
-  - [ ] List displays meetings correctly
-  - [ ] Search filters list
-  - [ ] Detail view shows correct data
+- [x] **6.4.1** Create `MeetingHistoryView.swift`
+- [x] **6.4.2** Create `MeetingRowView.swift`
+- [x] **6.4.3** Create `MeetingDetailView.swift`
+- [x] **6.4.4** Create `SummaryTabView.swift`
+- [x] **6.4.5** Create `TranscriptTabView.swift`
+- [x] **6.4.6** Create `ActionItemsTabView.swift`
+- [x] **6.4.7** Create `SpeakersTabView.swift`
+- [x] **6.4.8** Write UI tests (MANUAL):
+  - [x] List displays meetings correctly
+  - [x] Search filters list
+  - [x] Detail view shows correct data
 
 ### 6.5 Export
 
-- [ ] **6.5.1** Create `MeetingExporter.swift`
-- [ ] **6.5.2** Implement Markdown export
-- [ ] **6.5.3** Implement clipboard copy
-- [ ] **6.5.4** Write tests (AUTOMATED):
-  - [ ] `testMarkdownOutputFormat`
-  - [ ] `testMarkdownContainsAllSections`
+- [x] **6.5.1** Create `MeetingExporter.swift`
+- [x] **6.5.2** Implement Markdown export
+- [x] **6.5.3** Implement clipboard copy
+- [x] **6.5.4** Write tests (AUTOMATED):
+  - [x] `testMarkdownOutputFormat`
+  - [x] `testMarkdownContainsAllSections`
 
 ### 6.6 Storage Management
 
-- [ ] **6.6.1** Create `StorageManagementView.swift`
-- [ ] **6.6.2** Add "Keep audio" toggle
-- [ ] **6.6.3** Implement bulk delete
+- [x] **6.6.1** Create `StorageManagementView.swift`
+- [x] **6.6.2** Add "Keep audio" toggle
+- [x] **6.6.3** Implement bulk delete
 
 ### 6.7 Scale Testing
 
-- [ ] **6.7.1** `testWith100Meetings` (AUTOMATED) - performance check
-- [ ] **6.7.2** `testSearchPerformanceWith100Meetings` (AUTOMATED)
+- [x] **6.7.1** `testWith100Meetings` (AUTOMATED) - performance check
+- [x] **6.7.2** `testSearchPerformanceWith100Meetings` (AUTOMATED)
 
 ### 6.8 Phase 6 Validation Checklist
 
-- [ ] **6.8.1** All automated tests pass
-- [ ] **6.8.2** Full CRUD cycle demo successful
-- [ ] **6.8.3** Export produces valid Markdown
-- [ ] **6.8.4** Delete removes all related files
-- [ ] **6.8.5** Scale tests pass (100 meetings)
+- [x] **6.8.1** All automated tests pass
+- [x] **6.8.2** Full CRUD cycle demo successful
+- [x] **6.8.3** Export produces valid Markdown
+- [x] **6.8.4** Delete removes all related files
+- [x] **6.8.5** Scale tests pass (100 meetings)
 
 ---
 
