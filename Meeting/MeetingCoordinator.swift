@@ -139,6 +139,11 @@ class MeetingCoordinator: ObservableObject {
         
         // Create new session
         let session = MeetingSession(title: title, audioSource: audioSource)
+        
+        // Apply keep audio files setting from UserDefaults
+        session.keepAudioFiles = UserDefaults.standard.bool(forKey: Constants.UserDefaultsKeys.meetingKeepAudioFiles)
+        print("MeetingCoordinator: Created session with keepAudioFiles = \(session.keepAudioFiles)")
+        
         currentSession = session
         
         // Transition session to recording
@@ -644,6 +649,21 @@ class MeetingCoordinator: ObservableObject {
         do {
             try MeetingDatabase.shared.insertMeeting(record)
             print("📍 MeetingCoordinator: Saved meeting to database - id: \(id)")
+            
+            // Delete audio files if not keeping them to save disk space
+            if !audioKept {
+                let sessionDirURL = URL(fileURLWithPath: sessionDirectory)
+                let audioDir = sessionDirURL.appendingPathComponent("audio")
+                
+                if FileManager.default.fileExists(atPath: audioDir.path) {
+                    do {
+                        try FileManager.default.removeItem(at: audioDir)
+                        print("📍 MeetingCoordinator: Deleted audio directory to save disk space")
+                    } catch {
+                        print("⚠️ MeetingCoordinator: Failed to delete audio directory - \(error.localizedDescription)")
+                    }
+                }
+            }
             
             // Post notification that meeting was saved to history
             NotificationCenter.default.post(name: .meetingProcessingComplete, object: record)

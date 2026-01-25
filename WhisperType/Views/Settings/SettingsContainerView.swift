@@ -99,9 +99,65 @@ struct ModelsSettingsTabView: View {
 
 /// Wrapper view for Meetings/Summary Templates settings
 struct MeetingsSettingsTabView: View {
+    @StateObject private var viewModel = MeetingsSettingsViewModel()
+    
     var body: some View {
-        TemplateListView()
-            .padding(.top, 8)
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+                // Template selection section
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Summary Templates")
+                        .font(.headline)
+                    
+                    TemplateListView()
+                }
+                
+                Divider()
+                    .padding(.vertical, 8)
+                
+                // Storage settings section
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Storage Settings")
+                        .font(.headline)
+                    
+                    Toggle(isOn: Binding(
+                        get: { viewModel.keepAudioFiles },
+                        set: { _ in viewModel.toggleKeepAudioFiles() }
+                    )) {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Keep Audio Files")
+                            Text("Audio chunks will be preserved after transcription. Disabling saves storage space.")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    
+                    Text("Note: This setting applies to new recordings. Existing meetings are not affected.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .padding(.top, 4)
+                }
+                
+                Spacer()
+            }
+            .padding()
+        }
+    }
+}
+
+// MARK: - Meetings Settings View Model
+
+@MainActor
+class MeetingsSettingsViewModel: ObservableObject {
+    @Published var keepAudioFiles: Bool
+    
+    init() {
+        keepAudioFiles = UserDefaults.standard.bool(forKey: Constants.UserDefaultsKeys.meetingKeepAudioFiles)
+    }
+    
+    func toggleKeepAudioFiles() {
+        keepAudioFiles.toggle()
+        UserDefaults.standard.set(keepAudioFiles, forKey: Constants.UserDefaultsKeys.meetingKeepAudioFiles)
     }
 }
 

@@ -1525,16 +1525,60 @@ Also, remind everyone that the office will be closed next Thursday for the holid
 - [x] **7.9.8** Keyboard navigation works in all dialogs
 - [x] **7.9.9** Verify window singleton pattern prevents crashes (especially after multiple recording sessions)
 
-### 7.10 Phase 7 Validation Checklist
+### 7.10 Audio Features Enhancement
 
-- [x] **7.10.1** Full end-to-end demo successful (see Phase 7 Demo Milestone above)
-- [x] **7.10.2** All audio source combinations tested (mic only, system only, both)
-- [ ] **7.10.3** All critical error scenarios tested and handled (deferred to Phase 8)
-- [x] **7.10.4** v1.2 regression tests pass (quick dictation still works)
-- [x] **7.10.5** UI polish checklist complete
-- [x] **7.10.6** No zombie object crashes after multiple recording sessions
-- [ ] **7.10.7** Settings persistence verified (partial - needs final check)
-- [x] **7.10.8** Menu bar states work correctly throughout recording lifecycle
+> **New Addition:** Expose keep audio setting in UI and add audio playback to Meeting History
+
+**Backend Status:**
+- ✅ `StorageManagementView` already implements keep audio toggle
+- ✅ `MeetingSession.keepAudioFiles` property exists
+- ✅ `MeetingCoordinator` respects setting when saving
+- ✅ Database tracks `audio_kept` field
+- ❌ Setting not exposed in main Settings UI
+- ❌ No audio playback UI in Meeting History
+
+#### 7.10.1 Expose Keep Audio Setting in Settings UI
+
+- [x] **7.10.1.1** Link StorageManagementView to Settings → Meetings tab
+- [x] **7.10.1.2** Verify toggle appears in Settings UI
+- [ ] **7.10.1.3** Test toggle persistence across app restarts (MANUAL)
+- [ ] **7.10.1.4** Verify setting is applied during recording (MANUAL)
+- [ ] **7.10.1.5** Test with audio kept: verify chunks preserved (MANUAL)
+- [ ] **7.10.1.6** Test with audio not kept: verify chunks deleted after processing (MANUAL)
+
+#### 7.10.2 Add Audio Playback to Meeting Detail View
+
+- [x] **7.10.2.1** Create `AudioPlayerView.swift` component (integrated into MeetingDetailView.swift)
+- [x] **7.10.2.2** Implement AVAudioPlayer wrapper for WAV playback
+- [x] **7.10.2.3** Add audio section to MeetingDetailView when audio is kept
+- [x] **7.10.2.4** Display list of audio chunks with durations
+- [x] **7.10.2.5** Add playback controls (play, pause, stop, seek)
+- [x] **7.10.2.6** Show current playback position and duration
+- [x] **7.10.2.7** Handle error states (corrupted audio, missing files)
+- [ ] **7.10.2.8** Test playback of individual chunks (MANUAL)
+- [ ] **7.10.2.9** Test playback controls work correctly (MANUAL)
+
+#### 7.10.3 Integration Testing
+
+- [ ] **7.10.3.1** Record meeting with "keep audio" enabled (MANUAL)
+- [ ] **7.10.3.2** Verify audio chunks appear in meeting detail (MANUAL)
+- [ ] **7.10.3.3** Test playback of each chunk (MANUAL)
+- [ ] **7.10.3.4** Record meeting with "keep audio" disabled (MANUAL)
+- [ ] **7.10.3.5** Verify no audio section appears in meeting detail (MANUAL)
+- [ ] **7.10.3.6** Verify old meetings with audio still playable (MANUAL)
+
+### 7.11 Phase 7 Validation Checklist
+
+- [x] **7.11.1** Full end-to-end demo successful (see Phase 7 Demo Milestone above)
+- [x] **7.11.2** All audio source combinations tested (mic only, system only, both)
+- [ ] **7.11.3** All critical error scenarios tested and handled (deferred to Phase 8)
+- [x] **7.11.4** v1.2 regression tests pass (quick dictation still works)
+- [x] **7.11.5** UI polish checklist complete
+- [x] **7.11.6** No zombie object crashes after multiple recording sessions
+- [ ] **7.11.7** Settings persistence verified (partial - needs final check)
+- [x] **7.11.8** Menu bar states work correctly throughout recording lifecycle
+- [ ] **7.11.9** Keep audio setting accessible in UI
+- [ ] **7.11.10** Audio playback functional in Meeting History
 
 **Remaining for Phase 7:**
 - [ ] Verify TranscriptResultWindow opens correctly (Section 7.3.4)

@@ -6,7 +6,227 @@
 //
 
 import SwiftUI
-import MarkdownUI // Add import
+import MarkdownUI
+import AVFoundation
+
+// MARK: - Audio Player View Model
+
+@MainActor
+class AudioPlayerViewModel: ObservableObject {
+    @Published var isPlaying: Bool = false
+    @Published var currentTime: TimeInterval = 0
+    @Published var duration: TimeInterval = 0
+    @Published var errorMessage: String?
+    @Published var currentlyPlayingURL: URL?
+    
+    private var audioPlayer: AVAudioPlayer?
+    private var timer: Timer?
+    
+    // Called by the view before it disappears to ensure clean cleanup
+    func cleanup() {
+        timer?.invalidate()
+        timer = nil
+        audioPlayer?.stop()
+        audioPlayer = nil
+        isPlaying = false
+        currentlyPlayingURL = nil
+    }
+    
+    func loadAudio(url: URL) {
+        stop()
+        errorMessage = nil
+        
+        do {
+            audioPlayer = try AVAudioPlayer(contentsOf: url)
+            audioPlayer?.prepareToPlay()
+            duration = audioPlayer?.duration ?? 0
+            currentlyPlayingURL = url
+        } catch {
+            errorMessage = "Unable to load audio file: \(error.localizedDescription)"
+            print("AudioPlayerViewModel: Failed to load audio - \(error)")
+        }
+    }
+    
+    func play() {
+        guard let player = audioPlayer else { return }
+        
+        player.play()
+        isPlaying = true
+        startTimer()
+    }
+    
+    func pause() {
+        audioPlayer?.pause()
+        isPlaying = false
+        stopTimer()
+    }
+    
+    func stop() {
+        audioPlayer?.stop()
+        audioPlayer?.currentTime = 0
+        isPlaying = false
+        currentTime = 0
+        currentlyPlayingURL = nil
+        stopTimer()
+    }
+    
+    func seek(to time: TimeInterval) {
+        audioPlayer?.currentTime = time
+        currentTime = time
+    }
+    
+    // MARK: - Private Methods
+    
+    private func startTimer() {
+        timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
+            // Wrap in Task to avoid "Publishing changes from within view updates"
+            Task { @MainActor in
+                guard let self = self, let player = self.audioPlayer else { return }
+                
+                self.currentTime = player.currentTime
+                
+                // Auto-stop when finished
+                if !player.isPlaying && self.isPlaying {
+                    self.stop()
+                }
+            }
+        }
+    }
+    
+    private func stopTimer() {
+        timer?.invalidate()
+        timer = nil
+    }
+}
+
+// MARK: - Audio Player View
+
+struct AudioPlayerView: View {
+    let audioURL: URL
+    let chunkName: String
+    @ObservedObject var viewModel: AudioPlayerViewModel
+    
+    init(audioURL: URL, chunkName: String, viewModel: AudioPlayerViewModel) {
+        self.audioURL = audioURL
+        self.chunkName = chunkName
+        self.viewModel = viewModel
+    }
+    
+    var body: some View {
+        HStack(spacing: 12) {
+            // Play/Pause button
+            Button {
+                if viewModel.currentlyPlayingURL != audioURL {
+                    viewModel.loadAudio(url: audioURL)
+                    viewModel.play()
+                } else {
+                    if viewModel.isPlaying {
+                        viewModel.pause()
+                    } else {
+                        viewModel.play()
+                    }
+                }
+            } label: {
+                Image(systemName: (viewModel.currentlyPlayingURL == audioURL && viewModel.isPlaying) ? "pause.circle.fill" : "play.circle.fill")
+                    .font(.title2)
+                    .foregroundStyle(.tint)
+            }
+            .buttonStyle(.plain)
+            .disabled(viewModel.errorMessage != nil)
+            
+            // Stop button
+            Button {
+                if viewModel.currentlyPlayingURL == audioURL {
+                    viewModel.stop()
+                }
+            } label: {
+                Image(systemName: "stop.circle.fill")
+                    .font(.title2)
+                    .foregroundStyle(.secondary)
+            }
+            .buttonStyle(.plain)
+            .disabled(viewModel.currentlyPlayingURL != audioURL)
+            
+            VStack(alignment: .leading, spacing: 4) {
+                // Chunk name
+                Text(chunkName)
+                    .font(.body)
+                
+                // Progress and time
+                if viewModel.currentlyPlayingURL == audioURL {
+                    HStack(spacing: 8) {
+                        Text(formatTime(viewModel.currentTime))
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .monospacedDigit()
+                        
+                        Slider(
+                            value: Binding(
+                                get: { viewModel.currentTime },
+                                set: { viewModel.seek(to: $0) }
+                            ),
+                            in: 0...max(viewModel.duration, 1)
+                        )
+                        .controlSize(.small)
+                        
+                        Text(formatTime(viewModel.duration))
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .monospacedDigit()
+                    }
+                } else {
+                    // Show duration when not playing
+                    if let duration = getAudioDuration(url: audioURL) {
+                        Text(formatTime(duration))
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .monospacedDigit()
+                    }
+                }
+            }
+            
+            Spacer()
+        }
+        .padding(.vertical, 8)
+        .padding(.horizontal, 12)
+        .background(
+            RoundedRectangle(cornerRadius: 8)
+                .fill(viewModel.currentlyPlayingURL == audioURL ? Color.accentColor.opacity(0.1) : Color.secondary.opacity(0.05))
+        )
+        .overlay(
+            Group {
+                if let error = viewModel.errorMessage {
+                    HStack {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .foregroundStyle(.orange)
+                        Text(error)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        Spacer()
+                    }
+                    .padding(.horizontal, 12)
+                }
+            }
+        )
+    }
+    
+    // MARK: - Helpers
+    
+    private func formatTime(_ time: TimeInterval) -> String {
+        let minutes = Int(time) / 60
+        let seconds = Int(time) % 60
+        return String(format: "%02d:%02d", minutes, seconds)
+    }
+    
+    private func getAudioDuration(url: URL) -> TimeInterval? {
+        do {
+            let player = try AVAudioPlayer(contentsOf: url)
+            return player.duration
+        } catch {
+            return nil
+        }
+    }
+}
 
 // ... (existing code)
 
@@ -15,12 +235,14 @@ enum MeetingDetailTab: String, CaseIterable {
     case summary = "Summary"
     case transcript = "Transcript"
     case actionItems = "Action Items"
+    case audio = "Audio"
     
     var icon: String {
         switch self {
         case .summary: return "doc.text"
         case .transcript: return "text.quote"
         case .actionItems: return "checklist"
+        case .audio: return "waveform"
         }
     }
 }
@@ -38,8 +260,10 @@ struct MeetingDetailView: View {
     @State private var summaryContent: String = ""
     @State private var transcriptContent: String = ""
     @State private var actionItems: [MeetingActionItem] = []
+    @State private var audioChunks: [URL] = []
     @State private var showingExportSheet: Bool = false
     @State private var copyFeedback: String?
+    @StateObject private var audioPlayerViewModel = AudioPlayerViewModel()
     
     private let fileManager = MeetingFileManager.shared
     private let database = MeetingDatabase.shared
@@ -61,6 +285,10 @@ struct MeetingDetailView: View {
         }
         .onAppear {
             loadContent()
+        }
+        .onDisappear {
+            // Clean up audio player BEFORE view is destroyed to prevent deinit crash
+            audioPlayerViewModel.cleanup()
         }
         .onChange(of: meeting.id) { _ in
             loadContent()
@@ -182,7 +410,7 @@ struct MeetingDetailView: View {
     
     private var tabPicker: some View {
         HStack(spacing: 0) {
-            ForEach(MeetingDetailTab.allCases, id: \.self) { tab in
+            ForEach(availableTabs, id: \.self) { tab in
                 Button {
                     selectedTab = tab
                 } label: {
@@ -197,7 +425,7 @@ struct MeetingDetailView: View {
                 }
                 .buttonStyle(.plain)
                 
-                if tab != MeetingDetailTab.allCases.last {
+                if tab != availableTabs.last {
                     Divider()
                         .frame(height: 20)
                 }
@@ -209,6 +437,15 @@ struct MeetingDetailView: View {
         .padding(.vertical, 4)
     }
     
+    // Only show audio tab if audio files are kept
+    private var availableTabs: [MeetingDetailTab] {
+        if meeting.audioKept {
+            return MeetingDetailTab.allCases
+        } else {
+            return MeetingDetailTab.allCases.filter { $0 != .audio }
+        }
+    }
+    
     @ViewBuilder
     private var tabContent: some View {
         switch selectedTab {
@@ -218,6 +455,8 @@ struct MeetingDetailView: View {
             TranscriptTabView(content: transcriptContent)
         case .actionItems:
             ActionItemsTabView(items: $actionItems, database: database)
+        case .audio:
+            AudioTabView(audioChunks: audioChunks, viewModel: audioPlayerViewModel)
         }
     }
     
@@ -244,6 +483,16 @@ struct MeetingDetailView: View {
         
         // Load action items
         actionItems = (try? database.getActionItems(meetingId: meeting.id)) ?? []
+        
+        // Load audio chunks if available
+        if meeting.audioKept {
+            let audioDir = sessionDir.appendingPathComponent("audio")
+            if FileManager.default.fileExists(atPath: audioDir.path) {
+                let chunks = (try? FileManager.default.contentsOfDirectory(at: audioDir, includingPropertiesForKeys: nil))
+                    .map { $0.filter { $0.pathExtension == "wav" }.sorted { $0.lastPathComponent < $1.lastPathComponent } } ?? []
+                audioChunks = chunks
+            }
+        }
     }
     
     private func saveTitle() {
@@ -262,6 +511,8 @@ struct MeetingDetailView: View {
             content = transcriptContent
         case .actionItems:
             content = actionItems.map { "- \($0.actionText)" }.joined(separator: "\n")
+        case .audio:
+            content = "Audio files from this meeting"
         }
         
         NSPasteboard.general.clearContents()
@@ -384,6 +635,85 @@ struct ActionItemRow: View {
             }
         }
         .padding(.vertical, 4)
+    }
+}
+
+// MARK: - Audio Tab View
+
+struct AudioTabView: View {
+    let audioChunks: [URL]
+    @ObservedObject var viewModel: AudioPlayerViewModel
+    
+    var body: some View {
+        if audioChunks.isEmpty {
+            VStack(spacing: 16) {
+                Image(systemName: "waveform.slash")
+                    .font(.system(size: 48))
+                    .foregroundStyle(.secondary)
+                Text("No Audio Files")
+                    .font(.headline)
+                Text("Audio files were not preserved for this meeting.")
+                    .foregroundStyle(.secondary)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    // Header
+                    HStack {
+                        Image(systemName: "waveform")
+                            .font(.title2)
+                            .foregroundStyle(.secondary)
+                        
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Recorded Audio")
+                                .font(.headline)
+                            Text("\(audioChunks.count) chunk\(audioChunks.count == 1 ? "" : "s"), \(totalDuration)")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                        
+                        Spacer()
+                    }
+                    .padding(.bottom, 8)
+                    
+                    // Audio chunks
+                    ForEach(Array(audioChunks.enumerated()), id: \.offset) { index, url in
+                        AudioPlayerView(
+                            audioURL: url,
+                            chunkName: chunkName(for: index, url: url),
+                            viewModel: viewModel
+                        )
+                    }
+                }
+                .padding()
+            }
+            .background(Color(nsColor: .textBackgroundColor))
+        }
+    }
+    
+    // MARK: - Helpers
+    
+    private var totalDuration: String {
+        var total: TimeInterval = 0
+        for url in audioChunks {
+            if let player = try? AVAudioPlayer(contentsOf: url) {
+                total += player.duration
+            }
+        }
+        let minutes = Int(total) / 60
+        let seconds = Int(total) % 60
+        return String(format: "%d:%02d total", minutes, seconds)
+    }
+    
+    private func chunkName(for index: Int, url: URL) -> String {
+        let chunkNumber = index + 1
+        let startTime = index * 30 // Assuming 30 second chunks
+        let endTime = startTime + 30
+        return String(format: "Chunk %d: %02d:%02d - %02d:%02d", 
+                     chunkNumber,
+                     startTime / 60, startTime % 60,
+                     endTime / 60, endTime % 60)
     }
 }
 

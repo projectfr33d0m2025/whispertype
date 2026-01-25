@@ -209,12 +209,12 @@ class MeetingSession: ObservableObject, Identifiable, Codable {
         self.createdAt = Date()
         self.audioSource = audioSource
         
-        // Generate default title from current date/time
+        // Generate default title from current date/time (includes seconds for disambiguation)
         if let title = title {
             self.title = title
         } else {
             let formatter = DateFormatter()
-            formatter.dateFormat = "MMM d, h:mm a"
+            formatter.dateFormat = "MMM d, h:mm:ss a"
             self.title = "Meeting - \(formatter.string(from: createdAt))"
         }
         

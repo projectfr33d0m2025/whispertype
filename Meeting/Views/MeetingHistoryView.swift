@@ -223,6 +223,7 @@ struct MeetingHistoryView: View {
                         viewModel.confirmDelete(meeting)
                     }
                 )
+                .id(meeting.id) // Force view recreation when meeting changes
             } else {
                 Text("Select a meeting to view details")
                     .foregroundStyle(.secondary)
