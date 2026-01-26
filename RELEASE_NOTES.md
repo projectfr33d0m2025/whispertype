@@ -2,6 +2,54 @@
 
 ---
 
+## WhisperType v1.3.0
+
+### Major New Features
+
+🎙️ **Meeting Recording & Transcription**
+- **Full Meeting Support**: Record long meetings (1hr+) with no time limits
+- **System Audio Capture**: Record audio from video calls (Zoom, Teams, Google Meet) directly
+- **Dual-Channel Recording**: Capture both your microphone and system audio simultaneously
+- **Live Subtitles**: View real-time transcription in a floating window while recording
+- **Meeting History**: Complete archive of all your past meetings
+
+📝 **Advanced Summarization**
+- **Automatic Summaries**: Generate concise summaries of your meetings using LLMs
+- **Action Items**: Automatically extract tasks and action items
+- **Custom Templates**: Define your own summary structures for different meeting types
+- **Export Options**: Save transcripts and summaries to Markdown, Text, or JSON
+
+📊 **Enhanced Analyzing**
+- **Two-Pass Transcription**: Fast real-time subtitles followed by high-accuracy final processing
+- **Audio Waveform**: new visual feedback for audio levels
+
+### Improvements
+
+- **Memory Optimization**: Significant reductions in memory usage for long recordings
+- **Crash Fixes**: Resolved stability issues with autorelease pools during long sessions
+- **UI Refinement**: Polished windows for live subtitles and transcript results
+
+### Technical Changes
+
+- **Streaming Architecture**: New chunk-based audio processing pipeline
+- **Stable Storage**: Robust file-based storage prevents data loss even if app crashes
+
+### System Requirements
+
+- **macOS 13.0** (Ventura) or later
+- **8GB RAM minimum**
+- **Microphone** (for voice recording)
+- **Screen Recording Permission** (required for system audio capture)
+
+### Installation
+
+1. Download `WhisperType-1.3.0.dmg`
+2. Open the DMG and drag WhisperType to Applications
+3. Right-click WhisperType and select "Open"
+4. Grant Microphone and Screen Recording permissions when prompted
+
+---
+
 ## WhisperType v1.2.0
 
 ### Major New Features

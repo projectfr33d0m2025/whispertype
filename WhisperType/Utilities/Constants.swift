@@ -168,6 +168,7 @@ enum Constants {
         static let meetingSpeakerMode = "meetingSpeakerMode"
         static let meetingPythonPath = "meetingPythonPath"
         static let meetingLiveSubtitleWindowFrame = "meetingLiveSubtitleWindowFrame"
+        static let meetingSummaryLLMPreference = "meetingSummaryLLMPreference"
     }
 
     // MARK: - Default Values

@@ -140,14 +140,64 @@ final class LLMEngine: LLMEngineProtocol, ObservableObject {
         return currentStatus
     }
     
+    /// Get status for a specific preference (used by MeetingSummarizer)
+    func statusFor(preference: LLMPreference) async -> LLMEngineStatus {
+        // If disabled, always unavailable
+        if preference == .disabled {
+            return .unavailable(reason: "AI enhancement disabled")
+        }
+        
+        // Check providers based on preference
+        let localStatus = await ollamaProvider.status
+        let cloudStatus = await cloudProvider.status
+        
+        switch preference {
+        case .localOnly:
+            if localStatus.isAvailable {
+                return .available(provider: ollamaProvider.displayName)
+            } else {
+                return .unavailable(reason: "Ollama not available")
+            }
+            
+        case .localFirst:
+            if localStatus.isAvailable {
+                return .available(provider: ollamaProvider.displayName)
+            } else if cloudStatus.isAvailable {
+                return .available(provider: "\(cloudProvider.displayName) (fallback)")
+            } else {
+                return .unavailable(reason: "No providers available")
+            }
+            
+        case .cloudFirst:
+            if cloudStatus.isAvailable {
+                return .available(provider: cloudProvider.displayName)
+            } else if localStatus.isAvailable {
+                return .available(provider: "\(ollamaProvider.displayName) (fallback)")
+            } else {
+                return .unavailable(reason: "No providers available")
+            }
+            
+        case .cloudOnly:
+            if cloudStatus.isAvailable {
+                return .available(provider: cloudProvider.displayName)
+            } else {
+                return .unavailable(reason: "Cloud API not configured")
+            }
+            
+        case .disabled:
+            return .unavailable(reason: "AI enhancement disabled")
+        }
+    }
+    
     // MARK: - Processing
     
     func process(
         _ text: String,
         mode: ProcessingMode,
-        context: TranscriptionContext
+        context: TranscriptionContext,
+        preferenceOverride: LLMPreference? = nil
     ) async throws -> String {
-        let preference = settings.llmPreference
+        let preference = preferenceOverride ?? settings.llmPreference
         
         // Check if LLM is enabled
         guard preference.isEnabled else {

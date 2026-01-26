@@ -1022,6 +1022,7 @@ This document breaks down the v1.3.0 Meeting Transcription feature into developm
 - [x] **5.8.4** Keyword coverage > 80%
 - [x] **5.8.5** Fallback test passes
 - [x] **5.8.6** Summary demo successful
+- [x] **5.8.7** Meeting-specific LLM preference implemented (separate from global setting)
 
 ---
 
@@ -1794,15 +1795,15 @@ All remaining tasks verified and working.
 
 ### 8.7 Documentation
 
-- [ ] **8.7.1** Update README.md
-- [ ] **8.7.2** Write RELEASE_NOTES.md
+- [x] **8.7.1** Update README.md
+- [x] **8.7.2** Write RELEASE_NOTES.md
 - [ ] **8.7.3** Update screenshots
-- [ ] **8.7.4** Document PyAnnote setup
+- [N/A] **8.7.4** Document PyAnnote setup
 
 ### 8.8 Release
 
-- [ ] **8.8.1** Update version numbers
-- [ ] **8.8.2** Build release DMG
+- [x] **8.8.1** Update version numbers
+- [x] **8.8.2** Build release DMG
 - [ ] **8.8.3** Test DMG installation on clean Mac
 - [ ] **8.8.4** Create GitHub release
 - [ ] **8.8.5** Final review and tag

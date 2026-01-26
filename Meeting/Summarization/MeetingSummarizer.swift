@@ -46,6 +46,7 @@ class MeetingSummarizer: ObservableObject {
     private let llmEngine = LLMEngine.shared
     private let templateStore = SummaryTemplateStore.shared
     private let actionExtractor = ActionItemExtractor.shared
+    private let settings = AppSettings.shared
     
     // MARK: - Configuration
     
@@ -85,8 +86,9 @@ class MeetingSummarizer: ObservableObject {
         // Get template
         let selectedTemplate = template ?? templateStore.selectedTemplate ?? templateStore.defaultTemplate
         
-        // Check LLM availability
-        let llmStatus = await llmEngine.status
+        // Check LLM availability using meeting-specific preference
+        let meetingLLMPreference = settings.effectiveMeetingSummaryLLMPreference
+        let llmStatus = await llmEngine.statusFor(preference: meetingLLMPreference)
         let llmAvailable = llmStatus.isAvailable
         
         // Extract variables needed
@@ -198,7 +200,13 @@ class MeetingSummarizer: ObservableObject {
             """
             
             do {
-                let response = try await llmEngine.process(prompt, mode: .polished, context: .default)
+                let meetingPref = settings.effectiveMeetingSummaryLLMPreference
+                let response = try await llmEngine.process(
+                    prompt,
+                    mode: .polished,
+                    context: .default,
+                    preferenceOverride: meetingPref
+                )
                 chunkSummaries.append(response)
             } catch {
                 print("MeetingSummarizer: Failed to summarize chunk \(index) - \(error)")
@@ -318,7 +326,13 @@ class MeetingSummarizer: ObservableObject {
         }
         
         do {
-            let response = try await llmEngine.process(prompt, mode: .polished, context: .default)
+            let meetingPref = settings.effectiveMeetingSummaryLLMPreference
+            let response = try await llmEngine.process(
+                prompt,
+                mode: .polished,
+                context: .default,
+                preferenceOverride: meetingPref
+            )
             return response.trimmingCharacters(in: .whitespacesAndNewlines)
         } catch {
             print("MeetingSummarizer: Failed to generate \(variable) - \(error)")

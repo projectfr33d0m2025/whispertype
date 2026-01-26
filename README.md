@@ -21,11 +21,12 @@
 
 ## Overview
 
-WhisperType is a free, open-source menu bar application that provides **system-wide voice input** for macOS. Using OpenAI's Whisper speech recognition technology, all transcription happens **100% locally on your device** — no cloud services, no API calls, complete privacy.
+WhisperType is a free, open-source menu bar application that provides **system-wide voice input** and **meeting transcription** for macOS. Using OpenAI's Whisper speech recognition technology, all transcription happens **100% locally on your device** — no cloud services, no API calls, complete privacy.
 
 **Key Benefits:**
-- 🔒 **Complete Privacy** — Your voice never leaves your computer
-- 🌐 **Works Everywhere** — Any text field in any application
+- 🔒 **Complete Privacy** — Your voice and meeting audio never leaves your computer
+- 🎙️ **Meeting Assistant** — Record, transcribe, and summarize entire meetings
+- 🌐 **Works Everywhere** — Dictate into any app, or record audio from any app (Zoom, Teams, etc.)
 - ⚡ **Fast & Accurate** — Powered by whisper.cpp with Apple Silicon optimization
 - 💰 **Free Forever** — Open source, no subscriptions
 
@@ -33,6 +34,9 @@ WhisperType is a free, open-source menu bar application that provides **system-w
 
 ### Core Features
 - 🎤 **System-wide voice input** — Dictate in any application (browsers, editors, terminals, etc.)
+- 👥 **Meeting Recording** — Record and transcribe long meetings with system audio capture
+- 📝 **Live Subtitles** — See what's being said in real-time
+- 🧠 **Smart Summaries** — Generate meeting minutes and action items automatically
 - 🔒 **100% local processing** — No internet required after model download
 - ⌨️ **Global hotkey** — Quick activation with customizable shortcut (default: `⌥Space`)
 - 📦 **Multiple model sizes** — From tiny (75 MB) to large (3.1 GB)
@@ -158,6 +162,25 @@ Click the icon to open the menu with status details and quick access to settings
 <p align="center">
   <img src="docs/screenshots/screenshot-menubar.png" alt="Menu Bar" width="320">
 </p>
+
+## Meeting Recording (v1.3)
+
+WhisperType is now a full-featured meeting assistant.
+
+### Recording a Meeting
+1. Click the menu bar icon -> **Start Meeting Recording**
+2. Choose your audio sources:
+   - **Microphone**: Records your voice
+   - **System Audio**: Records other participants (Zoom, Teams, etc.)
+3. Capability to **Show Live Subtitles** for real-time transcription
+4. Recording continues in the background - click the menu bar icon to control
+
+### Summaries & History
+Access past meetings from the **Meeting History** window.
+- View full transcripts
+- Generate summaries and action items (requires LLM setup)
+- Search across all past meetings
+- Export validation data
 
 ## Processing Modes
 

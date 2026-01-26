@@ -42,6 +42,11 @@ class AppSettings: ObservableObject {
     
     private var _cloudProviderType: CloudProviderType = .openRouter
     private var _cloudModel: String = "openai/gpt-4o-mini"
+    
+    // MARK: - v1.3 Meeting Summarization Settings
+    
+    /// Separate LLM preference for meeting summarization (nil = use global preference)
+    private var _meetingSummaryLLMPreference: LLMPreference? = nil
 
     // MARK: - Public Computed Properties
 
@@ -240,6 +245,29 @@ class AppSettings: ObservableObject {
             print("AppSettings: Cloud model changed to \(newValue)")
         }
     }
+    
+    // MARK: - v1.3 Meeting Summarization LLM Settings
+    
+    /// Separate LLM preference for meeting summarization
+    /// When nil, falls back to the global llmPreference
+    var meetingSummaryLLMPreference: LLMPreference? {
+        get { _meetingSummaryLLMPreference }
+        set {
+            objectWillChange.send()
+            _meetingSummaryLLMPreference = newValue
+            if let preference = newValue {
+                UserDefaults.standard.set(preference.rawValue, forKey: Constants.UserDefaultsKeys.meetingSummaryLLMPreference)
+            } else {
+                UserDefaults.standard.removeObject(forKey: Constants.UserDefaultsKeys.meetingSummaryLLMPreference)
+            }
+            print("AppSettings: Meeting summary LLM preference changed to \(newValue?.rawValue ?? "global")")
+        }
+    }
+    
+    /// Effective LLM preference for meeting summarization (falls back to global)
+    var effectiveMeetingSummaryLLMPreference: LLMPreference {
+        meetingSummaryLLMPreference ?? llmPreference
+    }
 
     // MARK: - Initialization
 
@@ -324,6 +352,14 @@ class AppSettings: ObservableObject {
         
         self._cloudModel = defaults.string(forKey: Constants.UserDefaultsKeys.cloudModel)
             ?? Constants.Defaults.cloudModel
+        
+        // Load v1.3 Meeting Summarization LLM Settings
+        if let prefString = defaults.string(forKey: Constants.UserDefaultsKeys.meetingSummaryLLMPreference),
+           let pref = LLMPreference(rawValue: prefString) {
+            self._meetingSummaryLLMPreference = pref
+        } else {
+            self._meetingSummaryLLMPreference = nil // Use global preference
+        }
 
         print("AppSettings: Initialized with active model: \(_activeModelId), processing mode: \(_processingMode.rawValue)")
     }
@@ -351,6 +387,9 @@ class AppSettings: ObservableObject {
         ollamaPort = Constants.Defaults.ollamaPort
         cloudProviderType = Constants.Defaults.cloudProviderType
         cloudModel = Constants.Defaults.cloudModel
+        
+        // v1.3 Meeting Summarization Settings
+        meetingSummaryLLMPreference = nil // Reset to use global preference
 
         print("AppSettings: Reset to defaults")
     }

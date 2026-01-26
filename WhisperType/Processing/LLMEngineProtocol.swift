@@ -222,14 +222,29 @@ protocol LLMEngineProtocol: AnyObject {
     ///   - text: The text to process
     ///   - mode: The processing mode to use
     ///   - context: Additional context for processing
+    ///   - preferenceOverride: Optional preference override (for meeting-specific settings)
     /// - Returns: Processed text
     /// - Throws: LLMError if processing fails
     func process(
         _ text: String,
         mode: ProcessingMode,
-        context: TranscriptionContext
+        context: TranscriptionContext,
+        preferenceOverride: LLMPreference?
     ) async throws -> String
     
     /// Cancel any ongoing processing
     func cancel()
+}
+
+// MARK: - Default Parameter Extension
+
+extension LLMEngineProtocol {
+    /// Convenience method that uses global preference (preferenceOverride = nil)
+    func process(
+        _ text: String,
+        mode: ProcessingMode,
+        context: TranscriptionContext
+    ) async throws -> String {
+        try await process(text, mode: mode, context: context, preferenceOverride: nil)
+    }
 }

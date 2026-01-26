@@ -224,6 +224,73 @@ struct ProcessingSettingsView: View {
                 }
             }
             
+            // MARK: - Meeting Summary AI Provider
+            Section {
+                VStack(alignment: .leading, spacing: 12) {
+                    Label("Meeting Summary AI", systemImage: "text.document")
+                        .font(.headline)
+                    
+                    Text("Choose which AI provider to use when summarizing meeting transcripts after recording.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    
+                    // Toggle for using global preference
+                    Toggle("Use same as general AI preference", isOn: Binding(
+                        get: { settings.meetingSummaryLLMPreference == nil },
+                        set: { useGlobal in
+                            if useGlobal {
+                                settings.meetingSummaryLLMPreference = nil
+                            } else {
+                                settings.meetingSummaryLLMPreference = settings.llmPreference
+                            }
+                        }
+                    ))
+                    .toggleStyle(.switch)
+                    
+                    // Show specific picker when not using global
+                    if settings.meetingSummaryLLMPreference != nil {
+                        Picker("Provider", selection: Binding(
+                            get: { settings.meetingSummaryLLMPreference ?? settings.llmPreference },
+                            set: { settings.meetingSummaryLLMPreference = $0 }
+                        )) {
+                            ForEach(LLMPreference.allCases) { pref in
+                                Label(pref.displayName, systemImage: pref.icon)
+                                    .tag(pref)
+                            }
+                        }
+                        .pickerStyle(.menu)
+                        
+                        Text(settings.effectiveMeetingSummaryLLMPreference.description)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    } else {
+                        // Show current global preference
+                        HStack {
+                            Text("Currently using:")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                            Label(settings.llmPreference.displayName, systemImage: settings.llmPreference.icon)
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    
+                    // Privacy tip
+                    if settings.effectiveMeetingSummaryLLMPreference.prioritizesPrivacy {
+                        HStack(alignment: .top, spacing: 6) {
+                            Image(systemName: "lock.shield.fill")
+                                .foregroundColor(.green)
+                            Text("Meeting transcripts will be processed locally for privacy.")
+                                .font(.caption)
+                                .foregroundColor(.green)
+                        }
+                        .padding(8)
+                        .background(Color.green.opacity(0.1))
+                        .cornerRadius(6)
+                    }
+                }
+            }
+            
             // MARK: - Advanced Navigation
             Section {
                 VStack(alignment: .leading, spacing: 8) {
