@@ -67,7 +67,7 @@ class TranscriptResultState: ObservableObject {
 
 /// Manages the transcript result window shown after recording
 @MainActor
-class TranscriptResultWindow {
+class TranscriptResultWindow: NSObject, NSWindowDelegate {
     
     // MARK: - Properties
     
@@ -81,7 +81,9 @@ class TranscriptResultWindow {
     
     static let shared = TranscriptResultWindow()
     
-    private init() {}
+    override private init() {
+        super.init()
+    }
     
     // MARK: - Show Window
     
@@ -134,7 +136,21 @@ class TranscriptResultWindow {
         newWindow.minSize = NSSize(width: 400, height: 300)
         newWindow.center()
         
+        // CRITICAL FIX: Prevent window from releasing itself when closed
+        // This prevents zombie object crashes if we hold a reference to it
+        newWindow.isReleasedWhenClosed = false
+        newWindow.delegate = self
+        
         self.window = newWindow
+    }
+    
+    // MARK: - NSWindowDelegate
+    
+    func windowWillClose(_ notification: Notification) {
+        // Since we reuse the window (isReleasedWhenClosed = false), 
+        // we don't strictly need to nil it out, but if we wanted to force recreation:
+        // self.window = nil
+        print("TranscriptResultWindow: Window closing (hidden)")
     }
     
     // MARK: - Actions

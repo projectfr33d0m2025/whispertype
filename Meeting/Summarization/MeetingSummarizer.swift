@@ -108,9 +108,10 @@ class MeetingSummarizer: ObservableObject {
         if llmAvailable {
             currentStage = "Analyzing transcript..."
             
-            // Use hierarchical summarization for long transcripts
+            // Use hierarchical summarization for long transcripts, but only if privacy/local is prioritized
+            // Cloud providers have large context windows so we don't need to chunk
             let processedTranscript: String
-            if transcript.count > chunkSize * 2 {
+            if transcript.count > chunkSize * 2 && meetingLLMPreference.prioritizesPrivacy {
                 currentStage = "Processing long meeting..."
                 processedTranscript = await summarizeHierarchically(transcript)
             } else {
@@ -245,7 +246,14 @@ class MeetingSummarizer: ObservableObject {
             
             // Move start with overlap
             let overlapOffset = max(0, chunk.count - chunkOverlap)
-            startIndex = text.index(startIndex, offsetBy: overlapOffset, limitedBy: text.endIndex) ?? text.endIndex
+            let newStartIndex = text.index(startIndex, offsetBy: overlapOffset, limitedBy: text.endIndex) ?? text.endIndex
+            
+            // Prevent infinite loop if we're not advancing (e.g. chunk smaller than overlap)
+            if newStartIndex <= startIndex {
+                break
+            }
+            
+            startIndex = newStartIndex
         }
         
         return chunks
@@ -262,7 +270,8 @@ class MeetingSummarizer: ObservableObject {
             prompt = """
             Write a 2-3 paragraph summary of this meeting. Focus on the main topics discussed and key outcomes:
             
-            \(transcript.prefix(6000))
+            
+            \(transcript)
             
             Summary:
             """
@@ -271,7 +280,8 @@ class MeetingSummarizer: ObservableObject {
             prompt = """
             List the key discussion points from this meeting as bullet points (use - for each point):
             
-            \(transcript.prefix(6000))
+            
+            \(transcript)
             
             Key Points:
             """
@@ -280,7 +290,8 @@ class MeetingSummarizer: ObservableObject {
             prompt = """
             List any decisions that were made during this meeting. If no clear decisions were made, write "No explicit decisions recorded."
             
-            \(transcript.prefix(6000))
+            
+            \(transcript)
             
             Decisions:
             """
@@ -289,7 +300,8 @@ class MeetingSummarizer: ObservableObject {
             prompt = """
             List all action items, tasks, or follow-ups mentioned. Format as "- [Assignee]: Task" if assignee is known:
             
-            \(transcript.prefix(6000))
+            
+            \(transcript)
             
             Action Items:
             """
@@ -298,7 +310,8 @@ class MeetingSummarizer: ObservableObject {
             prompt = """
             List any blockers or obstacles mentioned during this meeting:
             
-            \(transcript.prefix(6000))
+            
+            \(transcript)
             
             Blockers:
             """
@@ -307,7 +320,8 @@ class MeetingSummarizer: ObservableObject {
             prompt = """
             Summarize any feedback, praise, or concerns shared during this 1-on-1 meeting:
             
-            \(transcript.prefix(6000))
+            
+            \(transcript)
             
             Feedback & Notes:
             """
@@ -316,7 +330,8 @@ class MeetingSummarizer: ObservableObject {
             prompt = """
             List any topics mentioned for the next meeting or future discussion:
             
-            \(transcript.prefix(6000))
+            
+            \(transcript)
             
             Next Meeting Topics:
             """
