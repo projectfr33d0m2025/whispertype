@@ -169,6 +169,7 @@ struct LLMResponse {
 enum CloudProviderType: String, Codable, CaseIterable, Identifiable {
     case openAI = "openai"
     case openRouter = "openrouter"
+    case anthropic = "anthropic"
     
     var id: String { rawValue }
     
@@ -176,6 +177,7 @@ enum CloudProviderType: String, Codable, CaseIterable, Identifiable {
         switch self {
         case .openAI: return "OpenAI"
         case .openRouter: return "OpenRouter"
+        case .anthropic: return "Anthropic"
         }
     }
     
@@ -185,6 +187,8 @@ enum CloudProviderType: String, Codable, CaseIterable, Identifiable {
             return "Direct OpenAI API access. Requires API key."
         case .openRouter:
             return "Access multiple models via OpenRouter. Requires API key."
+        case .anthropic:
+            return "Direct Anthropic API access. Requires API key."
         }
     }
     
@@ -192,6 +196,7 @@ enum CloudProviderType: String, Codable, CaseIterable, Identifiable {
         switch self {
         case .openAI: return "brain"
         case .openRouter: return "arrow.triangle.branch"
+        case .anthropic: return "sparkles"
         }
     }
     
@@ -201,6 +206,8 @@ enum CloudProviderType: String, Codable, CaseIterable, Identifiable {
             return "https://api.openai.com/v1"
         case .openRouter:
             return "https://openrouter.ai/api/v1"
+        case .anthropic:
+            return "https://api.anthropic.com/v1"
         }
     }
     
@@ -210,6 +217,8 @@ enum CloudProviderType: String, Codable, CaseIterable, Identifiable {
             return "gpt-4o-mini"
         case .openRouter:
             return "openai/gpt-4o-mini"
+        case .anthropic:
+            return "claude-3-5-sonnet-20241022"
         }
     }
     
@@ -219,6 +228,8 @@ enum CloudProviderType: String, Codable, CaseIterable, Identifiable {
             return "openai-api-key"
         case .openRouter:
             return "openrouter-api-key"
+        case .anthropic:
+            return "anthropic-api-key"
         }
     }
 }

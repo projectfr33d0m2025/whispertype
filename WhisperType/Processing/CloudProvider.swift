@@ -69,6 +69,8 @@ final class CloudProvider: LLMProvider {
             return keychainManager.getOpenAIKey()
         case .openRouter:
             return keychainManager.getOpenRouterKey()
+        case .anthropic:
+            return keychainManager.getAnthropicKey()
         }
     }
     
@@ -108,28 +110,68 @@ final class CloudProvider: LLMProvider {
             context: request.context
         )
         
-        // Create URL request
-        let url = URL(string: "\(providerType.baseURL)/chat/completions")!
-        var urlRequest = URLRequest(url: url)
-        urlRequest.httpMethod = "POST"
-        urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        urlRequest.setValue("Bearer \(key)", forHTTPHeaderField: "Authorization")
-        urlRequest.timeoutInterval = request.timeout
+        let url: URL
+        var requestBody: [String: Any]
         
-        // Add OpenRouter specific headers
-        if providerType == .openRouter {
-            urlRequest.setValue("WhisperType", forHTTPHeaderField: "X-Title")
-            urlRequest.setValue("https://github.com/whispertype", forHTTPHeaderField: "HTTP-Referer")
+        // Construct basic request
+        var urlRequest: URLRequest
+        
+        if providerType == .anthropic {
+            // Anthropic Setup
+            url = URL(string: "\(providerType.baseURL)/messages")!
+            urlRequest = URLRequest(url: url)
+            urlRequest.httpMethod = "POST"
+            urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            urlRequest.setValue(key, forHTTPHeaderField: "x-api-key")
+            urlRequest.setValue("2023-06-01", forHTTPHeaderField: "anthropic-version")
+            
+            // For Anthropic, system prompt must be separate if we were using it,
+            // but promptBuilder currently puts everything in messages.
+            // Anthropic accepts 'system' parameter but 'messages' is strictly user/assistant.
+            // Ideally we separate system message, but for now we follow simple chat structure.
+            // NOTE: Anthropic doesn't support 'system' role in 'messages'.
+            // We need to filter out system messages or move them to top-level system param.
+            
+            var anthropicMessages = messages
+            var systemPrompt: String? = nil
+            
+            if let first = messages.first, first["role"] as? String == "system" {
+                systemPrompt = first["content"] as? String
+                anthropicMessages.removeFirst()
+            }
+            
+            requestBody = [
+                "model": model,
+                "messages": anthropicMessages,
+                "max_tokens": 1024 // Anthropic requires max_tokens
+            ]
+            
+            if let system = systemPrompt {
+                requestBody["system"] = system
+            }
+            
+        } else {
+            // OpenAI / OpenRouter Setup
+            url = URL(string: "\(providerType.baseURL)/chat/completions")!
+            urlRequest = URLRequest(url: url)
+            urlRequest.httpMethod = "POST"
+            urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            urlRequest.setValue("Bearer \(key)", forHTTPHeaderField: "Authorization")
+            
+            if providerType == .openRouter {
+                urlRequest.setValue("WhisperType", forHTTPHeaderField: "X-Title")
+                urlRequest.setValue("https://github.com/whispertype", forHTTPHeaderField: "HTTP-Referer")
+            }
+            
+            requestBody = [
+                "model": model,
+                "messages": messages,
+                "temperature": 0.1,
+                "max_tokens": 500
+            ]
         }
         
-        // Build request body
-        let requestBody: [String: Any] = [
-            "model": model,
-            "messages": messages,
-            "temperature": 0.1,
-            "max_tokens": 500
-        ]
-        
+        urlRequest.timeoutInterval = request.timeout
         urlRequest.httpBody = try JSONSerialization.data(withJSONObject: requestBody)
         
         print("CloudProvider: Sending request to \(providerType.displayName) (\(model))...")
@@ -157,28 +199,52 @@ final class CloudProvider: LLMProvider {
             // Handle other errors
             guard httpResponse.statusCode == 200 else {
                 // Try to parse error message
-                if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-                   let error = json["error"] as? [String: Any],
-                   let message = error["message"] as? String {
-                    throw LLMError.processingFailed(reason: message)
+                if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
+                    if let error = json["error"] as? [String: Any],
+                       let message = error["message"] as? String {
+                        throw LLMError.processingFailed(reason: message)
+                    }
                 }
                 throw LLMError.processingFailed(reason: "HTTP \(httpResponse.statusCode)")
             }
             
             // Parse successful response
-            guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-                  let choices = json["choices"] as? [[String: Any]],
-                  let firstChoice = choices.first,
-                  let message = firstChoice["message"] as? [String: Any],
-                  let content = message["content"] as? String else {
-                throw LLMError.processingFailed(reason: "Invalid response format")
+            guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+                throw LLMError.processingFailed(reason: "Invalid JSON response")
             }
             
-            // Extract token usage
-            var tokensUsed: Int?
-            if let usage = json["usage"] as? [String: Any],
-               let total = usage["total_tokens"] as? Int {
-                tokensUsed = total
+            let content: String
+            var tokens: Int?
+            
+            if self.providerType == .anthropic {
+                // Parse Anthropic Response
+                // Format: { "content": [ { "type": "text", "text": "..." } ], "usage": { "input_tokens": 10, "output_tokens": 20 } }
+                guard let contentArray = json["content"] as? [[String: Any]],
+                      let firstContent = contentArray.first,
+                      let text = firstContent["text"] as? String else {
+                    throw LLMError.processingFailed(reason: "Invalid Anthropic response format")
+                }
+                content = text
+                
+                if let usage = json["usage"] as? [String: Any],
+                   let input = usage["input_tokens"] as? Int,
+                   let output = usage["output_tokens"] as? Int {
+                    tokens = input + output
+                }
+            } else {
+                // Parse OpenAI/OpenRouter Response
+                guard let choices = json["choices"] as? [[String: Any]],
+                      let firstChoice = choices.first,
+                      let message = firstChoice["message"] as? [String: Any],
+                      let text = message["content"] as? String else {
+                    throw LLMError.processingFailed(reason: "Invalid OpenAI response format")
+                }
+                content = text
+                
+                if let usage = json["usage"] as? [String: Any],
+                   let total = usage["total_tokens"] as? Int {
+                    tokens = total
+                }
             }
             
             let processingTime = Date().timeIntervalSince(startTime)
@@ -189,7 +255,7 @@ final class CloudProvider: LLMProvider {
             return LLMResponse(
                 processedText: cleanedResponse,
                 processingTime: processingTime,
-                tokensUsed: tokensUsed,
+                tokensUsed: tokens,
                 providerUsed: self.displayName,
                 modelUsed: self.model
             )

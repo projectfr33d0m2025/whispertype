@@ -161,4 +161,20 @@ extension KeychainManager {
     var hasOpenRouterKey: Bool {
         hasAPIKey(for: CloudProviderType.openRouter.keychainAccount)
     }
+    
+    /// Save Anthropic API key
+    @discardableResult
+    func saveAnthropicKey(_ key: String) -> Bool {
+        saveAPIKey(key, for: CloudProviderType.anthropic.keychainAccount)
+    }
+    
+    /// Get Anthropic API key
+    func getAnthropicKey() -> String? {
+        getAPIKey(for: CloudProviderType.anthropic.keychainAccount)
+    }
+    
+    /// Check if Anthropic key exists
+    var hasAnthropicKey: Bool {
+        hasAPIKey(for: CloudProviderType.anthropic.keychainAccount)
+    }
 }

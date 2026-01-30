@@ -348,6 +348,8 @@ struct ProcessingSettingsView: View {
             return KeychainManager.shared.hasOpenAIKey
         case .openRouter:
             return KeychainManager.shared.hasOpenRouterKey
+        case .anthropic:
+            return KeychainManager.shared.hasAnthropicKey
         }
     }
     
@@ -357,6 +359,8 @@ struct ProcessingSettingsView: View {
             return KeychainManager.shared.getMaskedAPIKey(for: CloudProviderType.openAI.keychainAccount) ?? "****"
         case .openRouter:
             return KeychainManager.shared.getMaskedAPIKey(for: CloudProviderType.openRouter.keychainAccount) ?? "****"
+        case .anthropic:
+            return KeychainManager.shared.getMaskedAPIKey(for: CloudProviderType.anthropic.keychainAccount) ?? "****"
         }
     }
     
@@ -366,6 +370,8 @@ struct ProcessingSettingsView: View {
             KeychainManager.shared.saveOpenAIKey(key)
         case .openRouter:
             KeychainManager.shared.saveOpenRouterKey(key)
+        case .anthropic:
+            KeychainManager.shared.saveAnthropicKey(key)
         }
         llmEngine.reconfigure()
         Task { await updateCloudStatus() }
@@ -446,6 +452,9 @@ struct APIKeyInputSheet: View {
                 // Help link
                 if providerType == .openRouter {
                     Link("Get an OpenRouter API key →", destination: URL(string: "https://openrouter.ai/keys")!)
+                        .font(.caption)
+                } else if providerType == .anthropic {
+                    Link("Get an Anthropic API key →", destination: URL(string: "https://console.anthropic.com/settings/keys")!)
                         .font(.caption)
                 } else {
                     Link("Get an OpenAI API key →", destination: URL(string: "https://platform.openai.com/api-keys")!)
