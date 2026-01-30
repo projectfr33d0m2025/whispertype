@@ -43,6 +43,7 @@
 		7BBD25BE2F0E3D5F001B3B5A /* PartialTranscriptStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BBD25BC2F0E3D5F001B3B5A /* PartialTranscriptStore.swift */; };
 		7BBD25BF2F0E3D5F001B3B5A /* WERCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BBD25BD2F0E3D5F001B3B5A /* WERCalculator.swift */; };
 		7BBD25C02F0E3D5F001B3B5A /* LatencyMeasurement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BBD25BB2F0E3D5F001B3B5A /* LatencyMeasurement.swift */; };
+		7BCF7C912F2C2A220080BF71 /* ResummarizeSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BCF7C902F2C2A210080BF71 /* ResummarizeSheet.swift */; };
 		A1000001000000000000001 /* WhisperTypeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000002000000000000001 /* WhisperTypeApp.swift */; };
 		A1000003000000000000001 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1000004000000000000001 /* Assets.xcassets */; };
 		A1000005000000000000001 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1000006000000000000001 /* Accelerate.framework */; };
@@ -155,6 +156,7 @@
 		7BBD25BB2F0E3D5F001B3B5A /* LatencyMeasurement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LatencyMeasurement.swift; sourceTree = "<group>"; };
 		7BBD25BC2F0E3D5F001B3B5A /* PartialTranscriptStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PartialTranscriptStore.swift; sourceTree = "<group>"; };
 		7BBD25BD2F0E3D5F001B3B5A /* WERCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WERCalculator.swift; sourceTree = "<group>"; };
+		7BCF7C902F2C2A210080BF71 /* ResummarizeSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResummarizeSheet.swift; sourceTree = "<group>"; };
 		A00E741F82F928527B0B8AE8 /* ActionItemExtractor.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ActionItemExtractor.swift; sourceTree = "<group>"; };
 		A1000002000000000000001 /* WhisperTypeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhisperTypeApp.swift; sourceTree = "<group>"; };
 		A1000004000000000000001 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -349,6 +351,7 @@
 		7BBD25B62F0E3D2E001B3B5A /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				7BCF7C902F2C2A210080BF71 /* ResummarizeSheet.swift */,
 				7B0072E42F1CF97E00D01584 /* ProcessingIndicatorWindow.swift */,
 				7B0072E22F1CEA4600D01584 /* TranscriptResultWindow.swift */,
 				7BBD25B22F0E3D2E001B3B5A /* LiveSubtitleView.swift */,
@@ -750,6 +753,7 @@
 				7BBD259F2F0E0687001B3B5A /* MeetingRecorder.swift in Sources */,
 				7BBD25A02F0E0687001B3B5A /* AudioMixer.swift in Sources */,
 				C1200001000000000000001 /* ProcessingMode.swift in Sources */,
+				7BCF7C912F2C2A220080BF71 /* ResummarizeSheet.swift in Sources */,
 				C1200003000000000000001 /* LLMPreference.swift in Sources */,
 				C1200005000000000000001 /* FillerRemover.swift in Sources */,
 				C1200007000000000000001 /* FormattingRules.swift in Sources */,

@@ -689,6 +689,7 @@ Store and organize past meeting transcripts and summaries in a searchable databa
 | F6.2.9 | Auto-delete audio after transcription (default) | Must |
 | F6.2.10 | Option to keep audio files | Must |
 | F6.2.11 | Full-text search on transcripts | Nice |
+| F6.2.12 | Re-summarize meeting with different template | Must |
 
 ### F6.3 Data Model
 
@@ -828,11 +829,63 @@ CREATE INDEX idx_meetings_title ON meetings(title);
 │  3. Schedule follow-up meeting with Acme Corp next week                 │
 │                                                                          │
 │  ─────────────────────────────────────────────────────────────────────  │
-│  [Copy Summary]  [Export as Markdown]                                   │
+│  [Copy Summary]  [Re-Summarize]  [Export as Markdown]                  │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
----
+### F6.7 Re-Summarize Feature
+
+**Purpose:** Allow users to regenerate meeting summaries using a different template without re-transcribing the audio.
+
+**User Flow:**
+1. User opens a meeting from Meeting History
+2. User clicks "Re-Summarize" button in the Summary tab
+3. Sheet/dialog appears with template picker showing all available templates
+4. User selects desired template from dropdown
+5. User clicks "Regenerate Summary"
+6. Processing indicator shows progress
+7. Summary is regenerated using the selected template and updated in place
+8. Summary file is overwritten with new content
+9. Database is updated with new template name
+
+**UI Specification:**
+
+```
+┌───────────────────────────────────────────────────────────┐
+│  Re-Summarize Meeting                                     │
+├───────────────────────────────────────────────────────────┤
+│                                                            │
+│  Choose a template to regenerate the meeting summary.     │
+│                                                            │
+│  Template:  [Standard Meeting Notes        ▼]             │
+│                                                            │
+│  Templates available:                                     │
+│  • Standard Meeting Notes                                │
+│  • Action-Focused                                         │
+│  • Detailed Minutes                                       │
+│  • Executive Brief                                        │
+│  • Stand-up/Scrum                                         │
+│  • 1-on-1                                                 │
+│  • [Your Custom Templates]                                │
+│                                                            │
+│  ⓘ This will regenerate the summary using the existing   │
+│     transcript. The original summary will be replaced.    │
+│                                                            │
+│                              [Cancel]  [Regenerate]       │
+└───────────────────────────────────────────────────────────┘
+```
+
+**Implementation Notes:**
+- Re-summarize uses the existing `transcript.txt` from the meeting session
+- No need to reload audio or re-transcribe
+- Calls `MeetingSummarizer.summarize()` with the selected template
+- Updates `summary.md` file in session directory
+- Updates database record with new `template_used` value
+- Shows processing indicator during LLM generation
+- Handles errors gracefully (e.g., LLM unavailable)
+- Button only appears on Summary tab when summary exists
+
+
 
 ## F7: Audio Quality Monitoring
 

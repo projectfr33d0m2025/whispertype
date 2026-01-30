@@ -564,6 +564,33 @@ class MeetingDatabase {
         return 0
     }
     
+    /// Update the template used for a meeting's summary
+    /// - Parameters:
+    ///   - id: Meeting ID
+    ///   - template: Template name
+    func updateMeetingTemplate(id: String, template: String) throws {
+        let sql = "UPDATE meetings SET template_used = ? WHERE id = ?;"
+        
+        var statement: OpaquePointer?
+        
+        guard sqlite3_prepare_v2(db, sql, -1, &statement, nil) == SQLITE_OK else {
+            let errorMessage = String(cString: sqlite3_errmsg(db))
+            throw MeetingDatabaseError.prepareFailed(errorMessage)
+        }
+        
+        defer { sqlite3_finalize(statement) }
+        
+        sqlite3_bind_text(statement, 1, template, -1, unsafeBitCast(-1, to: sqlite3_destructor_type.self))
+        sqlite3_bind_text(statement, 2, id, -1, unsafeBitCast(-1, to: sqlite3_destructor_type.self))
+        
+        guard sqlite3_step(statement) == SQLITE_DONE else {
+            let errorMessage = String(cString: sqlite3_errmsg(db))
+            throw MeetingDatabaseError.executeFailed(errorMessage)
+        }
+        
+        print("MeetingDatabase: Updated template for meeting \(id) to '\(template)'")
+    }
+    
     // MARK: - Action Items
     
     /// Insert an action item

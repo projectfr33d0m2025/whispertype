@@ -262,8 +262,12 @@ struct MeetingDetailView: View {
     @State private var actionItems: [MeetingActionItem] = []
     @State private var audioChunks: [URL] = []
     @State private var showingExportSheet: Bool = false
+    @State private var showingResummarizeSheet: Bool = false
+    @State private var isResummarizing: Bool = false
+    @State private var resummarizeError: String? = nil
     @State private var copyFeedback: String?
     @StateObject private var audioPlayerViewModel = AudioPlayerViewModel()
+    @StateObject private var templateStore = SummaryTemplateStore.shared
     
     private let fileManager = MeetingFileManager.shared
     private let database = MeetingDatabase.shared
@@ -450,7 +454,26 @@ struct MeetingDetailView: View {
     private var tabContent: some View {
         switch selectedTab {
         case .summary:
-            SummaryTabView(content: summaryContent)
+            SummaryTabView(
+                content: summaryContent,
+                templateName: meeting.templateUsed,
+                showingResummarizeSheet: $showingResummarizeSheet
+            )
+            .sheet(isPresented: $showingResummarizeSheet) {
+                ResummarizeSheet(
+                    currentTemplateName: meeting.templateUsed,
+                    isProcessing: $isResummarizing,
+                    errorMessage: $resummarizeError,
+                    onResummarize: { template in
+                        await resummarize(with: template)
+                    },
+                    onCancel: {
+                        showingResummarizeSheet = false
+                        isResummarizing = false
+                        resummarizeError = nil
+                    }
+                )
+            }
         case .transcript:
             TranscriptTabView(content: transcriptContent)
         case .actionItems:
@@ -524,6 +547,65 @@ struct MeetingDetailView: View {
             copyFeedback = nil
         }
     }
+    
+    private func resummarize(with template: SummaryTemplate) async {
+        isResummarizing = true
+        resummarizeError = nil
+        
+        let sessionDir = URL(fileURLWithPath: meeting.sessionDirectory)
+        
+        do {
+            // Load transcript from file
+            let transcript: String
+            if fileManager.hasTranscript(at: sessionDir) {
+                if FileManager.default.fileExists(atPath: sessionDir.appendingPathComponent("transcript.txt").path) {
+                    transcript = try fileManager.readTranscript(from: sessionDir, format: .plainText)
+                } else {
+                    transcript = try fileManager.readTranscript(from: sessionDir, format: .markdown)
+                }
+            } else {
+                throw NSError(
+                    domain: "MeetingDetailView",
+                    code: 1,
+                    userInfo: [NSLocalizedDescriptionKey: "Transcript file not found"]
+                )
+            }
+            
+            // Generate new summary with selected template
+            let summarizer = MeetingSummarizer.shared
+            let result = await summarizer.summarize(
+                transcript: transcript,
+                duration: meeting.formattedDuration,
+                date: meeting.createdAt,
+                template: template
+            )
+            
+            // Extract summary from result
+            let newSummary = result.summary
+            
+            // Save updated summary to file
+            _ = try fileManager.saveSummary(newSummary, to: sessionDir)
+            
+            // Update database with new template
+            try database.updateMeetingTemplate(id: meeting.id, template: template.name)
+            
+            // Update UI
+            await MainActor.run {
+                summaryContent = newSummary
+                isResummarizing = false
+                showingResummarizeSheet = false
+                
+                print("MeetingDetailView: Re-summarized meeting \(meeting.id) with template '\(template.name)'")
+            }
+            
+        } catch {
+            await MainActor.run {
+                isResummarizing = false
+                resummarizeError = "Failed to regenerate summary: \(error.localizedDescription)"
+                print("MeetingDetailView: Re-summarization failed - \(error)")
+            }
+        }
+    }
 }
 
 // MARK: - Summary Tab View
@@ -532,16 +614,45 @@ struct MeetingDetailView: View {
 
 struct SummaryTabView: View {
     let content: String
+    let templateName: String?
+    @Binding var showingResummarizeSheet: Bool
     
     var body: some View {
-        ScrollView {
-            Markdown(preprocess(content))
-                .textSelection(.enabled)
-                .markdownTheme(.whisperType)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding()
+        VStack(spacing: 0) {
+            ScrollView {
+                Markdown(preprocess(content))
+                    .textSelection(.enabled)
+                    .markdownTheme(.whisperType)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding()
+            }
+            .background(Color(nsColor: .textBackgroundColor))
+            
+            // Footer with Re-Summarize button
+            if !content.isEmpty {
+                Divider()
+                
+                HStack {
+                    if let template = templateName {
+                        Text("Template: \(template)")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    
+                    Spacer()
+                    
+                    Button {
+                        showingResummarizeSheet = true
+                    } label: {
+                        Label("Re-Summarize", systemImage: "arrow.triangle.2.circlepath")
+                    }
+                    .buttonStyle(.bordered)
+                }
+                .padding(.horizontal)
+                .padding(.vertical, 8)
+                .background(Color(nsColor: .windowBackgroundColor))
+            }
         }
-        .background(Color(nsColor: .textBackgroundColor))
     }
     
     private func preprocess(_ text: String) -> String {

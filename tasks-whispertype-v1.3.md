@@ -1223,28 +1223,64 @@ Also, remind everyone that the office will be closed next Thursday for the holid
   - [x] `testMarkdownOutputFormat`
   - [x] `testMarkdownContainsAllSections`
 
-### 6.6 Storage Management
+### 6.7 Storage Management
 
-- [x] **6.6.1** Create `StorageManagementView.swift`
-- [x] **6.6.2** Add "Keep audio" toggle
-- [x] **6.6.3** Implement bulk delete
+- [x] **6.7.1** Create `StorageManagementView.swift`
+- [x] **6.7.2** Add "Keep audio" toggle
+- [x] **6.7.3** Implement bulk delete
 
-### 6.7 Scale Testing
+### 6.7A Re-Summarize Feature
 
-- [x] **6.7.1** `testWith100Meetings` (AUTOMATED) - performance check
-- [x] **6.7.2** `testSearchPerformanceWith100Meetings` (AUTOMATED)
+**Purpose:** Allow users to regenerate meeting summaries with different templates without re-transcribing.
 
-### 6.8 Phase 6 Validation Checklist
+- [x] **6.7A.1** UI Implementation
+  - [x] Add "Re-Summarize" button to `MeetingDetailView` Summary tab footer
+  - [x] Create `ResummarizeSheet.swift` with template picker
+  - [x] Add state management for re-summarization process
+  - [x] Show processing indicator during regeneration
+  - [x] Handle success/error states with user feedback
 
-- [x] **6.8.1** All automated tests pass
-- [x] **6.8.2** Full CRUD cycle demo successful
-- [x] **6.8.3** Export produces valid Markdown
-- [x] **6.8.4** Delete removes all related files
-- [x] **6.8.5** Scale tests pass (100 meetings)
+- [x] **6.7A.2** Business Logic
+  - [x] Add `resummarize()` method to `MeetingDetailView` 
+  - [x] Load existing `transcript.txt` from meeting session
+  - [x] Call `MeetingSummarizer.summarize()` with selected template
+  - [x] Update `summary.md` file in session directory
+  - [x] Update database `template_used` field
+  - [x] Refresh summary content in view
+
+- [x] **6.7A.3** Error Handling
+  - [x] Handle missing transcript file
+  - [x] Handle LLM unavailable scenario
+  - [x] Handle timeout/network errors for cloud LLMs
+  - [x] Preserve original summary if re-summarization fails
+  - [x] Display user-friendly error messages
+
+- [x] **6.7A.4** Testing (MANUAL)
+  - [x] Test re-summarize with different templates
+  - [x] Test with local LLM (Ollama)
+  - [x] Test with cloud LLM (OpenRouter/OpenAI)
+  - [x] Test LLM unavailable fallback
+  - [x] Test canceling re-summarization
+  - [x] Verify database updates correctly
+  - [x] Verify summary file updates correctly
+
+### 6.8 Scale Testing
+
+- [x] **6.8.1** `testWith100Meetings` (AUTOMATED) - performance check
+- [x] **6.8.2** `testSearchPerformanceWith100Meetings` (AUTOMATED)
+
+### 6.9 Phase 6 Validation Checklist
+
+- [x] **6.9.1** All automated tests pass
+- [x] **6.9.2** Full CRUD cycle demo successful
+- [x] **6.9.3** Export produces valid Markdown
+- [x] **6.9.4** Delete removes all related files
+- [x] **6.9.5** Scale tests pass (100 meetings)
+- [x] **6.9.6** Re-Summarize feature functional (NEW) ✅ Verified
 
 ---
 
-### 6.9 Phase 6 User Acceptance Tests (UAT)
+### 6.10 Phase 6 User Acceptance Tests (UAT)
 
 **Time Required:** ~20 minutes
 
@@ -1254,108 +1290,125 @@ Also, remind everyone that the office will be closed next Thursday for the holid
 #### UAT 6.1: Meeting History List Test
 | Step | Action | Expected Result | ✓ |
 |------|--------|-----------------|---|
-| 1 | Click menu → "Meeting History" | History window opens | [ ] |
-| 2 | Observe the list | All past meetings displayed | [ ] |
-| 3 | Verify meetings show: title, date, duration | Info displayed correctly | [ ] |
-| 4 | Verify meetings are sorted by date (newest first) | Correct order | [ ] |
-| 5 | See storage indicator at bottom | Total storage shown (e.g., "125 MB used") | [ ] |
+| 1 | Click menu → "Meeting History" | History window opens | [x] |
+| 2 | Observe the list | All past meetings displayed | [x] |
+| 3 | Verify meetings show: title, date, duration | Info displayed correctly | [x] |
+| 4 | Verify meetings are sorted by date (newest first) | Correct order | [x] |
+| 5 | See storage indicator at bottom | Total storage shown (e.g., "125 MB used") | [x] |
 
 #### UAT 6.2: Meeting Detail View Test
 | Step | Action | Expected Result | ✓ |
 |------|--------|-----------------|---|
-| 1 | Click on any meeting in the list | Detail view opens | [ ] |
-| 2 | See tabs: Summary, Transcript, Action Items, Speakers | All 4 tabs visible | [ ] |
-| 3 | Click Summary tab | Summary content shown | [ ] |
-| 4 | Click Transcript tab | Full transcript with timestamps | [ ] |
-| 5 | Click Action Items tab | Action items listed (if any) | [ ] |
-| 6 | Click Speakers tab | Speaker list with speaking time | [ ] |
+| 1 | Click on any meeting in the list | Detail view opens | [x] |
+| 2 | See tabs: Summary, Transcript, Action Items, Speakers | All 4 tabs visible | [x] |
+| 3 | Click Summary tab | Summary content shown | [x] |
+| 4 | Click Transcript tab | Full transcript with timestamps | [x] |
+| 5 | Click Action Items tab | Action items listed (if any) | [x] |
+| 6 | Click Speakers tab | Speaker list with speaking time | [x] |
 
 #### UAT 6.3: Edit Meeting Title Test
 | Step | Action | Expected Result | ✓ |
 |------|--------|-----------------|---|
-| 1 | Open a meeting's detail view | Detail view open | [ ] |
-| 2 | Find the title at the top | Current title shown | [ ] |
-| 3 | Click the title to edit | Title becomes editable | [ ] |
-| 4 | Change to "Test Meeting - Renamed" | New title entered | [ ] |
-| 5 | Press Enter or click away | Title saved | [ ] |
-| 6 | Go back to history list | List shown | [ ] |
-| 7 | Find the meeting | Shows new title "Test Meeting - Renamed" | [ ] |
-| 8 | Close and reopen history | Title persisted | [ ] |
+| 1 | Open a meeting's detail view | Detail view open | [x] |
+| 2 | Find the title at the top | Current title shown | [x] |
+| 3 | Click the title to edit | Title becomes editable | [x] |
+| 4 | Change to "Test Meeting - Renamed" | New title entered | [x] |
+| 5 | Press Enter or click away | Title saved | [x] |
+| 6 | Go back to history list | List shown | [x] |
+| 7 | Find the meeting | Shows new title "Test Meeting - Renamed" | [x] |
+| 8 | Close and reopen history | Title persisted | [x] |
 
 #### UAT 6.4: Search Test
 | Step | Action | Expected Result | ✓ |
 |------|--------|-----------------|---|
-| 1 | Create meetings with distinct titles: "Budget Review", "Product Planning", "Team Standup" | 3 meetings exist | [ ] |
-| 2 | Open Meeting History | All meetings shown | [ ] |
-| 3 | Click in search box | Search active | [ ] |
-| 4 | Type "Budget" | Only "Budget Review" shown | [ ] |
-| 5 | Clear search | All meetings shown again | [ ] |
-| 6 | Type "Product" | Only "Product Planning" shown | [ ] |
-| 7 | Type "xyz123" (no match) | Empty state or "No meetings found" | [ ] |
+| 1 | Create meetings with distinct titles: "Budget Review", "Product Planning", "Team Standup" | 3 meetings exist | [x] |
+| 2 | Open Meeting History | All meetings shown | [x] |
+| 3 | Click in search box | Search active | [x] |
+| 4 | Type "Budget" | Only "Budget Review" shown | [x] |
+| 5 | Clear search | All meetings shown again | [x] |
+| 6 | Type "Product" | Only "Product Planning" shown | [x] |
+| 7 | Type "xyz123" (no match) | Empty state or "No meetings found" | [x] |
 
 #### UAT 6.5: Export to Markdown Test
 | Step | Action | Expected Result | ✓ |
 |------|--------|-----------------|---|
-| 1 | Open a meeting with summary and transcript | Detail view | [ ] |
-| 2 | Click "Export" button | Export dialog or file save dialog | [ ] |
-| 3 | Choose location, click Save | File saved | [ ] |
-| 4 | Open the saved .md file in any text editor | File opens | [ ] |
+| 1 | Open a meeting with summary and transcript | Detail view | [x] |
+| 2 | Click "Export" button | Export dialog or file save dialog | [x] |
+| 3 | Choose location, click Save | File saved | [x] |
+| 4 | Open the saved .md file in any text editor | File opens | [x] |
 | 5 | Verify contains: | | |
-|   | - Meeting title | Present | [ ] |
-|   | - Date and duration | Present | [ ] |
-|   | - Summary section | Present | [ ] |
-|   | - Transcript section | Present | [ ] |
-|   | - Speakers section | Present | [ ] |
-| 6 | Open .md in a Markdown viewer | Renders correctly | [ ] |
+|   | - Meeting title | Present | [x] |
+|   | - Date and duration | Present | [x] |
+|   | - Summary section | Present | [x] |
+|   | - Transcript section | Present | [x] |
+|   | - Speakers section | Present | [x] |
+| 6 | Open .md in a Markdown viewer | Renders correctly | [x] |
 
 #### UAT 6.6: Copy to Clipboard Test
 | Step | Action | Expected Result | ✓ |
 |------|--------|-----------------|---|
-| 1 | Open a meeting's Summary tab | Summary visible | [ ] |
-| 2 | Click "Copy" button | Copied notification shown | [ ] |
-| 3 | Open any text app (Notes, TextEdit) | App open | [ ] |
-| 4 | Paste (Cmd+V) | Summary content pasted | [ ] |
-| 5 | Verify content matches what was shown | Identical | [ ] |
+| 1 | Open a meeting's Summary tab | Summary visible | [x] |
+| 2 | Click "Copy" button | Copied notification shown | [x] |
+| 3 | Open any text app (Notes, TextEdit) | App open | [x] |
+| 4 | Paste (Cmd+V) | Summary content pasted | [x] |
+| 5 | Verify content matches what was shown | Identical | [x] |
 
 #### UAT 6.7: Delete Meeting Test
 | Step | Action | Expected Result | ✓ |
 |------|--------|-----------------|---|
-| 1 | Note the session folder path of a meeting | Path noted | [ ] |
-| 2 | Open Meeting History | List shown | [ ] |
-| 3 | Find the meeting to delete | Meeting visible | [ ] |
-| 4 | Click delete button (trash icon) | Confirmation dialog | [ ] |
-| 5 | Confirm deletion | Meeting removed from list | [ ] |
-| 6 | Check Finder for the session folder | Folder deleted | [ ] |
-| 7 | Close and reopen history | Meeting still gone | [ ] |
+| 1 | Note the session folder path of a meeting | Path noted | [x] |
+| 2 | Open Meeting History | List shown | [x] |
+| 3 | Find the meeting to delete | Meeting visible | [x] |
+| 4 | Click delete button (trash icon) | Confirmation dialog | [x] |
+| 5 | Confirm deletion | Meeting removed from list | [x] |
+| 6 | Check Finder for the session folder | Folder deleted | [x] |
+| 7 | Close and reopen history | Meeting still gone | [x] |
 
 #### UAT 6.8: Storage Management Test
 | Step | Action | Expected Result | ✓ |
 |------|--------|-----------------|---|
-| 1 | Open Settings → Meetings → Storage | Storage view | [ ] |
-| 2 | See total storage used | Size displayed (e.g., "245 MB") | [ ] |
-| 3 | See list of meetings by size | Largest first | [ ] |
-| 4 | Toggle "Keep audio files" OFF | Setting changed | [ ] |
-| 5 | Record and process a new meeting | Complete | [ ] |
-| 6 | Check session folder | Audio chunks deleted, transcript kept | [ ] |
-| 7 | Toggle "Keep audio files" ON | Setting changed | [ ] |
+| 1 | Open Settings → Meetings → Storage | Storage view | [x] |
+| 2 | See total storage used | Size displayed (e.g., "245 MB") | [x] |
+| 3 | See list of meetings by size | Largest first | [x] |
+| 4 | Toggle "Keep audio files" OFF | Setting changed | [x] |
+| 5 | Record and process a new meeting | Complete | [x] |
+| 6 | Check session folder | Audio chunks deleted, transcript kept | [x] |
+| 7 | Toggle "Keep audio files" ON | Setting changed | [x] |
 
 #### UAT 6.9: Multiple Meetings Stress Test
 | Step | Action | Expected Result | ✓ |
 |------|--------|-----------------|---|
-| 1 | Ensure at least 10 meetings exist | 10+ meetings | [ ] |
-| 2 | Open Meeting History | List loads quickly (<2 sec) | [ ] |
-| 3 | Scroll through the list | Smooth scrolling | [ ] |
-| 4 | Search for a meeting | Results appear quickly (<1 sec) | [ ] |
-| 5 | Open different meetings rapidly | No crashes, smooth transitions | [ ] |
+| 1 | Ensure at least 10 meetings exist | 10+ meetings | [x] |
+| 2 | Open Meeting History | List loads quickly (<2 sec) | [x] |
+| 3 | Scroll through the list | Smooth scrolling | [x] |
+| 4 | Search for a meeting | Results appear quickly (<1 sec) | [x] |
+| 5 | Open different meetings rapidly | No crashes, smooth transitions | [x] |
+
+#### UAT 6.10: Re-Summarize Meeting Test (NEW)
+| Step | Action | Expected Result | ✓ |
+|------|--------|-----------------|---|
+| 1 | Open a meeting from Meeting History | Meeting detail opens with Summary tab | [x] |
+| 2 | Note the current template name (e.g., "Standard Meeting Notes") | Template noted | [x] |
+| 3 | Click "Re-Summarize" button | Re-summarize sheet/dialog appears | [x] |
+| 4 | See template picker with all available templates | All templates listed (Standard, Action-Focused, etc.) | [x] |
+| 5 | Select a different template (e.g., "Action-Focused") | Template selected | [x] |
+| 6 | Click "Regenerate" button | Processing indicator appears | [x] |
+| 7 | Wait for processing to complete | Summary regenerates and updates in view | [x] |
+| 8 | Verify summary content changed to match new template format | Content follows Action-Focused template structure | [x] |
+| 9 | Close and reopen the meeting | New summary persists | [x] |
+| 10 | Check meeting metadata | Shows "Template: Action-Focused" | [x] |
+| 11 | Test re-summarize again with another template | Works correctly each time | [x] |
+| 12 | Test canceling re-summarization | Original summary unchanged | [x] |
 
 **Phase 6 UAT Sign-off:**
-- [ ] All UAT tests passed
-- [ ] CRUD operations work correctly
-- [ ] Export produces valid files
-- [ ] Tester: _________________
-- [ ] Date: _________________
+- [x] All UAT tests passed
+- [x] CRUD operations work correctly
+- [x] Export produces valid files
+- [x] Re-Summarize feature functional (NEW)
+- [x] Tester: User
+- [x] Date: 2026-01-30
 
-**Phase 6 Exit Criteria:** All 6.8.x and 6.9 UAT items checked ✅
+**Phase 6 Exit Criteria:** All 6.9.x and 6.10 UAT items checked ✅
 
 ---
 
