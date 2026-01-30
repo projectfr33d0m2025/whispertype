@@ -1773,6 +1773,20 @@ All remaining tasks verified and working.
 | 4 | Click "Meeting History" link | History opens | [ ] |
 | 5 | Restart app, verify settings persist | Persisted | [ ] |
 
+#### UAT 7.11: Meeting Summary AI Settings Test (New v1.3)
+| Step | Action | Expected Result | ✓ |
+|------|--------|-----------------|---|
+| 1 | **Reset Defaults / Fresh Install Code Path** | | |
+| 2 | Open Settings → Processing | Tab visible | [ ] |
+| 3 | Check "Meeting Summary AI" section | Visible | [ ] |
+| 4 | Verify "Use same as general AI preference" | **Unchecked** (Default) | [ ] |
+| 5 | Verify "Provider" popup | Set to **"Cloud Only"** (Default) | [ ] |
+| 6 | **Persistence Test** | | |
+| 7 | Check "Use same as general AI preference" | Checked | [ ] |
+| 8 | Restart App | Setting persists (Checked) | [ ] |
+| 9 | Uncheck "Use same..." and select "Local Only" | Unchecked, Local Only selected | [ ] |
+| 10 | Restart App | Setting persists (Unchecked, Local Only) | [ ] |
+
 **Phase 7 UAT Sign-off:**
 - [ ] All UAT tests passed
 - [ ] End-to-end flow works completely

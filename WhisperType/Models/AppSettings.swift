@@ -258,7 +258,9 @@ class AppSettings: ObservableObject {
             if let preference = newValue {
                 UserDefaults.standard.set(preference.rawValue, forKey: Constants.UserDefaultsKeys.meetingSummaryLLMPreference)
             } else {
-                UserDefaults.standard.removeObject(forKey: Constants.UserDefaultsKeys.meetingSummaryLLMPreference)
+                // v1.3: Use a sentinel value to explicitly store "Follow Global" preference
+                // This distinguishes it from "Not Set" (which defaults to Cloud Only)
+                UserDefaults.standard.set("follow_global", forKey: Constants.UserDefaultsKeys.meetingSummaryLLMPreference)
             }
             print("AppSettings: Meeting summary LLM preference changed to \(newValue?.rawValue ?? "global")")
         }
@@ -354,12 +356,28 @@ class AppSettings: ObservableObject {
             ?? Constants.Defaults.cloudModel
         
         // Load v1.3 Meeting Summarization LLM Settings
-        if let prefString = defaults.string(forKey: Constants.UserDefaultsKeys.meetingSummaryLLMPreference),
-           let pref = LLMPreference(rawValue: prefString) {
-            self._meetingSummaryLLMPreference = pref
+        // Logic:
+        // 1. If key missing -> Default to .cloudOnly (New Install / v1.3 Upgrade)
+        // 2. If value is "follow_global" -> Set to nil (Use Global)
+        // 3. If value is valid LLMPreference -> Use that value
+        
+        let storedValue = defaults.string(forKey: Constants.UserDefaultsKeys.meetingSummaryLLMPreference)
+        
+        if let storedValue = storedValue {
+            if storedValue == "follow_global" {
+                self._meetingSummaryLLMPreference = nil // Follow Global
+            } else if let pref = LLMPreference(rawValue: storedValue) {
+                self._meetingSummaryLLMPreference = pref
+            } else {
+                // Unknown value, fallback to default
+                self._meetingSummaryLLMPreference = .cloudOnly
+            }
         } else {
-            self._meetingSummaryLLMPreference = nil // Use global preference
+            // Key missing (New Install), default to Cloud Only to save battery
+            self._meetingSummaryLLMPreference = .cloudOnly
         }
+        
+
 
         print("AppSettings: Initialized with active model: \(_activeModelId), processing mode: \(_processingMode.rawValue)")
     }
@@ -389,7 +407,7 @@ class AppSettings: ObservableObject {
         cloudModel = Constants.Defaults.cloudModel
         
         // v1.3 Meeting Summarization Settings
-        meetingSummaryLLMPreference = nil // Reset to use global preference
+        meetingSummaryLLMPreference = .cloudOnly // Default to Cloud Only (v1.3 change)
 
         print("AppSettings: Reset to defaults")
     }
